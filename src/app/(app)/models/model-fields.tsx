@@ -72,7 +72,7 @@ export function ModelFields({
           defaultValue={defaults.depositCents != null ? (defaults.depositCents / 100).toFixed(2) : ""}
           className={inputClass}
         />
-        <span className="text-xs font-normal text-muted">Only used when a deposit is paid</span>
+        <span className="text-xs font-normal text-muted">A deposit makes the payment Pending; if it equals the price the model is marked as paid.</span>
       </label>
       <label className={labelClass}>
         Phase

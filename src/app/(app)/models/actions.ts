@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { clients, models, modelPhase, paymentStatus } from "@/db/schema";
 import { parseEuros } from "@/lib/labels";
+import { derivePayment } from "@/lib/payments";
 import { requireUser } from "@/lib/session";
 
 async function parseModel(formData: FormData, userId: string) {
@@ -23,17 +24,11 @@ async function parseModel(formData: FormData, userId: string) {
   if (!(paymentStatus.enumValues as readonly string[]).includes(payment)) {
     throw new Error("Invalid payment status");
   }
-  // The deposit only exists while the status is "deposit_paid".
-  let depositCents: number | null = null;
-  if (payment === "deposit_paid") {
-    depositCents = parseEuros(String(formData.get("deposit") ?? ""));
-    if (depositCents === null || depositCents <= 0) {
-      throw new Error("Deposit amount must be greater than 0");
-    }
-    if (priceCents !== null && depositCents >= priceCents) {
-      throw new Error("Deposit must be less than the price");
-    }
-  }
+  const { status, depositCents } = derivePayment({
+    status: payment as (typeof paymentStatus.enumValues)[number],
+    depositCents: parseEuros(String(formData.get("deposit") ?? "")),
+    priceCents,
+  });
 
   // The client must belong to the current user.
   const clientId = String(formData.get("clientId") ?? "") || null;
@@ -50,7 +45,7 @@ async function parseModel(formData: FormData, userId: string) {
     company: String(formData.get("company") ?? "").trim() || null,
     clientId,
     priceCents,
-    paymentStatus: payment as (typeof paymentStatus.enumValues)[number],
+    paymentStatus: status,
     depositCents,
     phase: phase as (typeof modelPhase.enumValues)[number],
     requestedDate: String(formData.get("requestedDate") ?? "") || null,
