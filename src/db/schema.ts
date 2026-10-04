@@ -32,6 +32,13 @@ export const modelPhase = pgEnum("model_phase", [
   "finished",
 ]);
 
+// Only one deposit is tracked per model; "paid" means settled in full.
+export const paymentStatus = pgEnum("payment_status", [
+  "none",
+  "deposit_paid",
+  "paid",
+]);
+
 // An accepted quote is converted into a model and deleted, so there is no
 // "accepted" state.
 export const quoteStatus = pgEnum("quote_status", ["open", "rejected"]);
@@ -62,9 +69,19 @@ export const models = pgTable(
     phase: modelPhase("phase").notNull().default("not_started"),
     requestedDate: date("requested_date"),
     estimatedDate: date("estimated_date"),
+    paymentStatus: paymentStatus("payment_status").notNull().default("none"),
+    // Only set while paymentStatus is "deposit_paid". The remaining amount is
+    // never stored: it is priceCents - depositCents.
+    depositCents: integer("deposit_cents"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
-  (t) => [index("models_user_idx").on(t.userId)],
+  (t) => [
+    index("models_user_idx").on(t.userId),
+    check(
+      "models_deposit_consistent",
+      sql`(${t.paymentStatus} = 'deposit_paid' AND ${t.depositCents} IS NOT NULL AND ${t.depositCents} > 0) OR (${t.paymentStatus} <> 'deposit_paid' AND ${t.depositCents} IS NULL)`,
+    ),
+  ],
 );
 
 export const quotes = pgTable(

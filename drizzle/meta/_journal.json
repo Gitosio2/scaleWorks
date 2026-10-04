@@ -57,6 +57,13 @@
       "when": 1791109120571,
       "tag": "0007_cleanup_quote_conversion",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791120134378,
+      "tag": "0008_payment_status",
+      "breakpoints": true
     }
   ]
 }
