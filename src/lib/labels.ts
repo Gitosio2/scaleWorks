@@ -27,7 +27,7 @@ export const supplyStatusLabels = {
 
 export const paymentStatusLabels = {
   none: "No payment",
-  deposit_paid: "Deposit paid",
+  deposit_paid: "Pending",
   paid: "Paid in full",
 } as const;
 
