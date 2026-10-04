@@ -75,7 +75,9 @@ export function SidebarNav() {
     <nav aria-label="Main" className="flex flex-wrap gap-1 md:flex-col">
       {items.map((item) => {
         const active =
-          item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+          item.href === "/"
+            ? pathname === "/"
+            : pathname === item.href || pathname.startsWith(item.href + "/");
         return (
           <Link
             key={item.href}

@@ -1,5 +1,6 @@
 import { SidebarNav } from "@/components/sidebar-nav";
 import { LogoutButton } from "@/components/logout-button";
+import { cardClass, cx } from "@/components/ui/styles";
 import { requireUser } from "@/lib/session";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -18,7 +19,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <span className="text-lg font-bold tracking-tight">scaleWorks</span>
         </div>
         <SidebarNav />
-        <div className="flex flex-col gap-0.5 rounded-[14px] border border-line bg-surface p-3 md:mt-auto">
+        <div className={cx(cardClass, "gap-0.5! p-3! md:mt-auto")}>
           <p className="text-xs text-muted">Signed in as</p>
           <p className="truncate font-semibold">{user.name}</p>
           <LogoutButton />

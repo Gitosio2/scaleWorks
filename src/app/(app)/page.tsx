@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cardClass, cx } from "@/components/ui/styles";
 import { PageHeader } from "@/components/ui/page-header";
 
 const sections = [
@@ -20,7 +21,7 @@ export default function Home() {
           <li key={s.href}>
             <Link
               href={s.href}
-              className="flex h-full flex-col gap-1 rounded-[14px] border border-line bg-surface p-5 hover:border-input-border"
+              className={cx(cardClass, "h-full gap-1! hover:border-input-border")}
             >
               <span className="text-lg font-bold tracking-tight">{s.title}</span>
               <span className="text-muted">{s.text}</span>

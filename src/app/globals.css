@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: light;
   --canvas: #f4f2ee;
   --sidebar: #edeae3;
   --surface: #fbfaf8;
@@ -16,6 +17,19 @@
   --brand-fg: #f7f5f0;
   --danger: #9b3328;
   --danger-line: #e3b7b1;
+  --info: #1d4a85;
+  --info-bg: #dce8f6;
+  --warn: #7c4306;
+  --warn-bg: #fbe7c6;
+  --ok: #11603b;
+  --ok-bg: #d6ede2;
+  --bad: #8e2a20;
+  --bad-bg: #f6d9d5;
+  --mute: #4f4b44;
+  --mute-bg: #e7e3db;
+  --progress: #3b72b8;
+  --progress-done: #2e8b5f;
+  --progress-track: #dad5cb;
 }
 
 @theme inline {
@@ -34,6 +48,19 @@
   --color-brand-fg: var(--brand-fg);
   --color-danger: var(--danger);
   --color-danger-line: var(--danger-line);
+  --color-info: var(--info);
+  --color-info-bg: var(--info-bg);
+  --color-warn: var(--warn);
+  --color-warn-bg: var(--warn-bg);
+  --color-ok: var(--ok);
+  --color-ok-bg: var(--ok-bg);
+  --color-bad: var(--bad);
+  --color-bad-bg: var(--bad-bg);
+  --color-mute: var(--mute);
+  --color-mute-bg: var(--mute-bg);
+  --color-progress: var(--progress);
+  --color-progress-done: var(--progress-done);
+  --color-progress-track: var(--progress-track);
   --font-sans: var(--font-figtree);
 }
 

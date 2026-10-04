@@ -14,7 +14,7 @@ const completed: Record<ModelPhase, number> = {
 
 export function PhaseProgress({ phase }: { phase: ModelPhase }) {
   const done = completed[phase];
-  const fill = phase === "finished" ? "bg-[#2e8b5f]" : "bg-[#3b72b8]";
+  const fill = phase === "finished" ? "bg-progress-done" : "bg-progress";
   return (
     <span
       role="img"
@@ -24,7 +24,7 @@ export function PhaseProgress({ phase }: { phase: ModelPhase }) {
       {Array.from({ length: STEPS }, (_, i) => (
         <span
           key={i}
-          className={`h-[5px] w-[18px] rounded-full ${i < done ? fill : "bg-[#dad5cb]"}`}
+          className={`h-[5px] w-[18px] rounded-full ${i < done ? fill : "bg-progress-track"}`}
         />
       ))}
     </span>

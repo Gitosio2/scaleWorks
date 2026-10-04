@@ -1,4 +1,11 @@
 // Shared class strings so every form control and action looks the same.
+export function cx(...parts: Array<string | false | null | undefined>) {
+  return parts.filter(Boolean).join(" ");
+}
+
+export const cardClass =
+  "flex flex-col gap-4 rounded-[14px] border border-line bg-surface p-5";
+
 export const inputClass =
   "min-h-11 rounded-[10px] border border-input-border bg-input px-3 text-ink placeholder:text-muted";
 

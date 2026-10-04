@@ -1,3 +1,5 @@
+import { cardClass, cx } from "./styles";
+
 export function Card({
   as: Tag = "section",
   className = "",
@@ -7,13 +9,7 @@ export function Card({
   className?: string;
   children: React.ReactNode;
 }) {
-  return (
-    <Tag
-      className={`flex flex-col gap-4 rounded-[14px] border border-line bg-surface p-5 ${className}`}
-    >
-      {children}
-    </Tag>
-  );
+  return <Tag className={cx(cardClass, className)}>{children}</Tag>;
 }
 
 export function CardTitle({ children }: { children: React.ReactNode }) {
