@@ -19,6 +19,7 @@ import {
 } from "@/lib/labels";
 import { requireUser } from "@/lib/session";
 import { addTimeEntry, deleteTimeEntry } from "./actions";
+import { createQuoteFromModel } from "./create-quote-action";
 import {
   removeModelConsumable,
   setModelConsumable,
@@ -107,6 +108,14 @@ export default async function ModelDetailPage({
           Requested: {m.requestedDate ?? "—"} · Estimated:{" "}
           {m.estimatedDate ?? "—"}
         </p>
+        <form action={createQuoteFromModel.bind(null, id)} className="pt-2">
+          <button
+            type="submit"
+            className="rounded border px-3 py-2 text-sm"
+          >
+            Create quote from this model
+          </button>
+        </form>
       </div>
 
       <section className="flex flex-col gap-4">

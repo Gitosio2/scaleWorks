@@ -38,8 +38,6 @@ export const quoteStatus = pgEnum("quote_status", [
   "rejected",
 ]);
 
-export const relationKind = pgEnum("relation_kind", ["same", "similar"]);
-
 // Prices are stored as integer cents to avoid floating-point rounding errors.
 
 export const clients = pgTable("clients", {
@@ -157,21 +155,5 @@ export const timeEntries = pgTable("time_entries", {
   workedOn: date("worked_on").notNull(),
   minutes: integer("minutes").notNull(),
 });
-
-// Links a quote to past models marked as the same or similar.
-export const quoteRelatedModels = pgTable(
-  "quote_related_models",
-  {
-    quoteId: uuid("quote_id")
-      .notNull()
-      .references(() => quotes.id, { onDelete: "cascade" }),
-    modelId: uuid("model_id")
-      .notNull()
-      .references(() => models.id, { onDelete: "cascade" }),
-    kind: relationKind("kind").notNull(),
-    note: text("note"),
-  },
-  (t) => [primaryKey({ columns: [t.quoteId, t.modelId] })],
-);
 
 export * from "./auth-schema";

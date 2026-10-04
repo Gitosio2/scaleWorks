@@ -6,6 +6,7 @@ import { db } from "@/db";
 import { clients, parts, quotes } from "@/db/schema";
 import { formatEuros, quoteStatusLabels } from "@/lib/labels";
 import { requireUser } from "@/lib/session";
+import { convertQuoteToModel } from "./convert-action";
 import {
   addQuotePart,
   deleteQuotePart,
@@ -48,6 +49,14 @@ export default async function QuoteDetailPage({
         <Link href={`/quotes/${id}/edit`} className="text-sm underline">
           Edit quote
         </Link>
+        <form action={convertQuoteToModel.bind(null, id)} className="pt-2">
+          <button
+            type="submit"
+            className="rounded bg-foreground px-3 py-2 text-sm text-background"
+          >
+            Accept and convert to model
+          </button>
+        </form>
       </div>
 
       <PartsSection

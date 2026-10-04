@@ -43,6 +43,13 @@
       "when": 1790791567826,
       "tag": "0005_model_consumable_quantity",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791107722791,
+      "tag": "0006_drop_quote_related_models",
+      "breakpoints": true
     }
   ]
 }
