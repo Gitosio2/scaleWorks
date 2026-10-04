@@ -32,11 +32,9 @@ export const modelPhase = pgEnum("model_phase", [
   "finished",
 ]);
 
-export const quoteStatus = pgEnum("quote_status", [
-  "open",
-  "accepted",
-  "rejected",
-]);
+// An accepted quote is converted into a model and deleted, so there is no
+// "accepted" state.
+export const quoteStatus = pgEnum("quote_status", ["open", "rejected"]);
 
 // Prices are stored as integer cents to avoid floating-point rounding errors.
 
@@ -80,10 +78,6 @@ export const quotes = pgTable(
     title: text("title").notNull(),
     priceCents: integer("price_cents"),
     status: quoteStatus("status").notNull().default("open"),
-    // Set when the quote is converted into a model.
-    convertedModelId: uuid("converted_model_id").references(() => models.id, {
-      onDelete: "set null",
-    }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
   (t) => [index("quotes_user_idx").on(t.userId)],

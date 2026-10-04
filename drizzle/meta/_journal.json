@@ -50,6 +50,13 @@
       "when": 1791107722791,
       "tag": "0006_drop_quote_related_models",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791109120571,
+      "tag": "0007_cleanup_quote_conversion",
+      "breakpoints": true
     }
   ]
 }

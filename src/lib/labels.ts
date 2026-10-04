@@ -14,7 +14,6 @@ export const phaseLabels: Record<ModelPhase, string> = {
 
 export const quoteStatusLabels = {
   open: "Open",
-  accepted: "Accepted",
   rejected: "Rejected",
 } as const;
 
