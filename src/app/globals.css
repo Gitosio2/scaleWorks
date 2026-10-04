@@ -1,26 +1,76 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+  --canvas: #f4f2ee;
+  --sidebar: #edeae3;
+  --surface: #fbfaf8;
+  --line: #e4e0d8;
+  --line-soft: #ece8e0;
+  --input-border: #d6d1c6;
+  --input-bg: #ffffff;
+  --ink: #2b2a27;
+  --ink-2: #4a4640;
+  --muted: #6a665e;
+  --brand: #3e5e58;
+  --brand-hover: #274540;
+  --brand-fg: #f7f5f0;
+  --danger: #9b3328;
+  --danger-line: #e3b7b1;
+  --info: #1d4a85;
+  --info-bg: #dce8f6;
+  --warn: #7c4306;
+  --warn-bg: #fbe7c6;
+  --ok: #11603b;
+  --ok-bg: #d6ede2;
+  --bad: #8e2a20;
+  --bad-bg: #f6d9d5;
+  --mute: #4f4b44;
+  --mute-bg: #e7e3db;
+  --progress: #3b72b8;
+  --progress-done: #2e8b5f;
+  --progress-track: #dad5cb;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-canvas: var(--canvas);
+  --color-sidebar: var(--sidebar);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+  --color-input-border: var(--input-border);
+  --color-input: var(--input-bg);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-fg: var(--brand-fg);
+  --color-danger: var(--danger);
+  --color-danger-line: var(--danger-line);
+  --color-info: var(--info);
+  --color-info-bg: var(--info-bg);
+  --color-warn: var(--warn);
+  --color-warn-bg: var(--warn-bg);
+  --color-ok: var(--ok);
+  --color-ok-bg: var(--ok-bg);
+  --color-bad: var(--bad);
+  --color-bad-bg: var(--bad-bg);
+  --color-mute: var(--mute);
+  --color-mute-bg: var(--mute-bg);
+  --color-progress: var(--progress);
+  --color-progress-done: var(--progress-done);
+  --color-progress-track: var(--progress-track);
+  --font-sans: var(--font-figtree);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-figtree), system-ui, sans-serif;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
 }

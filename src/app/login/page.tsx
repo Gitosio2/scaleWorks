@@ -3,6 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { Card } from "@/components/ui/card";
+import {
+  cx,
+  inputClass,
+  labelClass,
+  linkActionClass,
+  primaryButtonClass,
+} from "@/components/ui/styles";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -37,52 +45,76 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex flex-1 items-center justify-center p-8">
-      <form onSubmit={onSubmit} className="flex w-full max-w-sm flex-col gap-4">
-        <h1 className="text-2xl font-semibold">
-          {mode === "signin" ? "Sign in" : "Create account"}
-        </h1>
-        {mode === "signup" && (
-          <input
-            name="name"
-            placeholder="Name"
-            required
-            className="rounded border px-3 py-2"
-          />
-        )}
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          required
-          className="rounded border px-3 py-2"
-        />
-        <input
-          name="password"
-          type="password"
-          placeholder="Password (min. 8 characters)"
-          required
-          minLength={8}
-          className="rounded border px-3 py-2"
-        />
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded bg-foreground px-3 py-2 text-background disabled:opacity-50"
-        >
-          {mode === "signin" ? "Sign in" : "Sign up"}
-        </button>
-        <button
-          type="button"
-          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          className="text-sm underline"
-        >
-          {mode === "signin"
-            ? "No account? Create one"
-            : "Already have an account? Sign in"}
-        </button>
-      </form>
+    <main className="flex flex-1 items-center justify-center bg-canvas p-4">
+      <Card as="div" className="w-full max-w-[400px] p-6!">
+        <form onSubmit={onSubmit} className="flex flex-col gap-4">
+          <div className="flex items-center gap-2.5">
+            <span
+              aria-hidden
+              className="flex size-8 items-center justify-center rounded-[9px] bg-brand font-bold text-brand-fg"
+            >
+              S
+            </span>
+            <span className="text-lg font-bold tracking-tight">scaleWorks</span>
+          </div>
+          <h1 className="text-[28px] font-bold leading-tight tracking-tight">
+            {mode === "signin" ? "Sign in" : "Create account"}
+          </h1>
+          {mode === "signup" && (
+            <label className={labelClass}>
+              Name
+              <input
+                name="name"
+                placeholder="Name"
+                required
+                className={cx(inputClass, "text-base font-normal")}
+              />
+            </label>
+          )}
+          <label className={labelClass}>
+            Email
+            <input
+              name="email"
+              type="email"
+              placeholder="Email"
+              required
+              className={cx(inputClass, "text-base font-normal")}
+            />
+          </label>
+          <label className={labelClass}>
+            Password
+            <input
+              name="password"
+              type="password"
+              placeholder="Password (min. 8 characters)"
+              required
+              minLength={8}
+              className={cx(inputClass, "text-base font-normal")}
+            />
+          </label>
+          {error && (
+            <p role="alert" className="text-sm font-semibold text-danger">
+              {error}
+            </p>
+          )}
+          <button
+            type="submit"
+            disabled={pending}
+            className={cx(primaryButtonClass, "w-full")}
+          >
+            {mode === "signin" ? "Sign in" : "Sign up"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+            className={cx(linkActionClass, "justify-center")}
+          >
+            {mode === "signin"
+              ? "No account? Create one"
+              : "Already have an account? Sign in"}
+          </button>
+        </form>
+      </Card>
     </main>
   );
 }
