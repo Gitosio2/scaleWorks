@@ -1,26 +1,49 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --canvas: #f4f2ee;
+  --sidebar: #edeae3;
+  --surface: #fbfaf8;
+  --line: #e4e0d8;
+  --line-soft: #ece8e0;
+  --input-border: #d6d1c6;
+  --input-bg: #ffffff;
+  --ink: #2b2a27;
+  --ink-2: #4a4640;
+  --muted: #6a665e;
+  --brand: #3e5e58;
+  --brand-hover: #274540;
+  --brand-fg: #f7f5f0;
+  --danger: #9b3328;
+  --danger-line: #e3b7b1;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-canvas: var(--canvas);
+  --color-sidebar: var(--sidebar);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+  --color-input-border: var(--input-border);
+  --color-input: var(--input-bg);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-fg: var(--brand-fg);
+  --color-danger: var(--danger);
+  --color-danger-line: var(--danger-line);
+  --font-sans: var(--font-figtree);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-figtree), system-ui, sans-serif;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
 }

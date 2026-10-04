@@ -36,47 +36,65 @@ export default function LoginPage() {
     router.refresh();
   }
 
+  const field = "flex flex-col gap-1.5 text-[13px] font-semibold text-ink-2";
+  const input =
+    "min-h-11 rounded-[10px] border border-input-border bg-input px-3 text-base font-normal text-ink";
+
   return (
-    <main className="flex flex-1 items-center justify-center p-8">
-      <form onSubmit={onSubmit} className="flex w-full max-w-sm flex-col gap-4">
-        <h1 className="text-2xl font-semibold">
+    <main className="flex flex-1 items-center justify-center bg-canvas p-4">
+      <form
+        onSubmit={onSubmit}
+        className="flex w-full max-w-[400px] flex-col gap-4 rounded-[14px] border border-line bg-surface p-6"
+      >
+        <div className="flex items-center gap-2.5">
+          <span
+            aria-hidden
+            className="flex size-8 items-center justify-center rounded-[9px] bg-brand font-bold text-brand-fg"
+          >
+            S
+          </span>
+          <span className="text-lg font-bold tracking-tight">scaleWorks</span>
+        </div>
+        <h1 className="text-[28px] font-bold leading-tight tracking-tight">
           {mode === "signin" ? "Sign in" : "Create account"}
         </h1>
         {mode === "signup" && (
-          <input
-            name="name"
-            placeholder="Name"
-            required
-            className="rounded border px-3 py-2"
-          />
+          <label className={field}>
+            Name
+            <input name="name" placeholder="Name" required className={input} />
+          </label>
         )}
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          required
-          className="rounded border px-3 py-2"
-        />
-        <input
-          name="password"
-          type="password"
-          placeholder="Password (min. 8 characters)"
-          required
-          minLength={8}
-          className="rounded border px-3 py-2"
-        />
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        <label className={field}>
+          Email
+          <input name="email" type="email" placeholder="Email" required className={input} />
+        </label>
+        <label className={field}>
+          Password
+          <input
+            name="password"
+            type="password"
+            placeholder="Password (min. 8 characters)"
+            required
+            minLength={8}
+            className={input}
+          />
+        </label>
+        {error && (
+          <p role="alert" className="text-sm font-semibold text-danger">
+            {error}
+          </p>
+        )}
         <button
           type="submit"
           disabled={pending}
-          className="rounded bg-foreground px-3 py-2 text-background disabled:opacity-50"
+          className="inline-flex min-h-11 w-full cursor-pointer items-center justify-center rounded-[10px] bg-brand px-[18px] font-semibold text-brand-fg hover:bg-brand-hover disabled:opacity-50"
         >
           {mode === "signin" ? "Sign in" : "Sign up"}
         </button>
         <button
           type="button"
           onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          className="text-sm underline"
+          className="min-h-11 cursor-pointer text-sm font-semibold text-brand hover:text-brand-hover"
         >
           {mode === "signin"
             ? "No account? Create one"
