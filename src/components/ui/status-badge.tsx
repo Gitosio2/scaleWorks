@@ -1,4 +1,11 @@
-import { phaseLabels, type ModelPhase } from "@/lib/labels";
+import {
+  formatEuros,
+  paymentStatusLabels,
+  phaseLabels,
+  remainingCents,
+  type ModelPhase,
+  type PaymentStatus,
+} from "@/lib/labels";
 
 export type BadgeVariant = "info" | "warn" | "ok" | "bad" | "mute";
 
@@ -45,4 +52,30 @@ export function phaseVariant(phase: ModelPhase): BadgeVariant {
 
 export function PhaseBadge({ phase }: { phase: ModelPhase }) {
   return <StatusBadge variant={phaseVariant(phase)}>{phaseLabels[phase]}</StatusBadge>;
+}
+
+export function paymentVariant(status: PaymentStatus): BadgeVariant {
+  return status === "paid" ? "ok" : status === "deposit_paid" ? "warn" : "mute";
+}
+
+// Badge plus, for a paid deposit, what is still owed.
+export function PaymentBadge({
+  status,
+  priceCents,
+  depositCents,
+}: {
+  status: PaymentStatus;
+  priceCents: number | null;
+  depositCents: number | null;
+}) {
+  return (
+    <span className="inline-flex flex-wrap items-center gap-2">
+      <StatusBadge variant={paymentVariant(status)}>{paymentStatusLabels[status]}</StatusBadge>
+      {status === "deposit_paid" && (
+        <span className="text-[13px] text-ink-2">
+          Remaining {formatEuros(remainingCents(priceCents, depositCents))}
+        </span>
+      )}
+    </span>
+  );
 }

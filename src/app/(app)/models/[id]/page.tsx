@@ -14,6 +14,7 @@ import {
   formatDuration,
   formatEuros,
   formatQuantity,
+  remainingCents,
   supplyStatusLabels,
 } from "@/lib/labels";
 import { requireUser } from "@/lib/session";
@@ -28,7 +29,7 @@ import { addPart, deletePart, updatePartStatus } from "./part-actions";
 import { Card, CardTitle } from "@/components/ui/card";
 import { BackLink, PageHeader } from "@/components/ui/page-header";
 import { PhaseProgress } from "@/components/ui/phase-progress";
-import { PhaseBadge, StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
+import { PaymentBadge, PhaseBadge, StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
 import {
   dangerActionClass,
   inputClass,
@@ -116,12 +117,20 @@ export default async function ModelDetailPage({
             {" · "}
             {formatEuros(m.priceCents)}
             <br />
+            {m.paymentStatus === "deposit_paid" && (
+              <>
+                Deposit: {formatEuros(m.depositCents)} · Remaining:{" "}
+                {formatEuros(remainingCents(m.priceCents, m.depositCents))}
+                <br />
+              </>
+            )}
             Requested: {m.requestedDate ?? "—"} · Estimated: {m.estimatedDate ?? "—"}
           </>
         }
         action={
           <div className="flex flex-col items-start gap-2 sm:items-end">
             <PhaseBadge phase={m.phase} />
+            <PaymentBadge status={m.paymentStatus} priceCents={m.priceCents} depositCents={m.depositCents} />
             <PhaseProgress phase={m.phase} />
             <form action={createQuoteFromModel.bind(null, id)}>
               <button type="submit" className={secondaryButtonClass}>

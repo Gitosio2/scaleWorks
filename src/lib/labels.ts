@@ -1,6 +1,8 @@
-import type { modelPhase } from "@/db/schema";
+import type { modelPhase, paymentStatus } from "@/db/schema";
 
 export type ModelPhase = (typeof modelPhase.enumValues)[number];
+
+export type PaymentStatus = (typeof paymentStatus.enumValues)[number];
 
 export const phaseLabels: Record<ModelPhase, string> = {
   not_started: "Not started",
@@ -22,6 +24,20 @@ export const supplyStatusLabels = {
   ordered: "Ordered",
   in_hand: "In hand",
 } as const;
+
+export const paymentStatusLabels = {
+  none: "No payment",
+  deposit_paid: "Deposit paid",
+  paid: "Paid in full",
+} as const;
+
+// Remaining = price - deposit. Null when the price is unknown.
+export function remainingCents(
+  priceCents: number | null,
+  depositCents: number | null,
+) {
+  return priceCents === null ? null : priceCents - (depositCents ?? 0);
+}
 
 // "12,50" or "12.5" -> 1250 (cents). Empty -> null. Invalid -> throws.
 export function parseEuros(raw: string) {

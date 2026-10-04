@@ -4,7 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
-import { clients, models, modelPhase } from "@/db/schema";
+import { clients, models, modelPhase, paymentStatus } from "@/db/schema";
 import { parseEuros } from "@/lib/labels";
 import { requireUser } from "@/lib/session";
 
@@ -18,6 +18,22 @@ async function parseModel(formData: FormData, userId: string) {
   }
 
   const priceCents = parseEuros(String(formData.get("price") ?? ""));
+
+  const payment = String(formData.get("paymentStatus") ?? "none");
+  if (!(paymentStatus.enumValues as readonly string[]).includes(payment)) {
+    throw new Error("Invalid payment status");
+  }
+  // The deposit only exists while the status is "deposit_paid".
+  let depositCents: number | null = null;
+  if (payment === "deposit_paid") {
+    depositCents = parseEuros(String(formData.get("deposit") ?? ""));
+    if (depositCents === null || depositCents <= 0) {
+      throw new Error("Deposit amount must be greater than 0");
+    }
+    if (priceCents !== null && depositCents >= priceCents) {
+      throw new Error("Deposit must be less than the price");
+    }
+  }
 
   // The client must belong to the current user.
   const clientId = String(formData.get("clientId") ?? "") || null;
@@ -34,6 +50,8 @@ async function parseModel(formData: FormData, userId: string) {
     company: String(formData.get("company") ?? "").trim() || null,
     clientId,
     priceCents,
+    paymentStatus: payment as (typeof paymentStatus.enumValues)[number],
+    depositCents,
     phase: phase as (typeof modelPhase.enumValues)[number],
     requestedDate: String(formData.get("requestedDate") ?? "") || null,
     estimatedDate: String(formData.get("estimatedDate") ?? "") || null,

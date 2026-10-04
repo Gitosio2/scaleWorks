@@ -1,5 +1,5 @@
-import { modelPhase } from "@/db/schema";
-import { phaseLabels } from "@/lib/labels";
+import { modelPhase, paymentStatus } from "@/db/schema";
+import { paymentStatusLabels, phaseLabels } from "@/lib/labels";
 import { inputClass, labelClass } from "@/components/ui/styles";
 
 type Defaults = {
@@ -8,6 +8,8 @@ type Defaults = {
   clientId?: string | null;
   priceCents?: number | null;
   phase?: (typeof modelPhase.enumValues)[number];
+  paymentStatus?: (typeof paymentStatus.enumValues)[number];
+  depositCents?: number | null;
   requestedDate?: string | null;
   estimatedDate?: string | null;
 };
@@ -52,6 +54,25 @@ export function ModelFields({
           defaultValue={defaults.priceCents != null ? (defaults.priceCents / 100).toFixed(2) : ""}
           className={inputClass}
         />
+      </label>
+      <label className={labelClass}>
+        Payment status
+        <select name="paymentStatus" defaultValue={defaults.paymentStatus ?? "none"} className={inputClass}>
+          {paymentStatus.enumValues.map((p) => (
+            <option key={p} value={p}>{paymentStatusLabels[p]}</option>
+          ))}
+        </select>
+      </label>
+      <label className={labelClass}>
+        Deposit (€)
+        <input
+          name="deposit"
+          inputMode="decimal"
+          placeholder="0,00"
+          defaultValue={defaults.depositCents != null ? (defaults.depositCents / 100).toFixed(2) : ""}
+          className={inputClass}
+        />
+        <span className="text-xs font-normal text-muted">Only used when a deposit is paid</span>
       </label>
       <label className={labelClass}>
         Phase

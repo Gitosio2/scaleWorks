@@ -7,7 +7,7 @@ import { requireUser } from "@/lib/session";
 import { Card, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { PhaseProgress } from "@/components/ui/phase-progress";
-import { PhaseBadge } from "@/components/ui/status-badge";
+import { PaymentBadge, PhaseBadge } from "@/components/ui/status-badge";
 import {
   dangerActionClass,
   linkActionClass,
@@ -68,6 +68,7 @@ export default async function ModelsPage() {
               <div className="flex flex-wrap items-center gap-3">
                 <div className="flex flex-col items-start gap-2">
                   <PhaseBadge phase={m.phase} />
+                  <PaymentBadge status={m.paymentStatus} priceCents={m.priceCents} depositCents={m.depositCents} />
                   <PhaseProgress phase={m.phase} />
                 </div>
                 <Link href={`/models/${m.id}/edit`} className={linkActionClass}>Edit</Link>
