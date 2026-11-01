@@ -69,8 +69,10 @@ export const models = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     userId: text("user_id").notNull(),
+    // RESTRICT: a client with models cannot be deleted, even by a concurrent
+    // request that slips past the application-level check.
     clientId: uuid("client_id").references(() => clients.id, {
-      onDelete: "set null",
+      onDelete: "restrict",
     }),
     name: text("name").notNull(),
     // Company of the real-world subject (e.g. an airline or car brand).
@@ -100,7 +102,7 @@ export const quotes = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     userId: text("user_id").notNull(),
     clientId: uuid("client_id").references(() => clients.id, {
-      onDelete: "set null",
+      onDelete: "restrict",
     }),
     title: text("title").notNull(),
     priceCents: integer("price_cents"),
