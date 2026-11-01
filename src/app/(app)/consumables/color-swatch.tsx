@@ -12,13 +12,16 @@ export function ColorSwatch({
   const t = useTranslations("consumables");
   const color = colorHex ?? ralHex(reference);
   if (!color) return null;
+  // An SVG fill is a presentation attribute, not an inline style, so it works
+  // under the CSP (which forbids style attributes) for any color.
   return (
-    <span
+    <svg
       role="img"
       aria-label={t("colorSwatch", { color: color.toUpperCase() })}
-      title={color.toUpperCase()}
-      style={{ backgroundColor: color }}
-      className="size-11 shrink-0 self-center rounded-[10px] border border-line"
-    />
+      className="size-11 shrink-0 self-center overflow-hidden rounded-[10px] border border-line"
+    >
+      <title>{color.toUpperCase()}</title>
+      <rect width="100%" height="100%" fill={color} />
+    </svg>
   );
 }
