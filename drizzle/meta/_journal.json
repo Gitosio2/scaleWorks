@@ -64,6 +64,20 @@
       "when": 1791120134378,
       "tag": "0008_payment_status",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793546848363,
+      "tag": "0009_consumable_category",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1793549795075,
+      "tag": "0010_consumable_color",
+      "breakpoints": true
     }
   ]
 }

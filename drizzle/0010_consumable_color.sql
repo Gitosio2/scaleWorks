@@ -1,0 +1,1 @@
+ALTER TABLE "consumables" ADD COLUMN "color_hex" text;

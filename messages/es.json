@@ -36,6 +36,8 @@
     "search": "Buscar",
     "sortBy": "Ordenar por",
     "status": "Estado",
+    "category": "Categoría",
+    "color": "Color",
     "description": "Descripción",
     "brand": "Marca",
     "reference": "Referencia",
@@ -85,6 +87,12 @@
     "ordered": "Pedido",
     "in_hand": "En mano"
   },
+  "consumableCategory": {
+    "paint": "Pinturas, barnices y sprays",
+    "tools": "Herramientas",
+    "glue": "Pegamentos",
+    "other": "Otros"
+  },
   "paymentStatus": {
     "none": "Sin pago",
     "deposit_paid": "Pendiente",
@@ -127,9 +135,12 @@
   "consumables": {
     "subtitle": "Pinturas, pegamentos y otros materiales.",
     "add": "Añadir consumible",
-    "back": "← Consumibles",
     "editTitle": "Editar consumible",
     "referencePlaceholder": "Referencia (opcional)",
+    "colorFromRal": "Detectado del código RAL en Referencia",
+    "colorHint": "Elige un color o escribe un código RAL en Referencia",
+    "colorClear": "Quitar color",
+    "colorSwatch": "Color {color}",
     "searchPlaceholder": "Descripción, referencia o tienda",
     "empty": "Aún no hay consumibles.",
     "emptyFiltered": "Ningún consumible coincide con estos filtros.",
@@ -138,7 +149,8 @@
       "store": "Tienda (A–Z)",
       "price_desc": "Precio (de mayor a menor)",
       "price_asc": "Precio (de menor a mayor)",
-      "status": "Estado"
+      "status": "Estado",
+      "category": "Categoría"
     }
   },
   "models": {
@@ -235,6 +247,8 @@
     "titleRequired": "El título es obligatorio",
     "descriptionRequired": "La descripción es obligatoria",
     "invalidStatus": "Estado no válido",
+    "invalidCategory": "Categoría no válida",
+    "invalidColor": "Color no válido",
     "invalidPhase": "Fase no válida",
     "invalidPaymentStatus": "Estado de pago no válido",
     "invalidLink": "Enlace no válido",

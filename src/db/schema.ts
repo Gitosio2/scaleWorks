@@ -22,6 +22,14 @@ export const supplyStatus = pgEnum("supply_status", [
   "in_hand",
 ]);
 
+// Stable keys only; labels live in messages/*.json under "consumableCategory".
+export const consumableCategory = pgEnum("consumable_category", [
+  "paint",
+  "tools",
+  "glue",
+  "other",
+]);
+
 export const modelPhase = pgEnum("model_phase", [
   "not_started",
   "pending_decal_design",
@@ -138,6 +146,9 @@ export const consumables = pgTable("consumables", {
   priceCents: integer("price_cents"),
   reference: text("reference"),
   status: supplyStatus("status").notNull().default("to_order"),
+  category: consumableCategory("category").notNull().default("other"),
+  // Manual color as "#rrggbb"; when null the swatch falls back to a RAL code in `reference`.
+  colorHex: text("color_hex"),
 });
 
 // Many-to-many: which consumables were used on which model.

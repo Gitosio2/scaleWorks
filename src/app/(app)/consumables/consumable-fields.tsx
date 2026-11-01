@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
-import { supplyStatus } from "@/db/schema";
+import { consumableCategory, supplyStatus } from "@/db/schema";
 import { inputClass, labelClass } from "@/components/ui/styles";
+import { ColorField } from "./color-field";
 
 type Defaults = {
   description?: string;
@@ -8,17 +9,28 @@ type Defaults = {
   reference?: string | null;
   priceCents?: number | null;
   status?: (typeof supplyStatus.enumValues)[number];
+  category?: (typeof consumableCategory.enumValues)[number];
+  colorHex?: string | null;
 };
 
 export function ConsumableFields({ defaults = {} }: { defaults?: Defaults }) {
   const t = useTranslations("consumables");
   const tc = useTranslations("common");
   const ts = useTranslations("supplyStatus");
+  const tcat = useTranslations("consumableCategory");
   return (
     <>
       <label className={labelClass}>
         {tc("description")}
         <input name="description" placeholder={tc("description")} required defaultValue={defaults.description} className={inputClass} />
+      </label>
+      <label className={labelClass}>
+        {tc("category")}
+        <select name="category" defaultValue={defaults.category ?? "other"} className={inputClass}>
+          {consumableCategory.enumValues.map((c) => (
+            <option key={c} value={c}>{tcat(c)}</option>
+          ))}
+        </select>
       </label>
       <div className="flex flex-wrap gap-3">
         <label className={`${labelClass} min-w-40 flex-1`}>
@@ -30,6 +42,11 @@ export function ConsumableFields({ defaults = {} }: { defaults?: Defaults }) {
           <input name="reference" placeholder={t("referencePlaceholder")} defaultValue={defaults.reference ?? ""} className={inputClass} />
         </label>
       </div>
+      <ColorField
+        defaultColor={defaults.colorHex}
+        defaultReference={defaults.reference}
+        defaultCategory={defaults.category ?? "other"}
+      />
       <label className={labelClass}>
         {tc("price")}
         <input
