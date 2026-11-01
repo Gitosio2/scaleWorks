@@ -1,9 +1,9 @@
 "use client";
 
 import Form from "next/form";
-import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
+import { RESET_PARAM } from "@/lib/filter-reset";
 import { inputClass, labelClass, secondaryButtonClass } from "./styles";
 
 const TYPING_DEBOUNCE_MS = 400;
@@ -39,7 +39,6 @@ export function ListFilters({
   children: React.ReactNode;
 }) {
   const t = useTranslations("common");
-  const router = useRouter();
   const typingTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => () => clearTimeout(typingTimer.current), []);
@@ -52,13 +51,6 @@ export function ListFilters({
     } else {
       form.requestSubmit();
     }
-  }
-
-  function reset(e: React.MouseEvent<HTMLButtonElement>) {
-    clearTimeout(typingTimer.current);
-    // Drops unsubmitted edits; the URL change then syncs the fields to the defaults.
-    e.currentTarget.form?.reset();
-    router.replace(action);
   }
 
   return (
@@ -92,9 +84,10 @@ export function ListFilters({
       >
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{children}</div>
         <div className="flex flex-wrap justify-end gap-2">
-          <button type="button" onClick={reset} className={secondaryButtonClass}>
+          {/* A plain link, not a script: the page is loaded afresh, so the fields and the list always come back at their initial state. */}
+          <a href={`${action}?${RESET_PARAM}=1`} className={secondaryButtonClass}>
             {t("reset")}
-          </button>
+          </a>
         </div>
       </Form>
     </details>
