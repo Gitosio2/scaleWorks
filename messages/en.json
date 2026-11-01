@@ -169,7 +169,8 @@
     "staleHint": "Not started for over 7 months",
     "staleAge": "{months, plural, one {# month} other {# months}}",
     "andMore": "and {count} more",
-    "activeToCollect": "Still to collect on active work"
+    "activeToCollect": "Still to collect on active work",
+    "notStartedToCollect": "Still to collect on models not started yet"
   },
   "parts": {
     "title": "Parts: {total}",

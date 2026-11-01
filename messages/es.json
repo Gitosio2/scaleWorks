@@ -169,7 +169,8 @@
     "staleHint": "Sin empezar desde hace más de 7 meses",
     "staleAge": "{months, plural, one {# mes} other {# meses}}",
     "andMore": "y {count} más",
-    "activeToCollect": "Pendiente de cobro de los trabajos en activo"
+    "activeToCollect": "Pendiente de cobro de los trabajos en activo",
+    "notStartedToCollect": "Pendiente de cobro de maquetas sin empezar"
   },
   "parts": {
     "title": "Piezas: {total}",

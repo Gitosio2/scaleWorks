@@ -91,6 +91,10 @@ export default async function Home() {
         // models not paid in full. This is the money still to be received.
         activeToCollectCents: sql<number>`coalesce(sum(${models.priceCents} - coalesce(${models.depositCents}, 0)) filter (where ${ACTIVE} and ${models.paymentStatus} <> 'paid' and ${models.priceCents} is not null), 0)::int`,
         finishedCount: sql<number>`count(*) filter (where ${models.phase} = 'finished')::int`,
+        // Priced models not started yet and not paid in full (e.g. a converted quote).
+        // They are neither active nor finished, so without this figure they would be
+        // missing from both cards.
+        notStartedToCollectCents: sql<number>`coalesce(sum(${models.priceCents} - coalesce(${models.depositCents}, 0)) filter (where ${models.phase} = 'not_started' and ${models.paymentStatus} <> 'paid' and ${models.priceCents} is not null), 0)::int`,
         // Finished models not paid in full, with a price: price minus any deposit. The
         // ones still in progress are counted on the active work card instead.
         pendingCount: sql<number>`count(*) filter (where ${models.phase} = 'finished' and ${models.paymentStatus} <> 'paid' and ${models.priceCents} is not null)::int`,
@@ -189,6 +193,13 @@ export default async function Home() {
               valueClass={stats.activeToCollectCents > 0 ? "text-warn" : ""}
               label={t("activeToCollect")}
             />
+            {stats.notStartedToCollectCents > 0 && (
+              <Stat
+                value={formatEuros(stats.notStartedToCollectCents, locale)}
+                valueClass="text-warn"
+                label={t("notStartedToCollect")}
+              />
+            )}
           </div>
           <div>
             <h3 className="text-[13px] font-semibold text-ink-2">{t("deadlinesTitle")}</h3>
