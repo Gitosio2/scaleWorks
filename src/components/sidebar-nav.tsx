@@ -92,7 +92,7 @@ export function SidebarNav() {
             }`}
           >
             {item.icon}
-            {item.label}
+            {t(item.label)}
           </Link>
         );
       })}
