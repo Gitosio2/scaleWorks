@@ -4,6 +4,7 @@ import Form from "next/form";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
+import { RESET_PARAM } from "@/lib/filter-reset";
 import { inputClass, labelClass, secondaryButtonClass } from "./styles";
 
 const TYPING_DEBOUNCE_MS = 400;
@@ -58,7 +59,8 @@ export function ListFilters({
     clearTimeout(typingTimer.current);
     // Drops unsubmitted edits; the URL change then syncs the fields to the defaults.
     e.currentTarget.form?.reset();
-    router.replace(action);
+    // The proxy remembers the last filters of each list; this forgets them.
+    router.replace(`${action}?${RESET_PARAM}=1`);
   }
 
   return (

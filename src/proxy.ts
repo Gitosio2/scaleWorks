@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
+import { restoreFilters, saveFilters } from "@/lib/saved-filters";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -45,6 +46,9 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
+  const restored = restoreFilters(request);
+  if (restored) return restored;
+
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const csp = contentSecurityPolicy(nonce);
 
@@ -56,6 +60,7 @@ export function proxy(request: NextRequest) {
 
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set("Content-Security-Policy", csp);
+  saveFilters(request, response);
   return response;
 }
 
