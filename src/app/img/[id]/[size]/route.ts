@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { modelImages, models } from "@/db/schema";
+import { modelImages, models, user } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { getObject } from "@/lib/storage";
 
@@ -30,15 +30,25 @@ export async function GET(
       key: modelImages.key,
       thumbKey: modelImages.thumbKey,
       ownerId: modelImages.userId,
+      ownerEmail: user.email,
       published: models.published,
       phase: models.phase,
     })
     .from(modelImages)
     .innerJoin(models, eq(models.id, modelImages.modelId))
+    .innerJoin(user, eq(user.id, modelImages.userId))
     .where(eq(modelImages.id, id));
   if (!image) return notFound();
 
-  const isPublic = image.published && image.phase === "finished";
+  // Public only for the gallery's account (PORTFOLIO_EMAIL), like the gallery
+  // pages: sign-up is open, so any other account's photos must never be served
+  // anonymously from this domain.
+  const galleryEmail = process.env.PORTFOLIO_EMAIL?.trim().toLowerCase();
+  const isPublic =
+    image.published &&
+    image.phase === "finished" &&
+    !!galleryEmail &&
+    image.ownerEmail.toLowerCase() === galleryEmail;
   if (!isPublic) {
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session || session.user.id !== image.ownerId) return notFound();

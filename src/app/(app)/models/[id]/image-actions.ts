@@ -83,7 +83,13 @@ export async function addModelImage(modelId: string, formData: FormData) {
       userId: user.id,
       key,
       thumbKey,
-      position: count,
+      // Next free position, read in the same statement so two uploads at once
+      // do not get the same one (the cover is the lowest position).
+      position: sql`(
+        select coalesce(max(${modelImages.position}) + 1, 0)
+        from ${modelImages}
+        where ${modelImages.modelId} = ${modelId}
+      )`,
     });
   } catch (error) {
     await deleteObjects([key, thumbKey]);

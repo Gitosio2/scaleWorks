@@ -88,7 +88,14 @@ export async function deleteModel(id: string) {
   await db
     .delete(models)
     .where(and(eq(models.id, id), eq(models.userId, user.id)));
-  await deleteObjects(images.flatMap((i) => [i.key, i.thumbKey]));
+  // The model is already gone, so a storage failure must not fail the action or
+  // skip the revalidation: log the keys so the files can be removed by hand.
+  const keys = images.flatMap((i) => [i.key, i.thumbKey]);
+  try {
+    await deleteObjects(keys);
+  } catch (error) {
+    console.error("Stored photos of a deleted model could not be removed:", keys, error);
+  }
   revalidatePath("/models");
   revalidatePath("/portfolio");
 }
