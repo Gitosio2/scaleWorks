@@ -77,6 +77,37 @@ export function DeleteIconButton({ label }: { label: string }) {
   );
 }
 
+// Non-submit variant of the trash, for triggers that open a confirmation. When
+// `blocked` is set it stays visible but inert, and the reason is the tooltip.
+export function TrashIconButton({
+  label,
+  onClick,
+  blocked,
+}: {
+  label: string;
+  onClick: () => void;
+  blocked?: string;
+}) {
+  const text = blocked ?? label;
+  return (
+    <button
+      type="button"
+      onClick={blocked ? undefined : onClick}
+      aria-haspopup={blocked ? undefined : "dialog"}
+      aria-disabled={blocked ? true : undefined}
+      aria-label={text}
+      title={text}
+      className={cx(
+        baseClass,
+        "text-danger",
+        blocked && "cursor-not-allowed opacity-40 hover:bg-transparent",
+      )}
+    >
+      <TrashIcon />
+    </button>
+  );
+}
+
 export function ConfirmIconButton({ label }: { label: string }) {
   return (
     <button type="submit" aria-label={label} title={label} className={cx(baseClass, "text-brand")}>
