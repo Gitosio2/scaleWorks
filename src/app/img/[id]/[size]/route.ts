@@ -62,9 +62,12 @@ export async function GET(
     headers: {
       "Content-Type": contentTypeOf(key),
       "X-Content-Type-Options": "nosniff",
-      // Public photos may be cached by the CDN for an hour; private ones never.
+      // Public photos are cached briefly: long enough that the CDN absorbs
+      // visits (the free B2 account allows 2,500 downloads a day), short enough
+      // that an unpublished or deleted photo stops being served within minutes.
+      // Cached copies cannot be purged, so this window is the revocation delay.
       "Cache-Control": isPublic
-        ? "public, max-age=300, s-maxage=3600"
+        ? "public, max-age=60, s-maxage=300"
         : "private, no-store",
     },
   });
