@@ -148,15 +148,15 @@
   "dashboard": {
     "activeTitle": "Active work",
     "activeCount": "{count, plural, one {model in progress} other {models in progress}}",
-    "activeAmount": "Total value of active work",
+    "activeAmount": "Total value of active work (including what was already paid)",
     "deadlinesTitle": "Deadlines within two months",
     "deadlinesEmpty": "No deadlines in the next two months.",
     "overdue": "{days, plural, one {# day overdue} other {# days overdue}}",
     "dueIn": "{days, plural, =0 {Due today} one {Due in # day} other {Due in # days}}",
     "finishedTitle": "Models completed",
     "finishedHint": "Finished models in total",
-    "pendingTitle": "Pending payment",
-    "pendingCount": "{count, plural, one {# model awaiting payment} other {# models awaiting payment}}",
+    "pendingTitle": "Pending payment (finished)",
+    "pendingCount": "{count, plural, one {# finished model awaiting payment} other {# finished models awaiting payment}}",
     "financesTitle": "Income and expenses",
     "incomeLabel": "Income received (paid models and deposits)",
     "expensesLabel": "Expenses (parts and consumables ordered or in hand)",
@@ -168,7 +168,9 @@
     "staleTitle": "Stalled models",
     "staleHint": "Not started for over 7 months",
     "staleAge": "{months, plural, one {# month} other {# months}}",
-    "andMore": "and {count} more"
+    "andMore": "and {count} more",
+    "activeToCollect": "Still to collect on active work",
+    "notStartedToCollect": "Still to collect on models not started yet"
   },
   "parts": {
     "title": "Parts: {total}",

@@ -148,15 +148,15 @@
   "dashboard": {
     "activeTitle": "Trabajos en activo",
     "activeCount": "{count, plural, one {maqueta en curso} other {maquetas en curso}}",
-    "activeAmount": "Importe total de los trabajos en activo",
+    "activeAmount": "Importe total de los trabajos en activo (incluye lo ya cobrado)",
     "deadlinesTitle": "Fechas límite en dos meses o menos",
     "deadlinesEmpty": "No hay fechas límite en los próximos dos meses.",
     "overdue": "{days, plural, one {# día de retraso} other {# días de retraso}}",
     "dueIn": "{days, plural, =0 {Vence hoy} one {Vence en # día} other {Vence en # días}}",
     "finishedTitle": "Maquetas hechas",
     "finishedHint": "Maquetas finalizadas en total",
-    "pendingTitle": "Pendiente de cobro",
-    "pendingCount": "{count, plural, one {# maqueta pendiente de cobro} other {# maquetas pendientes de cobro}}",
+    "pendingTitle": "Pendiente de cobro (terminadas)",
+    "pendingCount": "{count, plural, one {# maqueta terminada pendiente de cobro} other {# maquetas terminadas pendientes de cobro}}",
     "financesTitle": "Ingresos y gastos",
     "incomeLabel": "Ingresos cobrados (maquetas pagadas y anticipos)",
     "expensesLabel": "Gastos (piezas y consumibles pedidos o en mano)",
@@ -168,7 +168,9 @@
     "staleTitle": "Maquetas paradas",
     "staleHint": "Sin empezar desde hace más de 7 meses",
     "staleAge": "{months, plural, one {# mes} other {# meses}}",
-    "andMore": "y {count} más"
+    "andMore": "y {count} más",
+    "activeToCollect": "Pendiente de cobro de los trabajos en activo",
+    "notStartedToCollect": "Pendiente de cobro de maquetas sin empezar"
   },
   "parts": {
     "title": "Piezas: {total}",
