@@ -2,7 +2,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { supplyStatus } from "@/db/schema";
 import type { parts } from "@/db/schema";
 import { formatEuros } from "@/lib/labels";
-import { Card, CardTitle } from "@/components/ui/card";
+import { CollapsibleCard } from "@/components/ui/card";
 import { StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
 import { ConfirmIconButton, DeleteIconButton } from "@/components/ui/icon-actions";
 import {
@@ -35,8 +35,7 @@ export function PartsSection({
   const pair = `${labelClass} min-w-40 flex-1`;
 
   return (
-    <Card>
-      <CardTitle>{t("title", { total: formatEuros(totalCents, locale) })}</CardTitle>
+    <CollapsibleCard title={t("title", { total: formatEuros(totalCents, locale) })}>
 
       <form action={add} className="flex flex-col gap-3">
         <label className={labelClass}>
@@ -122,6 +121,6 @@ export function PartsSection({
           </li>
         ))}
       </ul>
-    </Card>
+    </CollapsibleCard>
   );
 }

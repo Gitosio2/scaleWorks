@@ -27,7 +27,7 @@ import {
   updateModelConsumableQuantity,
 } from "./consumable-actions";
 import { addPart, deletePart, updatePartStatus } from "./part-actions";
-import { Card, CardTitle } from "@/components/ui/card";
+import { CollapsibleCard } from "@/components/ui/card";
 import { BackLink, PageHeader } from "@/components/ui/page-header";
 import { PhaseProgress } from "@/components/ui/phase-progress";
 import { PaymentBadge, PhaseBadge, StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
@@ -150,8 +150,7 @@ export default async function ModelDetailPage({
         }
       />
 
-      <Card>
-        <CardTitle>{t("time.title", { total: formatDuration(Number(total ?? 0)) })}</CardTitle>
+      <CollapsibleCard title={t("time.title", { total: formatDuration(Number(total ?? 0)) })}>
 
         <form action={addTimeEntry.bind(null, id)} className="flex flex-wrap items-end gap-3">
           <label className={labelClass}>
@@ -198,7 +197,7 @@ export default async function ModelDetailPage({
             </li>
           ))}
         </ul>
-      </Card>
+      </CollapsibleCard>
 
       <PartsSection
         parts={partRows}
@@ -207,8 +206,7 @@ export default async function ModelDetailPage({
         remove={deletePart.bind(null, id)}
       />
 
-      <Card>
-        <CardTitle>{t("consumables.title", { total: formatEuros(consumablesTotalCents, locale) })}</CardTitle>
+      <CollapsibleCard title={t("consumables.title", { total: formatEuros(consumablesTotalCents, locale) })}>
 
         {consumableOptions.length === 0 ? (
           <p className="text-muted">
@@ -282,7 +280,7 @@ export default async function ModelDetailPage({
             );
           })}
         </ul>
-      </Card>
+      </CollapsibleCard>
     </>
   );
 }
