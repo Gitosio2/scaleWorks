@@ -217,4 +217,25 @@ export const timeEntries = pgTable("time_entries", {
   minutes: integer("minutes").notNull(),
 });
 
+// Where a purchase stands: placed with the shop, in hand, or settled. Stable keys;
+// labels live in messages/*.json under "expenseStatus".
+export const expenseStatus = pgEnum("expense_status", ["ordered", "received", "paid"]);
+
+// Things still to be paid for (consumables, tools, anything). Deliberately flat:
+// no category and no link to consumables or parts, just what, where, how much
+// and whether it has been paid.
+export const expenses = pgTable(
+  "expenses",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    description: text("description").notNull(),
+    store: text("store"),
+    priceCents: integer("price_cents"),
+    status: expenseStatus("status").notNull().default("ordered"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [index("expenses_user_idx").on(t.userId)],
+);
+
 export * from "./auth-schema";

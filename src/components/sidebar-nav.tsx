@@ -69,6 +69,16 @@ const items = [
     ),
   },
   {
+    href: "/expenses",
+    label: "expenses" as const,
+    icon: (
+      <svg {...icon}>
+        <path d="M6 3h12v18l-3-2-3 2-3-2-3 2z" />
+        <path d="M9.5 8h5M9.5 12h5" />
+      </svg>
+    ),
+  },
+  {
     href: "/portfolio",
     label: "gallery" as const,
     icon: (

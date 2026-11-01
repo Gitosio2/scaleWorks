@@ -9,6 +9,7 @@
     "quotes": "Quotes",
     "clients": "Clients",
     "consumables": "Consumables",
+    "expenses": "Pending expenses",
     "gallery": "Public gallery",
     "signedInAs": "Signed in as",
     "logOut": "Log out",
@@ -88,6 +89,33 @@
     "crane": "Crane",
     "machine": "Machine"
   },
+  "expenseStatus": {
+    "ordered": "Ordered",
+    "received": "Received",
+    "paid": "Paid"
+  },
+  "expenses": {
+    "title": "Pending expenses",
+    "subtitle": "{count, plural, =0 {Nothing left to pay.} one {# item left to pay: {amount}} other {# items left to pay: {amount}}}",
+    "add": "Add expense",
+    "editTitle": "Edit expense",
+    "descriptionPlaceholder": "What did you buy?",
+    "searchPlaceholder": "Description or store",
+    "empty": "Nothing pending.",
+    "emptyFiltered": "No expenses match these filters.",
+    "deleteTitle": "Delete expense",
+    "deleteMessage": "Delete \"{name}\"? This cannot be undone.",
+    "filter": {
+      "pending": "Pending (not paid)",
+      "all": "All"
+    },
+    "sort": {
+      "newest": "Newest first",
+      "oldest": "Oldest first",
+      "price_desc": "Price (high to low)",
+      "description": "Description (A–Z)"
+    }
+  },
   "supplyStatus": {
     "to_order": "To order",
     "ordered": "Ordered",
@@ -131,6 +159,7 @@
     "incomeLabel": "Income received (paid models and deposits)",
     "expensesLabel": "Expenses (parts and consumables ordered or in hand)",
     "balanceLabel": "Balance",
+    "unpaidExpensesLabel": "{count, plural, =0 {Nothing left to pay} one {# expense left to pay} other {# expenses left to pay}}",
     "quotesTitle": "Quotes to decide",
     "quotesHint": "Open quotes, oldest first",
     "quoteAge": "{days, plural, =0 {Today} one {# day old} other {# days old}}",

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { and, asc, eq, isNotNull, lt, lte, ne, notInArray, sql } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
-import { consumables, models, parts, quotes } from "@/db/schema";
+import { consumables, expenses, models, parts, quotes } from "@/db/schema";
 import { formatDate, formatEuros } from "@/lib/labels";
 import { modelTitle } from "@/lib/model-title";
 import { stalledCutoff } from "@/lib/stalled";
@@ -74,7 +74,15 @@ export default async function Home() {
   const deadlineCutoff = horizon.toISOString().slice(0, 10);
   const staleCutoff = stalledCutoff(now);
 
-  const [[stats], deadlines, openQuotes, stalled, [partsSpent], [consumablesSpent]] = await Promise.all([
+  const [
+    [stats],
+    deadlines,
+    openQuotes,
+    stalled,
+    [partsSpent],
+    [consumablesSpent],
+    [unpaidExpenses],
+  ] = await Promise.all([
     db
       .select({
         activeCount: sql<number>`count(*) filter (where ${ACTIVE})::int`,
@@ -135,6 +143,14 @@ export default async function Home() {
       .select({ cents: sql<number>`coalesce(sum(${consumables.priceCents}), 0)::int` })
       .from(consumables)
       .where(and(eq(consumables.userId, user.id), ne(consumables.status, "to_order"))),
+    // Still to pay: the pending expenses list, everything not marked paid.
+    db
+      .select({
+        count: sql<number>`count(*)::int`,
+        cents: sql<number>`coalesce(sum(${expenses.priceCents}), 0)::int`,
+      })
+      .from(expenses)
+      .where(and(eq(expenses.userId, user.id), ne(expenses.status, "paid"))),
   ]);
   const expensesCents = partsSpent.cents + consumablesSpent.cents;
   const balanceCents = stats.incomeCents - expensesCents;
@@ -259,6 +275,15 @@ export default async function Home() {
               value={formatEuros(balanceCents, locale)}
               label={t("balanceLabel")}
               valueClass={balanceCents < 0 ? "text-bad" : "text-ok"}
+            />
+            <Stat
+              value={formatEuros(unpaidExpenses.cents, locale)}
+              valueClass={unpaidExpenses.count > 0 ? "text-warn" : ""}
+              label={
+                <Link href="/expenses" className="font-semibold text-brand hover:underline">
+                  {t("unpaidExpensesLabel", { count: unpaidExpenses.count })}
+                </Link>
+              }
             />
           </div>
         </Card>
