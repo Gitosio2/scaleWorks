@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { and, eq } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { clients } from "@/db/schema";
 import { requireUser } from "@/lib/session";
@@ -16,6 +17,8 @@ export default async function EditClientPage({
 }) {
   const { id } = await params;
   const user = await requireUser();
+  const t = await getTranslations("clients");
+  const tc = await getTranslations("common");
   const [client] = await db
     .select()
     .from(clients)
@@ -24,13 +27,13 @@ export default async function EditClientPage({
 
   return (
     <>
-      <BackLink href="/clients">← Clients</BackLink>
-      <PageHeader title="Edit client" />
+      <BackLink href="/clients">{t("back")}</BackLink>
+      <PageHeader title={t("editTitle")} />
       <Card>
         <form action={updateClient.bind(null, id)} className="flex flex-col gap-3">
           <ClientFields defaults={client} />
           <button type="submit" className={`${primaryButtonClass} self-start`}>
-            Save
+            {tc("save")}
           </button>
         </form>
       </Card>

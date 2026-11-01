@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 const icon = {
   width: 20,
@@ -18,7 +19,7 @@ const icon = {
 const items = [
   {
     href: "/",
-    label: "Home",
+    label: "home" as const,
     icon: (
       <svg {...icon}>
         <path d="M3 11.5 12 4l9 7.5" />
@@ -28,7 +29,7 @@ const items = [
   },
   {
     href: "/models",
-    label: "Models",
+    label: "models" as const,
     icon: (
       <svg {...icon}>
         <path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z" />
@@ -38,7 +39,7 @@ const items = [
   },
   {
     href: "/quotes",
-    label: "Quotes",
+    label: "quotes" as const,
     icon: (
       <svg {...icon}>
         <path d="M6 3h9l4 4v14H6z" />
@@ -48,7 +49,7 @@ const items = [
   },
   {
     href: "/clients",
-    label: "Clients",
+    label: "clients" as const,
     icon: (
       <svg {...icon}>
         <circle cx="9" cy="8" r="3.5" />
@@ -59,7 +60,7 @@ const items = [
   },
   {
     href: "/consumables",
-    label: "Consumables",
+    label: "consumables" as const,
     icon: (
       <svg {...icon}>
         <path d="M9 3h6v3l2 3v11a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V9l2-3z" />
@@ -70,9 +71,10 @@ const items = [
 ];
 
 export function SidebarNav() {
+  const t = useTranslations("nav");
   const pathname = usePathname();
   return (
-    <nav aria-label="Main" className="flex flex-wrap gap-1 md:flex-col">
+    <nav aria-label={t("main")} className="flex flex-wrap gap-1 md:flex-col">
       {items.map((item) => {
         const active =
           item.href === "/"

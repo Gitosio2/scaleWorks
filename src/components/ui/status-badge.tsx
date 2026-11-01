@@ -1,7 +1,6 @@
+import { useLocale, useTranslations } from "next-intl";
 import {
   formatEuros,
-  paymentStatusLabels,
-  phaseLabels,
   remainingCents,
   type ModelPhase,
   type PaymentStatus,
@@ -51,7 +50,8 @@ export function phaseVariant(phase: ModelPhase): BadgeVariant {
 }
 
 export function PhaseBadge({ phase }: { phase: ModelPhase }) {
-  return <StatusBadge variant={phaseVariant(phase)}>{phaseLabels[phase]}</StatusBadge>;
+  const t = useTranslations("phase");
+  return <StatusBadge variant={phaseVariant(phase)}>{t(phase)}</StatusBadge>;
 }
 
 export function paymentVariant(status: PaymentStatus): BadgeVariant {
@@ -68,12 +68,17 @@ export function PaymentBadge({
   priceCents: number | null;
   depositCents: number | null;
 }) {
+  const t = useTranslations("paymentStatus");
+  const tc = useTranslations("common");
+  const locale = useLocale();
   return (
     <span className="inline-flex flex-wrap items-center gap-2">
-      <StatusBadge variant={paymentVariant(status)}>{paymentStatusLabels[status]}</StatusBadge>
+      <StatusBadge variant={paymentVariant(status)}>{t(status)}</StatusBadge>
       {status === "deposit_paid" && (
         <span className="text-[13px] text-ink-2">
-          Remaining {formatEuros(remainingCents(priceCents, depositCents))}
+          {tc("remaining", {
+            amount: formatEuros(remainingCents(priceCents, depositCents), locale),
+          })}
         </span>
       )}
     </span>

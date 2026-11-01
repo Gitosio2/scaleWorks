@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth-client";
 import { cx, linkActionClass } from "@/components/ui/styles";
 
 export function LogoutButton() {
+  const t = useTranslations("nav");
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -37,11 +39,11 @@ export function LogoutButton() {
         disabled={pending}
         className={cx(linkActionClass, "self-start disabled:opacity-50")}
       >
-        Log out
+        {t("logOut")}
       </button>
       {failed && (
         <p role="alert" className="text-xs font-semibold text-danger">
-          Could not sign out. Try again.
+          {t("signOutFailed")}
         </p>
       )}
     </>

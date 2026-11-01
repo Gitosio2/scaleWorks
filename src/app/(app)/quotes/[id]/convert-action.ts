@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { models, parts, quotes } from "@/db/schema";
 import { requireUser } from "@/lib/session";
@@ -18,7 +19,7 @@ export async function convertQuoteToModel(quoteId: string) {
     .select()
     .from(quotes)
     .where(and(eq(quotes.id, quoteId), eq(quotes.userId, user.id)));
-  if (!quote) throw new Error("Quote not found");
+  if (!quote) throw new Error((await getTranslations("actionErrors"))("quoteNotFound"));
 
   const modelId = randomUUID();
 

@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { and, asc, desc, eq, ilike, isNotNull, isNull, ne, or, type SQL } from "drizzle-orm";
+import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { clients, modelPhase, models, paymentStatus } from "@/db/schema";
-import { formatEuros, paymentStatusLabels, phaseLabels } from "@/lib/labels";
+import { formatDate, formatEuros } from "@/lib/labels";
 import {
   ascNullsLast,
   containsPattern,
@@ -28,22 +29,19 @@ import { createModel, deleteModel } from "./actions";
 import { ModelFields } from "./model-fields";
 
 const sorts = {
-  newest: { label: "Newest first", order: [desc(models.createdAt)] },
-  oldest: { label: "Oldest first", order: [asc(models.createdAt)] },
-  name: { label: "Name (A–Z)", order: [asc(models.name)] },
-  price_desc: { label: "Price (high to low)", order: [descNullsLast(models.priceCents)] },
-  price_asc: { label: "Price (low to high)", order: [ascNullsLast(models.priceCents)] },
-  requested: { label: "Requested date", order: [ascNullsLast(models.requestedDate)] },
-  estimated: { label: "Estimated date", order: [ascNullsLast(models.estimatedDate)] },
+  newest: { order: [desc(models.createdAt)] },
+  oldest: { order: [asc(models.createdAt)] },
+  name: { order: [asc(models.name)] },
+  price_desc: { order: [descNullsLast(models.priceCents)] },
+  price_asc: { order: [ascNullsLast(models.priceCents)] },
+  requested: { order: [ascNullsLast(models.requestedDate)] },
+  estimated: { order: [ascNullsLast(models.estimatedDate)] },
 };
 type SortKey = keyof typeof sorts;
 const sortKeys = Object.keys(sorts) as SortKey[];
 
 // "open" (the default) hides models that are both finished and paid in full.
-const scopes = [
-  { value: "open", label: "Unfinished or not fully paid" },
-  { value: "all", label: "Everything" },
-];
+const scopes = ["open", "all"] as const;
 
 export default async function ModelsPage({
   searchParams,
@@ -52,6 +50,12 @@ export default async function ModelsPage({
 }) {
   const sp = await searchParams;
   const user = await requireUser();
+  const t = await getTranslations("models");
+  const tc = await getTranslations("common");
+  const tn = await getTranslations("nav");
+  const tp = await getTranslations("phase");
+  const tpay = await getTranslations("paymentStatus");
+  const locale = await getLocale();
 
   const q = textParam(sp, "q");
   const client = uuidParam(sp, "client") ?? (textParam(sp, "client") === "none" ? "none" : null);
@@ -102,53 +106,53 @@ export default async function ModelsPage({
 
   return (
     <>
-      <PageHeader title="Models" subtitle="Everything you are building or have built." />
+      <PageHeader title={tn("models")} subtitle={t("subtitle")} />
 
-      <CreateModal label="Add model" title="Add model" action={createModel}>
+      <CreateModal label={t("add")} title={t("add")} action={createModel}>
         <ModelFields clients={clientRows} />
       </CreateModal>
 
       <ListFilters action="/models" activeCount={activeCount}>
-        <FilterText name="q" label="Search" defaultValue={q} placeholder="Name, company or client" />
+        <FilterText name="q" label={tc("search")} defaultValue={q} placeholder={t("searchPlaceholder")} />
         <FilterSelect
           name="scope"
-          label="Show"
+          label={t("show")}
           defaultValue={scope}
-          options={scopes}
+          options={scopes.map((s) => ({ value: s, label: t(`scope.${s}`) }))}
           allLabel={null}
         />
         <FilterSelect
           name="client"
-          label="Client"
+          label={tc("client")}
           defaultValue={client ?? ""}
           options={[
-            { value: "none", label: "Own project" },
+            { value: "none", label: t("ownProject") },
             ...clientRows.map((c) => ({ value: c.id, label: c.name })),
           ]}
         />
         <FilterSelect
           name="company"
-          label="Company"
+          label={tc("company")}
           defaultValue={company}
           options={companyRows.map((r) => ({ value: r.company!, label: r.company! }))}
         />
         <FilterSelect
           name="phase"
-          label="Phase"
+          label={t("phase")}
           defaultValue={phase ?? ""}
-          options={modelPhase.enumValues.map((p) => ({ value: p, label: phaseLabels[p] }))}
+          options={modelPhase.enumValues.map((p) => ({ value: p, label: tp(p) }))}
         />
         <FilterSelect
           name="payment"
-          label="Payment"
+          label={t("payment")}
           defaultValue={payment ?? ""}
-          options={paymentStatus.enumValues.map((p) => ({ value: p, label: paymentStatusLabels[p] }))}
+          options={paymentStatus.enumValues.map((p) => ({ value: p, label: tpay(p) }))}
         />
         <FilterSelect
           name="sort"
-          label="Sort by"
+          label={tc("sortBy")}
           defaultValue={sort}
-          options={sortKeys.map((k) => ({ value: k, label: sorts[k].label }))}
+          options={sortKeys.map((k) => ({ value: k, label: t(`sort.${k}`) }))}
           allLabel={null}
         />
       </ListFilters>
@@ -158,25 +162,28 @@ export default async function ModelsPage({
           {rows.length === 0 && (
             <li className="text-muted">
               {hasUserFilters
-                ? "No models match these filters."
+                ? t("emptyFiltered")
                 : scope === "open"
-                  ? "No unfinished or unpaid models. Finished and fully paid ones are hidden."
-                  : "No models yet."}
+                  ? t("emptyOpen")
+                  : t("empty")}
             </li>
           )}
           {rows.map(({ model: m, clientName }) => (
             <li key={m.id} className={`${listItemClass} flex flex-wrap items-center justify-between gap-4`}>
               <div className="flex min-w-0 flex-col gap-0.5">
-                <p className="text-[13px] font-semibold text-brand">{clientName ?? "Own project"}</p>
+                <p className="text-[13px] font-semibold text-brand">{clientName ?? t("ownProject")}</p>
                 <Link href={`/models/${m.id}`} className="font-bold hover:underline">
                   {m.name}
                 </Link>
                 <p className="text-[13px] text-muted">
                   {m.company ? `${m.company} · ` : ""}
-                  {formatEuros(m.priceCents)}
+                  {formatEuros(m.priceCents, locale)}
                 </p>
                 <p className="text-[13px] text-muted">
-                  Requested: {m.requestedDate ?? "—"} · Estimated: {m.estimatedDate ?? "—"}
+                  {t("dates", {
+                    requested: formatDate(m.requestedDate, locale),
+                    estimated: formatDate(m.estimatedDate, locale),
+                  })}
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
@@ -185,9 +192,9 @@ export default async function ModelsPage({
                   <PaymentBadge status={m.paymentStatus} priceCents={m.priceCents} depositCents={m.depositCents} />
                   <PhaseProgress phase={m.phase} />
                 </div>
-                <Link href={`/models/${m.id}/edit`} className={linkActionClass}>Edit</Link>
+                <Link href={`/models/${m.id}/edit`} className={linkActionClass}>{tc("edit")}</Link>
                 <form action={deleteModel.bind(null, m.id)}>
-                  <button type="submit" className={dangerActionClass}>Delete</button>
+                  <button type="submit" className={dangerActionClass}>{tc("delete")}</button>
                 </form>
               </div>
             </li>

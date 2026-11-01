@@ -2,13 +2,15 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
 import { primaryButtonClass, secondaryButtonClass } from "./styles";
 
 function SubmitButton({ children }: { children: React.ReactNode }) {
+  const t = useTranslations("common");
   const { pending } = useFormStatus();
   return (
     <button type="submit" disabled={pending} className={primaryButtonClass}>
-      {pending ? "Saving…" : children}
+      {pending ? t("saving") : children}
     </button>
   );
 }
@@ -29,6 +31,7 @@ export function CreateModal({
   action: (formData: FormData) => Promise<void>;
   children: React.ReactNode;
 }) {
+  const t = useTranslations("common");
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -67,7 +70,7 @@ export function CreateModal({
       await action(formData);
       close();
     } catch {
-      setError("Could not save. Check the fields and try again.");
+      setError(t("saveFailed"));
     }
   }
 
@@ -101,7 +104,7 @@ export function CreateModal({
               <button
                 type="button"
                 onClick={close}
-                aria-label="Close"
+                aria-label={t("close")}
                 className="-mt-2 -mr-2 inline-flex size-11 cursor-pointer items-center justify-center rounded-[10px] text-2xl leading-none text-muted hover:bg-canvas"
               >
                 ×
@@ -116,7 +119,7 @@ export function CreateModal({
               )}
               <div className="flex flex-wrap justify-end gap-2">
                 <button type="button" onClick={close} className={secondaryButtonClass}>
-                  Cancel
+                  {t("cancel")}
                 </button>
                 <SubmitButton>{label}</SubmitButton>
               </div>

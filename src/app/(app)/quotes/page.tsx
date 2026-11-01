@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { and, asc, desc, eq, ilike, isNull, or, type SQL } from "drizzle-orm";
+import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { clients, quoteStatus, quotes } from "@/db/schema";
-import { formatEuros, quoteStatusLabels } from "@/lib/labels";
+import { formatEuros } from "@/lib/labels";
 import {
   ascNullsLast,
   containsPattern,
@@ -27,11 +28,11 @@ import { createQuote, deleteQuote } from "./actions";
 import { QuoteFields } from "./quote-fields";
 
 const sorts = {
-  newest: { label: "Newest first", order: [desc(quotes.createdAt)] },
-  oldest: { label: "Oldest first", order: [asc(quotes.createdAt)] },
-  title: { label: "Title (A–Z)", order: [asc(quotes.title)] },
-  price_desc: { label: "Price (high to low)", order: [descNullsLast(quotes.priceCents)] },
-  price_asc: { label: "Price (low to high)", order: [ascNullsLast(quotes.priceCents)] },
+  newest: { order: [desc(quotes.createdAt)] },
+  oldest: { order: [asc(quotes.createdAt)] },
+  title: { order: [asc(quotes.title)] },
+  price_desc: { order: [descNullsLast(quotes.priceCents)] },
+  price_asc: { order: [ascNullsLast(quotes.priceCents)] },
 };
 type SortKey = keyof typeof sorts;
 const sortKeys = Object.keys(sorts) as SortKey[];
@@ -43,6 +44,11 @@ export default async function QuotesPage({
 }) {
   const sp = await searchParams;
   const user = await requireUser();
+  const t = await getTranslations("quotes");
+  const tc = await getTranslations("common");
+  const tn = await getTranslations("nav");
+  const tq = await getTranslations("quoteStatus");
+  const locale = await getLocale();
 
   const q = textParam(sp, "q");
   const client =
@@ -83,34 +89,34 @@ export default async function QuotesPage({
 
   return (
     <>
-      <PageHeader title="Quotes" subtitle="Proposals for upcoming work." />
+      <PageHeader title={tn("quotes")} subtitle={t("subtitle")} />
 
-      <CreateModal label="Add quote" title="Add quote" action={createQuote}>
+      <CreateModal label={t("add")} title={t("add")} action={createQuote}>
         <QuoteFields clients={clientRows} />
       </CreateModal>
 
       <ListFilters action="/quotes" activeCount={activeCount}>
-        <FilterText name="q" label="Search" defaultValue={q} placeholder="Title or client" />
+        <FilterText name="q" label={tc("search")} defaultValue={q} placeholder={t("searchPlaceholder")} />
         <FilterSelect
           name="client"
-          label="Client"
+          label={tc("client")}
           defaultValue={client ?? ""}
           options={[
-            { value: "none", label: "No client" },
+            { value: "none", label: t("noClient") },
             ...clientRows.map((c) => ({ value: c.id, label: c.name })),
           ]}
         />
         <FilterSelect
           name="status"
-          label="Status"
+          label={tc("status")}
           defaultValue={status ?? ""}
-          options={quoteStatus.enumValues.map((s) => ({ value: s, label: quoteStatusLabels[s] }))}
+          options={quoteStatus.enumValues.map((s) => ({ value: s, label: tq(s) }))}
         />
         <FilterSelect
           name="sort"
-          label="Sort by"
+          label={tc("sortBy")}
           defaultValue={sort}
-          options={sortKeys.map((k) => ({ value: k, label: sorts[k].label }))}
+          options={sortKeys.map((k) => ({ value: k, label: t(`sort.${k}`) }))}
           allLabel={null}
         />
       </ListFilters>
@@ -119,7 +125,7 @@ export default async function QuotesPage({
         <ul className="flex flex-col">
           {rows.length === 0 && (
             <li className="text-muted">
-              {activeCount > 0 ? "No quotes match these filters." : "No quotes yet."}
+              {activeCount > 0 ? t("emptyFiltered") : t("empty")}
             </li>
           )}
           {rows.map(({ quote: q, clientName }) => (
@@ -128,16 +134,16 @@ export default async function QuotesPage({
                 <Link href={`/quotes/${q.id}`} className="font-bold hover:underline">
                   {q.title}
                 </Link>
-                <p className="text-[13px] text-muted">{clientName ?? "No client"}</p>
+                <p className="text-[13px] text-muted">{clientName ?? t("noClient")}</p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <span className="font-bold">{formatEuros(q.priceCents)}</span>
+                <span className="font-bold">{formatEuros(q.priceCents, locale)}</span>
                 <StatusBadge variant={quoteStatusVariant(q.status)}>
-                  {quoteStatusLabels[q.status]}
+                  {tq(q.status)}
                 </StatusBadge>
-                <Link href={`/quotes/${q.id}/edit`} className={linkActionClass}>Edit</Link>
+                <Link href={`/quotes/${q.id}/edit`} className={linkActionClass}>{tc("edit")}</Link>
                 <form action={deleteQuote.bind(null, q.id)}>
-                  <button type="submit" className={dangerActionClass}>Delete</button>
+                  <button type="submit" className={dangerActionClass}>{tc("delete")}</button>
                 </form>
               </div>
             </li>

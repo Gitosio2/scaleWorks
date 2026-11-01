@@ -1,26 +1,23 @@
+import { useTranslations } from "next-intl";
 import { inputClass } from "@/components/ui/styles";
 
-const QUICK = [
-  ["1/16", "1/16"],
-  ["1/8", "1/8"],
-  ["1/4", "1/4"],
-  ["1/2", "1/2"],
-  ["1", "1 unit"],
-] as const;
+const QUICK = ["1/16", "1/8", "1/4", "1/2"] as const;
 
 export function QuantityFields({ defaultQuick = "" }: { defaultQuick?: string }) {
+  const t = useTranslations("models.quantity");
   return (
     <>
-      <select name="quantity" defaultValue={defaultQuick} aria-label="Quantity" className={inputClass}>
-        <option value="">Quantity (optional)</option>
-        {QUICK.map(([value, label]) => (
-          <option key={value} value={value}>{label}</option>
+      <select name="quantity" defaultValue={defaultQuick} aria-label={t("label")} className={inputClass}>
+        <option value="">{t("optional")}</option>
+        {QUICK.map((value) => (
+          <option key={value} value={value}>{value}</option>
         ))}
+        <option value="1">{t("oneUnit")}</option>
       </select>
       <input
         name="quantityCustom"
-        placeholder="Custom (3/8, 0,3...)"
-        aria-label="Custom quantity"
+        placeholder={t("customPlaceholder")}
+        aria-label={t("customLabel")}
         className={`${inputClass} w-44`}
       />
     </>

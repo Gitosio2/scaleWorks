@@ -3,9 +3,10 @@
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { consumables, supplyStatus } from "@/db/schema";
-import { parseEuros } from "@/lib/labels";
+import { parseEuros, type ActionT } from "@/lib/labels";
 import { requireUser } from "@/lib/session";
 
 type SupplyStatus = (typeof supplyStatus.enumValues)[number];
@@ -14,22 +15,23 @@ function text(formData: FormData, key: string) {
   return String(formData.get(key) ?? "").trim() || null;
 }
 
-function parseStatus(value: string): SupplyStatus {
+function parseStatus(value: string, t: ActionT): SupplyStatus {
   if (!(supplyStatus.enumValues as readonly string[]).includes(value)) {
-    throw new Error("Invalid status");
+    throw new Error(t("invalidStatus"));
   }
   return value as SupplyStatus;
 }
 
-function parseConsumable(formData: FormData) {
+async function parseConsumable(formData: FormData) {
+  const t = await getTranslations("actionErrors");
   const description = text(formData, "description");
-  if (!description) throw new Error("Description is required");
+  if (!description) throw new Error(t("descriptionRequired"));
   return {
     description,
     store: text(formData, "store"),
     reference: text(formData, "reference"),
-    priceCents: parseEuros(String(formData.get("price") ?? "")),
-    status: parseStatus(String(formData.get("status"))),
+    priceCents: parseEuros(String(formData.get("price") ?? ""), t),
+    status: parseStatus(String(formData.get("status")), t),
   };
 }
 
@@ -37,7 +39,7 @@ export async function createConsumable(formData: FormData) {
   const user = await requireUser();
   await db
     .insert(consumables)
-    .values({ ...parseConsumable(formData), userId: user.id });
+    .values({ ...(await parseConsumable(formData)), userId: user.id });
   revalidatePath("/consumables");
 }
 
@@ -45,7 +47,7 @@ export async function updateConsumable(id: string, formData: FormData) {
   const user = await requireUser();
   await db
     .update(consumables)
-    .set(parseConsumable(formData))
+    .set(await parseConsumable(formData))
     .where(and(eq(consumables.id, id), eq(consumables.userId, user.id)));
   revalidatePath("/consumables");
   redirect("/consumables");
@@ -53,9 +55,10 @@ export async function updateConsumable(id: string, formData: FormData) {
 
 export async function updateConsumableStatus(id: string, formData: FormData) {
   const user = await requireUser();
+  const t = await getTranslations("actionErrors");
   await db
     .update(consumables)
-    .set({ status: parseStatus(String(formData.get("status"))) })
+    .set({ status: parseStatus(String(formData.get("status")), t) })
     .where(and(eq(consumables.id, id), eq(consumables.userId, user.id)));
   revalidatePath("/consumables");
 }

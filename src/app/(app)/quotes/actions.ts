@@ -3,18 +3,20 @@
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { clients, quotes, quoteStatus } from "@/db/schema";
 import { parseEuros } from "@/lib/labels";
 import { requireUser } from "@/lib/session";
 
 async function parseQuote(formData: FormData, userId: string) {
+  const t = await getTranslations("actionErrors");
   const title = String(formData.get("title") ?? "").trim();
-  if (!title) throw new Error("Title is required");
+  if (!title) throw new Error(t("titleRequired"));
 
   const status = String(formData.get("status"));
   if (!(quoteStatus.enumValues as readonly string[]).includes(status)) {
-    throw new Error("Invalid status");
+    throw new Error(t("invalidStatus"));
   }
 
   // The client must belong to the current user.
@@ -24,13 +26,13 @@ async function parseQuote(formData: FormData, userId: string) {
       .select({ id: clients.id })
       .from(clients)
       .where(and(eq(clients.id, clientId), eq(clients.userId, userId)));
-    if (!owned) throw new Error("Client not found");
+    if (!owned) throw new Error(t("clientNotFound"));
   }
 
   return {
     title,
     clientId,
-    priceCents: parseEuros(String(formData.get("price") ?? "")),
+    priceCents: parseEuros(String(formData.get("price") ?? ""), t),
     status: status as (typeof quoteStatus.enumValues)[number],
   };
 }

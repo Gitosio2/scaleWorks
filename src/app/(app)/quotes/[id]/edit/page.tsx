@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { and, eq } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { clients, quotes } from "@/db/schema";
 import { requireUser } from "@/lib/session";
@@ -16,6 +17,8 @@ export default async function EditQuotePage({
 }) {
   const { id } = await params;
   const user = await requireUser();
+  const t = await getTranslations("quotes");
+  const tc = await getTranslations("common");
   const [[quote], clientRows] = await Promise.all([
     db
       .select()
@@ -31,13 +34,13 @@ export default async function EditQuotePage({
 
   return (
     <>
-      <BackLink href="/quotes">← Quotes</BackLink>
-      <PageHeader title="Edit quote" />
+      <BackLink href="/quotes">{t("back")}</BackLink>
+      <PageHeader title={t("editTitle")} />
       <Card>
         <form action={updateQuote.bind(null, id)} className="flex flex-col gap-3">
           <QuoteFields clients={clientRows} defaults={quote} />
           <button type="submit" className={`${primaryButtonClass} self-start`}>
-            Save
+            {tc("save")}
           </button>
         </form>
       </Card>

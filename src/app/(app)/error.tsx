@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { cx, primaryButtonClass } from "@/components/ui/styles";
@@ -12,21 +13,22 @@ export default function AppError({
   error: Error & { digest?: string };
   retry: () => void;
 }) {
+  const t = useTranslations("errors");
   useEffect(() => {
     console.error(error);
   }, [error]);
 
   return (
     <>
-      <PageHeader title="Something went wrong" />
+      <PageHeader title={t("title")} />
       <Card>
-        <p className="text-muted">An unexpected error occurred while loading this page.</p>
+        <p className="text-muted">{t("description")}</p>
         <button
           type="button"
           onClick={() => retry()}
           className={cx(primaryButtonClass, "self-start")}
         >
-          Try again
+          {t("retry")}
         </button>
       </Card>
     </>
