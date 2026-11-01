@@ -14,6 +14,9 @@ export const labelClass = "flex flex-col gap-1.5 text-[13px] font-semibold text-
 export const primaryButtonClass =
   "inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[10px] bg-brand px-[18px] font-semibold text-brand-fg hover:bg-brand-hover disabled:opacity-50";
 
+export const dangerButtonClass =
+  "inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[10px] bg-danger px-[18px] font-semibold text-white hover:opacity-90 disabled:opacity-50";
+
 export const secondaryButtonClass =
   "inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[10px] border border-input-border bg-surface px-[18px] font-semibold text-ink hover:bg-canvas";
 

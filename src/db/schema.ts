@@ -58,7 +58,8 @@ export const clients = pgTable("clients", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: text("user_id").notNull(),
   name: text("name").notNull(),
-  contact: text("contact").notNull(),
+  // Free text (email or phone); only the name is required.
+  contact: text("contact"),
   company: text("company"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });

@@ -3,13 +3,23 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { useTranslations } from "next-intl";
-import { primaryButtonClass, secondaryButtonClass } from "./styles";
+import { dangerButtonClass, primaryButtonClass, secondaryButtonClass } from "./styles";
 
-function SubmitButton({ children }: { children: React.ReactNode }) {
+function SubmitButton({
+  children,
+  destructive,
+}: {
+  children: React.ReactNode;
+  destructive: boolean;
+}) {
   const t = useTranslations("common");
   const { pending } = useFormStatus();
   return (
-    <button type="submit" disabled={pending} className={primaryButtonClass}>
+    <button
+      type="submit"
+      disabled={pending}
+      className={destructive ? dangerButtonClass : primaryButtonClass}
+    >
       {pending ? t("saving") : children}
     </button>
   );
@@ -25,6 +35,7 @@ export function FormDialog({
   onClose,
   title,
   submitLabel,
+  destructive = false,
   action,
   children,
 }: {
@@ -32,6 +43,8 @@ export function FormDialog({
   onClose: () => void;
   title: string;
   submitLabel: string;
+  // Styles the submit button as a dangerous action (e.g. a delete confirmation).
+  destructive?: boolean;
   action: (formData: FormData) => Promise<void>;
   children: React.ReactNode;
 }) {
@@ -115,7 +128,7 @@ export function FormDialog({
               <button type="button" onClick={close} className={secondaryButtonClass}>
                 {t("cancel")}
               </button>
-              <SubmitButton>{submitLabel}</SubmitButton>
+              <SubmitButton destructive={destructive}>{submitLabel}</SubmitButton>
             </div>
           </form>
         </div>

@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import { inputClass, labelClass } from "@/components/ui/styles";
 
-type Defaults = { name?: string; contact?: string; company?: string | null };
+type Defaults = { name?: string; contact?: string | null; company?: string | null };
 
 export function ClientFields({ defaults = {} }: { defaults?: Defaults }) {
   const t = useTranslations("clients");
@@ -14,7 +14,7 @@ export function ClientFields({ defaults = {} }: { defaults?: Defaults }) {
       </label>
       <label className={labelClass}>
         {t("contact")}
-        <input name="contact" placeholder={t("contactPlaceholder")} required defaultValue={defaults.contact} className={inputClass} />
+        <input name="contact" placeholder={t("contactPlaceholder")} defaultValue={defaults.contact ?? ""} className={inputClass} />
       </label>
       <label className={labelClass}>
         {tc("company")}
