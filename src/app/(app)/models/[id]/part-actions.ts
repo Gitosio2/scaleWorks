@@ -62,13 +62,13 @@ export async function addPart(modelId: string, formData: FormData) {
 export async function updatePartStatus(
   modelId: string,
   partId: string,
-  formData: FormData,
+  status: string,
 ) {
   const user = await requireUser();
   const t = await getTranslations("actionErrors");
   await db
     .update(parts)
-    .set({ status: parseStatus(String(formData.get("status")), t) })
+    .set({ status: parseStatus(status, t) })
     .where(
       and(
         eq(parts.id, partId),

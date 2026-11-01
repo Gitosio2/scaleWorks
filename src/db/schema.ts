@@ -144,8 +144,8 @@ export const quotes = pgTable(
   (t) => [index("quotes_user_idx").on(t.userId)],
 );
 
-// A part belongs to exactly one model OR one quote. Converting a quote
-// moves its parts to the new model.
+// A part belongs to one model OR one quote, or to neither (a loose purchase added
+// from Pending expenses). Converting a quote moves its parts to the new model.
 export const parts = pgTable(
   "parts",
   {
@@ -164,11 +164,16 @@ export const parts = pgTable(
     store: text("store"),
     url: text("url"),
     status: supplyStatus("status").notNull().default("to_order"),
+    // Payment is separate from supply: a part can be ordered or in hand and still
+    // unpaid. Unpaid parts of models that were bought feed "Pending expenses".
+    paid: boolean("paid").notNull().default(false),
   },
   (t) => [
+    // At most one owner. A part with neither is a "loose" purchase added from
+    // Pending expenses, not tied to any model or quote.
     check(
-      "parts_one_owner",
-      sql`(${t.modelId} IS NOT NULL) <> (${t.quoteId} IS NOT NULL)`,
+      "parts_at_most_one_owner",
+      sql`NOT (${t.modelId} IS NOT NULL AND ${t.quoteId} IS NOT NULL)`,
     ),
   ],
 );
@@ -216,26 +221,5 @@ export const timeEntries = pgTable("time_entries", {
   workedOn: date("worked_on").notNull(),
   minutes: integer("minutes").notNull(),
 });
-
-// Where a purchase stands: placed with the shop, in hand, or settled. Stable keys;
-// labels live in messages/*.json under "expenseStatus".
-export const expenseStatus = pgEnum("expense_status", ["ordered", "received", "paid"]);
-
-// Things still to be paid for (consumables, tools, anything). Deliberately flat:
-// no category and no link to consumables or parts, just what, where, how much
-// and whether it has been paid.
-export const expenses = pgTable(
-  "expenses",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    userId: text("user_id").notNull(),
-    description: text("description").notNull(),
-    store: text("store"),
-    priceCents: integer("price_cents"),
-    status: expenseStatus("status").notNull().default("ordered"),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-  },
-  (t) => [index("expenses_user_idx").on(t.userId)],
-);
 
 export * from "./auth-schema";

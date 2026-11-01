@@ -127,6 +127,27 @@ export function QuoteIconButton({ label }: { label: string }) {
   );
 }
 
+/**
+ * Round check that toggles "paid": an empty circle when unpaid, a filled green
+ * one when paid. `label` says what pressing it does (mark as paid / not paid).
+ */
+export function PaidCheckButton({ paid, label }: { paid: boolean; label: string }) {
+  return (
+    <button
+      type="submit"
+      aria-label={label}
+      aria-pressed={paid}
+      title={label}
+      className={cx(baseClass, paid ? "text-ok" : "text-muted hover:text-ok")}
+    >
+      <svg {...iconProps}>
+        <circle cx="12" cy="12" r="9" fill={paid ? "currentColor" : "none"} fillOpacity={paid ? 0.15 : 0} />
+        <path d="m8 12.5 2.8 2.8L16.5 9.5" />
+      </svg>
+    </button>
+  );
+}
+
 export function ConfirmIconButton({ label }: { label: string }) {
   return (
     <button type="submit" aria-label={label} title={label} className={cx(baseClass, "text-brand")}>

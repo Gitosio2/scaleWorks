@@ -1,44 +1,40 @@
-import { and, asc, desc, eq, ilike, ne, or, sql, type SQL } from "drizzle-orm";
+import Link from "next/link";
+import { and, asc, desc, eq, ilike, isNull, ne, or, sql, type SQL } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
-import { expenses, expenseStatus } from "@/db/schema";
+import { models, parts } from "@/db/schema";
 import { formatEuros } from "@/lib/labels";
-import {
-  containsPattern,
-  descNullsLast,
-  enumParam,
-  textParam,
-  type SearchParams,
-} from "@/lib/list-filters";
+import { modelTitle } from "@/lib/model-title";
+import { containsPattern, descNullsLast, enumParam, textParam, type SearchParams } from "@/lib/list-filters";
 import { requireUser } from "@/lib/session";
 import { Card } from "@/components/ui/card";
 import { ConfirmDelete } from "@/components/ui/confirm-delete";
 import { CreateModal } from "@/components/ui/create-modal";
 import { EditModal } from "@/components/ui/edit-modal";
+import { PaidCheckButton } from "@/components/ui/icon-actions";
 import { FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filters";
 import { PageHeader } from "@/components/ui/page-header";
-import { SegmentedToggle } from "@/components/ui/segmented-toggle";
-import { expenseStatusVariant, StatusBadge } from "@/components/ui/status-badge";
+import { StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
 import { listItemClass } from "@/components/ui/styles";
-import {
-  createExpense,
-  deleteExpense,
-  updateExpense,
-  updateExpenseStatus,
-} from "./actions";
+import { createLoosePart, deleteLoosePart, setPartPaid, updateLoosePart } from "./actions";
 import { ExpenseFields } from "./expense-fields";
 
+// What can be owed: parts of models and loose purchases (no model, no quote) that
+// have been bought (ordered or in hand). A part still "to order" is a plan, and
+// quote parts are estimates.
+const bought = and(isNull(parts.quoteId), ne(parts.status, "to_order"));
+
 const sorts = {
-  newest: { order: [desc(expenses.createdAt)] },
-  oldest: { order: [asc(expenses.createdAt)] },
-  price_desc: { order: [descNullsLast(expenses.priceCents)] },
-  description: { order: [asc(expenses.description)] },
+  model: { order: [asc(sql`lower(concat_ws(' ', ${models.brand}, ${models.name}))`)] },
+  price_desc: { order: [descNullsLast(parts.priceCents)] },
+  description: { order: [asc(parts.description)] },
+  store: { order: [asc(parts.store), asc(parts.description)] },
 };
 type SortKey = keyof typeof sorts;
 const sortKeys = Object.keys(sorts) as SortKey[];
 
-// "pending" (the default) is everything not paid yet: ordered or received.
-const statusFilters = ["pending", ...expenseStatus.enumValues, "all"] as const;
+// "pending" (the default) is what is still unpaid.
+const statusFilters = ["pending", "paid", "all"] as const;
 
 export default async function ExpensesPage({
   searchParams,
@@ -49,49 +45,44 @@ export default async function ExpensesPage({
   const user = await requireUser();
   const t = await getTranslations("expenses");
   const tc = await getTranslations("common");
-  const ts = await getTranslations("expenseStatus");
+  const ts = await getTranslations("supplyStatus");
   const locale = await getLocale();
 
   const q = textParam(sp, "q");
   const status = enumParam(sp, "status", statusFilters) ?? "pending";
-  const sort = enumParam(sp, "sort", sortKeys) ?? "newest";
+  const sort = enumParam(sp, "sort", sortKeys) ?? "model";
 
   const conditions: Array<SQL | undefined> = [
-    eq(expenses.userId, user.id),
+    eq(parts.userId, user.id),
+    bought,
+    status === "all" ? undefined : eq(parts.paid, status === "paid"),
     q
       ? or(
-          ilike(expenses.description, containsPattern(q)),
-          ilike(expenses.store, containsPattern(q)),
+          ilike(parts.description, containsPattern(q)),
+          ilike(parts.brand, containsPattern(q)),
+          ilike(parts.reference, containsPattern(q)),
+          ilike(parts.store, containsPattern(q)),
+          ilike(sql`concat_ws(' ', ${models.brand}, ${models.name})`, containsPattern(q)),
         )
       : undefined,
-    status === "pending"
-      ? ne(expenses.status, "paid")
-      : status === "all"
-        ? undefined
-        : eq(expenses.status, status),
   ];
   const activeCount = [q, status !== "pending"].filter(Boolean).length;
 
-  const statusOptions = expenseStatus.enumValues.map((s) => ({
-    value: s as string,
-    label: ts(s),
-    variant: expenseStatusVariant(s),
-  }));
-
   const [rows, [owed]] = await Promise.all([
     db
-      .select()
-      .from(expenses)
+      .select({ part: parts, modelId: models.id, modelBrand: models.brand, modelName: models.name })
+      .from(parts)
+      .leftJoin(models, eq(models.id, parts.modelId))
       .where(and(...conditions))
-      .orderBy(...sorts[sort].order, asc(expenses.id)),
-    // What is still owed across all unpaid items, whatever the list is filtered by.
+      .orderBy(...sorts[sort].order, desc(parts.priceCents), asc(parts.id)),
+    // What is still owed across every unpaid bought part, whatever the list is filtered by.
     db
       .select({
-        count: sql<number>`count(*) filter (where ${expenses.status} <> 'paid')::int`,
-        cents: sql<number>`coalesce(sum(${expenses.priceCents}) filter (where ${expenses.status} <> 'paid'), 0)::int`,
+        count: sql<number>`count(*)::int`,
+        cents: sql<number>`coalesce(sum(${parts.priceCents}), 0)::int`,
       })
-      .from(expenses)
-      .where(eq(expenses.userId, user.id)),
+      .from(parts)
+      .where(and(eq(parts.userId, user.id), bought, eq(parts.paid, false))),
   ]);
 
   return (
@@ -101,7 +92,7 @@ export default async function ExpensesPage({
         subtitle={t("subtitle", { amount: formatEuros(owed.cents, locale), count: owed.count })}
       />
 
-      <CreateModal label={t("add")} title={t("add")} action={createExpense}>
+      <CreateModal label={t("add")} title={t("add")} action={createLoosePart}>
         <ExpenseFields />
       </CreateModal>
 
@@ -109,12 +100,9 @@ export default async function ExpensesPage({
         <FilterText name="q" label={tc("search")} defaultValue={q} placeholder={t("searchPlaceholder")} />
         <FilterSelect
           name="status"
-          label={tc("status")}
+          label={t("paymentFilter")}
           defaultValue={status}
-          options={statusFilters.map((k) => ({
-            value: k,
-            label: k === "pending" || k === "all" ? t(`filter.${k}`) : ts(k),
-          }))}
+          options={statusFilters.map((k) => ({ value: k, label: t(`filter.${k}`) }))}
           allLabel={null}
         />
         <FilterSelect
@@ -131,40 +119,50 @@ export default async function ExpensesPage({
           {rows.length === 0 && (
             <li className="text-muted">{activeCount > 0 ? t("emptyFiltered") : t("empty")}</li>
           )}
-          {rows.map((e) => (
-            <li key={e.id} className={`${listItemClass} flex flex-wrap items-center justify-between gap-x-4 gap-y-2`}>
+          {rows.map(({ part: p, modelId, modelBrand, modelName }) => (
+            <li key={p.id} className={`${listItemClass} flex flex-wrap items-center justify-between gap-x-4 gap-y-2`}>
               <div className="min-w-0">
-                <p className={e.status === "paid" ? "font-bold text-muted" : "font-bold"}>
-                  {e.description}
-                </p>
+                <p className={p.paid ? "font-bold text-muted" : "font-bold"}>{p.description}</p>
                 <p className="text-[13px] text-muted">
-                  {[e.store, formatEuros(e.priceCents, locale)].filter(Boolean).join(" · ")}
+                  {[p.brand, p.reference, p.store, formatEuros(p.priceCents, locale)]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+                <p className="text-[13px]">
+                  {modelId && modelName ? (
+                    <Link href={`/models/${modelId}`} className="font-semibold text-brand hover:underline">
+                      {modelTitle(modelBrand, modelName)}
+                    </Link>
+                  ) : (
+                    <span className="text-muted">{t("noModel")}</span>
+                  )}
                 </p>
               </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <SegmentedToggle
-                  value={e.status}
-                  options={statusOptions}
-                  action={updateExpenseStatus.bind(null, e.id)}
-                  label={tc("status")}
-                />
-                <StatusBadge variant={expenseStatusVariant(e.status)}>{ts(e.status)}</StatusBadge>
-                <div className="flex items-center">
-                  <EditModal
-                    label={tc("edit")}
-                    title={t("editTitle")}
-                    submitLabel={tc("save")}
-                    action={updateExpense.bind(null, e.id)}
-                  >
-                    <ExpenseFields defaults={e} />
-                  </EditModal>
-                  <ConfirmDelete
-                    label={tc("delete")}
-                    title={t("deleteTitle")}
-                    message={t("deleteMessage", { name: e.description })}
-                    action={deleteExpense.bind(null, e.id)}
-                  />
-                </div>
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                <StatusBadge variant={supplyStatusVariant(p.status)}>{ts(p.status)}</StatusBadge>
+                <StatusBadge variant={p.paid ? "ok" : "warn"}>{p.paid ? t("paid") : t("unpaid")}</StatusBadge>
+                <form action={setPartPaid.bind(null, p.id, !p.paid)}>
+                  <PaidCheckButton paid={p.paid} label={p.paid ? t("markUnpaid") : t("markPaid")} />
+                </form>
+                {/* Parts of a model are edited on the model; loose ones only here. */}
+                {!modelId && (
+                  <>
+                    <EditModal
+                      label={tc("edit")}
+                      title={t("editTitle")}
+                      submitLabel={tc("save")}
+                      action={updateLoosePart.bind(null, p.id)}
+                    >
+                      <ExpenseFields defaults={p} />
+                    </EditModal>
+                    <ConfirmDelete
+                      label={tc("delete")}
+                      title={t("deleteTitle")}
+                      message={t("deleteMessage", { name: p.description })}
+                      action={deleteLoosePart.bind(null, p.id)}
+                    />
+                  </>
+                )}
               </div>
             </li>
           ))}

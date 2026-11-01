@@ -89,32 +89,34 @@
     "crane": "Crane",
     "machine": "Machine"
   },
-  "expenseStatus": {
-    "ordered": "Ordered",
-    "received": "Received",
-    "paid": "Paid"
-  },
   "expenses": {
     "title": "Pending expenses",
     "subtitle": "{count, plural, =0 {Nothing left to pay.} one {# item left to pay: {amount}} other {# items left to pay: {amount}}}",
-    "add": "Add expense",
-    "editTitle": "Edit expense",
-    "descriptionPlaceholder": "What did you buy?",
-    "searchPlaceholder": "Description or store",
+    "searchPlaceholder": "Item, brand, store or model",
     "empty": "Nothing pending.",
-    "emptyFiltered": "No expenses match these filters.",
-    "deleteTitle": "Delete expense",
-    "deleteMessage": "Delete \"{name}\"? This cannot be undone.",
+    "emptyFiltered": "Nothing matches these filters.",
+    "paymentFilter": "Payment",
+    "paid": "Paid",
+    "unpaid": "Unpaid",
+    "markPaid": "Mark as paid",
+    "markUnpaid": "Mark as not paid",
     "filter": {
-      "pending": "Pending (not paid)",
+      "pending": "Unpaid",
+      "paid": "Paid",
       "all": "All"
     },
     "sort": {
-      "newest": "Newest first",
-      "oldest": "Oldest first",
+      "model": "Model (A–Z)",
       "price_desc": "Price (high to low)",
-      "description": "Description (A–Z)"
-    }
+      "description": "Description (A–Z)",
+      "store": "Store (A–Z)"
+    },
+    "add": "Add expense",
+    "editTitle": "Edit expense",
+    "descriptionPlaceholder": "What did you buy?",
+    "noModel": "No model",
+    "deleteTitle": "Delete expense",
+    "deleteMessage": "Delete \"{name}\"? This cannot be undone."
   },
   "supplyStatus": {
     "to_order": "To order",
@@ -175,7 +177,10 @@
     "add": "Add part",
     "empty": "No parts yet.",
     "noStore": "No store",
-    "updateStatus": "Update status"
+    "paid": "Paid",
+    "unpaid": "Unpaid",
+    "markPaid": "Mark as paid",
+    "markUnpaid": "Mark as not paid"
   },
   "clients": {
     "subtitle": "People and companies you work for.",
@@ -350,7 +355,6 @@
     "invalidQuantity": "Invalid quantity",
     "nameRequired": "Name is required",
     "clientHasRecords": "This client has models or quotes and cannot be deleted",
-    "nameRequired": "Name is required",
     "titleRequired": "Title is required",
     "descriptionRequired": "Description is required",
     "invalidStatus": "Invalid status",

@@ -1,18 +1,20 @@
 import { useTranslations } from "next-intl";
-import { expenseStatus } from "@/db/schema";
 import { inputClass, labelClass } from "@/components/ui/styles";
 
 type Defaults = {
   description?: string;
   store?: string | null;
   priceCents?: number | null;
-  status?: (typeof expenseStatus.enumValues)[number];
+  status?: "ordered" | "in_hand" | "to_order";
+  paid?: boolean;
 };
 
+// Fields of a loose expense (a part with no model). "To order" is left out: it
+// would not count as owed until it is bought.
 export function ExpenseFields({ defaults = {} }: { defaults?: Defaults }) {
   const tc = useTranslations("common");
   const t = useTranslations("expenses");
-  const ts = useTranslations("expenseStatus");
+  const ts = useTranslations("supplyStatus");
   return (
     <>
       <label className={labelClass}>
@@ -37,11 +39,18 @@ export function ExpenseFields({ defaults = {} }: { defaults?: Defaults }) {
       </div>
       <label className={labelClass}>
         {tc("status")}
-        <select name="status" defaultValue={defaults.status ?? "ordered"} className={inputClass}>
-          {expenseStatus.enumValues.map((s) => (
-            <option key={s} value={s}>{ts(s)}</option>
-          ))}
+        <select
+          name="status"
+          defaultValue={defaults.status === "in_hand" ? "in_hand" : "ordered"}
+          className={inputClass}
+        >
+          <option value="ordered">{ts("ordered")}</option>
+          <option value="in_hand">{ts("in_hand")}</option>
         </select>
+      </label>
+      <label className="flex min-h-11 items-center gap-2 text-sm font-semibold text-ink-2">
+        <input type="checkbox" name="paid" defaultChecked={defaults.paid ?? false} className="size-4 accent-brand" />
+        {t("paid")}
       </label>
     </>
   );

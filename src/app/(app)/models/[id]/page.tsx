@@ -28,6 +28,7 @@ import {
   updateModelConsumableQuantity,
 } from "./consumable-actions";
 import { addPart, deletePart, updatePartStatus } from "./part-actions";
+import { setPartPaid } from "../../expenses/actions";
 import { CollapsibleCard } from "@/components/ui/card";
 import { BackLink, PageHeader } from "@/components/ui/page-header";
 import { PhaseProgress } from "@/components/ui/phase-progress";
@@ -234,6 +235,7 @@ export default async function ModelDetailPage({
         add={addPart.bind(null, id)}
         updateStatus={updatePartStatus.bind(null, id)}
         remove={deletePart.bind(null, id)}
+        setPaid={setPartPaid}
       />
 
       <CollapsibleCard title={t("consumables.title", { total: formatEuros(consumablesTotalCents, locale) })}>

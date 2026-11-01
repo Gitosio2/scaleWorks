@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { and, asc, eq, isNotNull, lt, lte, ne, notInArray, sql } from "drizzle-orm";
+import { and, asc, eq, isNotNull, isNull, lt, lte, ne, notInArray, sql } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
-import { consumables, expenses, models, parts, quotes } from "@/db/schema";
+import { consumables, models, parts, quotes } from "@/db/schema";
 import { formatDate, formatEuros } from "@/lib/labels";
 import { modelTitle } from "@/lib/model-title";
 import { stalledCutoff } from "@/lib/stalled";
@@ -131,26 +131,33 @@ export default async function Home() {
         ),
       )
       .orderBy(asc(models.createdAt), asc(models.id)),
-    // Spent = bought (ordered or in hand), not merely planned. Parts only count
-    // on models: parts on a quote are an estimate for work not yet accepted.
+    // Spent = bought (ordered or in hand), not merely planned. Parts on a model or
+    // loose ones count; parts on a quote are an estimate for work not yet accepted.
     db
       .select({ cents: sql<number>`coalesce(sum(${parts.priceCents}), 0)::int` })
       .from(parts)
       .where(
-        and(eq(parts.userId, user.id), isNotNull(parts.modelId), ne(parts.status, "to_order")),
+        and(eq(parts.userId, user.id), isNull(parts.quoteId), ne(parts.status, "to_order")),
       ),
     db
       .select({ cents: sql<number>`coalesce(sum(${consumables.priceCents}), 0)::int` })
       .from(consumables)
       .where(and(eq(consumables.userId, user.id), ne(consumables.status, "to_order"))),
-    // Still to pay: the pending expenses list, everything not marked paid.
+    // Still to pay (the Pending expenses list): bought parts, of a model or loose, not marked paid.
     db
       .select({
         count: sql<number>`count(*)::int`,
-        cents: sql<number>`coalesce(sum(${expenses.priceCents}), 0)::int`,
+        cents: sql<number>`coalesce(sum(${parts.priceCents}), 0)::int`,
       })
-      .from(expenses)
-      .where(and(eq(expenses.userId, user.id), ne(expenses.status, "paid"))),
+      .from(parts)
+      .where(
+        and(
+          eq(parts.userId, user.id),
+          isNull(parts.quoteId),
+          ne(parts.status, "to_order"),
+          eq(parts.paid, false),
+        ),
+      ),
   ]);
   const expensesCents = partsSpent.cents + consumablesSpent.cents;
   const balanceCents = stats.incomeCents - expensesCents;

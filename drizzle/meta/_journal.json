@@ -120,6 +120,13 @@
       "when": 1793568260669,
       "tag": "0016_expenses",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1793570182563,
+      "tag": "0017_parts_paid_and_loose",
+      "breakpoints": true
     }
   ]
 }
