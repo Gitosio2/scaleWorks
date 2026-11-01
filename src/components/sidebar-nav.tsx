@@ -68,6 +68,17 @@ const items = [
       </svg>
     ),
   },
+  {
+    href: "/portfolio",
+    label: "gallery" as const,
+    icon: (
+      <svg {...icon}>
+        <rect x="3.5" y="4.5" width="17" height="15" rx="2" />
+        <circle cx="9" cy="10" r="1.6" />
+        <path d="m20.5 16-5-5-8 8" />
+      </svg>
+    ),
+  },
 ];
 
 export function SidebarNav() {

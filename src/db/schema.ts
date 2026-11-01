@@ -85,6 +85,9 @@ export const models = pgTable(
     // Only set while paymentStatus is "deposit_paid". The remaining amount is
     // never stored: it is priceCents - depositCents.
     depositCents: integer("deposit_cents"),
+    // Shown on the public gallery once finished. Off by default: nothing about a
+    // model is public until the owner opts in.
+    published: boolean("published").notNull().default(false),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
   (t) => [
@@ -94,6 +97,26 @@ export const models = pgTable(
       sql`(${t.paymentStatus} = 'deposit_paid' AND ${t.depositCents} IS NOT NULL AND ${t.depositCents} > 0) OR (${t.paymentStatus} <> 'deposit_paid' AND ${t.depositCents} IS NULL)`,
     ),
   ],
+);
+
+// Photos of a model. Only storage keys live here (never URLs), so the storage
+// provider can change without rewriting data; see lib/storage.ts.
+export const modelImages = pgTable(
+  "model_images",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    modelId: uuid("model_id")
+      .notNull()
+      .references(() => models.id, { onDelete: "cascade" }),
+    userId: text("user_id").notNull(),
+    // Full-size and thumbnail objects.
+    key: text("key").notNull(),
+    thumbKey: text("thumb_key").notNull(),
+    // The lowest position is the cover (setting a cover may go below zero).
+    position: integer("position").notNull().default(0),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [index("model_images_model_idx").on(t.modelId, t.position)],
 );
 
 export const quotes = pgTable(

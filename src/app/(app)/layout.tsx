@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { Brand } from "@/components/brand";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { LogoutButton } from "@/components/logout-button";
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -12,15 +13,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex flex-1 flex-col md:flex-row">
       <aside className="flex shrink-0 flex-col gap-6 border-b border-line bg-sidebar p-4 md:sticky md:top-0 md:h-dvh md:w-[232px] md:self-start md:overflow-y-auto md:border-r md:border-b-0 md:py-6">
-        <div className="flex items-center gap-2.5 px-1">
-          <span
-            aria-hidden
-            className="flex size-8 items-center justify-center rounded-[9px] bg-brand font-bold text-brand-fg"
-          >
-            S
-          </span>
-          <span className="text-lg font-bold tracking-tight">scaleWorks</span>
-        </div>
+        <Brand />
         <SidebarNav />
         <div className={cx(cardClass, "gap-0.5! p-3! md:mt-auto")}>
           <p className="text-xs text-muted">{t("signedInAs")}</p>
