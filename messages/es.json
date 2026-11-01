@@ -13,7 +13,8 @@
     "gallery": "Galería pública",
     "signedInAs": "Sesión iniciada como",
     "logOut": "Cerrar sesión",
-    "signOutFailed": "No se pudo cerrar la sesión. Inténtalo de nuevo."
+    "signOutFailed": "No se pudo cerrar la sesión. Inténtalo de nuevo.",
+    "backup": "Copia de seguridad"
   },
   "language": {
     "label": "Idioma",
@@ -379,5 +380,30 @@
     "depositNotPositive": "El importe del anticipo debe ser mayor que 0",
     "depositExceedsPrice": "El anticipo no puede ser mayor que el precio",
     "depositRequired": "Indica el importe del anticipo para un pago pendiente"
+  },
+  "backup": {
+    "title": "Copia de seguridad",
+    "subtitle": "Descarga tus datos para guardar una copia fuera de la app.",
+    "fullTitle": "Copia completa",
+    "fullHelp": "{count, plural, one {Todos tus datos en un solo archivo (# registro).} other {Todos tus datos en un solo archivo (# registros).}}",
+    "downloadAll": "Descargar copia completa (JSON)",
+    "csvTitle": "Por tabla, para una hoja de cálculo",
+    "csvHelp": "Archivos CSV separados por punto y coma. Las columnas de dinero salen también en euros.",
+    "downloadCsv": "Descargar CSV",
+    "rows": "{count, plural, one {# fila} other {# filas}}",
+    "tables": {
+      "clients": "Clientes",
+      "models": "Maquetas",
+      "modelImages": "Fotos de maquetas (solo claves)",
+      "quotes": "Presupuestos",
+      "parts": "Piezas y gastos sueltos",
+      "consumables": "Consumibles",
+      "modelConsumables": "Consumibles usados en maquetas",
+      "timeEntries": "Registros de tiempo"
+    },
+    "noteTitle": "Conviene saber",
+    "noteSensitive": "Los archivos contienen los datos de tus clientes y tus precios. Guárdalos en un sitio privado.",
+    "notePhotos": "Los archivos de las fotos no se incluyen: siguen en su almacén. La copia solo lista sus claves.",
+    "noteExcluded": "Tus datos de acceso (contraseña y sesiones) no se exportan nunca."
   }
 }

@@ -13,7 +13,8 @@
     "gallery": "Public gallery",
     "signedInAs": "Signed in as",
     "logOut": "Log out",
-    "signOutFailed": "Could not sign out. Try again."
+    "signOutFailed": "Could not sign out. Try again.",
+    "backup": "Backup"
   },
   "language": {
     "label": "Language",
@@ -379,5 +380,30 @@
     "depositNotPositive": "Deposit amount must be greater than 0",
     "depositExceedsPrice": "Deposit cannot be greater than the price",
     "depositRequired": "Enter the deposit amount for a pending payment"
+  },
+  "backup": {
+    "title": "Backup",
+    "subtitle": "Download your data to keep a copy outside the app.",
+    "fullTitle": "Full copy",
+    "fullHelp": "{count, plural, one {All your data in one file (# record).} other {All your data in one file (# records).}}",
+    "downloadAll": "Download full copy (JSON)",
+    "csvTitle": "By table, for a spreadsheet",
+    "csvHelp": "CSV files separated by semicolons. Money columns also come in euros.",
+    "downloadCsv": "Download CSV",
+    "rows": "{count, plural, one {# row} other {# rows}}",
+    "tables": {
+      "clients": "Clients",
+      "models": "Models",
+      "modelImages": "Model photos (keys only)",
+      "quotes": "Quotes",
+      "parts": "Parts and loose purchases",
+      "consumables": "Consumables",
+      "modelConsumables": "Consumables used on models",
+      "timeEntries": "Time entries"
+    },
+    "noteTitle": "Good to know",
+    "noteSensitive": "The files contain your clients' data and your prices. Keep them somewhere private.",
+    "notePhotos": "The photo files are not included: they stay in the photo storage. The copy lists their keys.",
+    "noteExcluded": "Your login data (password, sessions) is never exported."
   }
 }
