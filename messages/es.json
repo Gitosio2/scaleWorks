@@ -99,11 +99,31 @@
     "paid": "Pagado por completo"
   },
   "home": {
-    "subtitle": "Gestiona tus maquetas, presupuestos, piezas y horas.",
-    "models": "Sigue las fases, el tiempo, las piezas y los consumibles.",
-    "quotes": "Prepara presupuestos y convierte los aceptados en maquetas.",
-    "clients": "Guarda tus clientes y sus datos de contacto.",
-    "consumables": "Pinturas, pegamentos y otros materiales que utilizas."
+    "subtitle": "Gestiona tus maquetas, presupuestos, piezas y horas."
+  },
+  "dashboard": {
+    "activeTitle": "Trabajos en activo",
+    "activeCount": "{count, plural, one {maqueta en curso} other {maquetas en curso}}",
+    "activeAmount": "Importe total de los trabajos en activo",
+    "deadlinesTitle": "Fechas límite en dos meses o menos",
+    "deadlinesEmpty": "No hay fechas límite en los próximos dos meses.",
+    "overdue": "{days, plural, one {# día de retraso} other {# días de retraso}}",
+    "dueIn": "{days, plural, =0 {Vence hoy} one {Vence en # día} other {Vence en # días}}",
+    "finishedTitle": "Maquetas hechas",
+    "finishedHint": "Maquetas finalizadas en total",
+    "pendingTitle": "Pendiente de cobro",
+    "pendingCount": "{count, plural, one {# maqueta pendiente de cobro} other {# maquetas pendientes de cobro}}",
+    "financesTitle": "Ingresos y gastos",
+    "incomeLabel": "Ingresos cobrados (maquetas pagadas y anticipos)",
+    "expensesLabel": "Gastos (piezas y consumibles pedidos o en mano)",
+    "balanceLabel": "Balance",
+    "quotesTitle": "Presupuestos por decidir",
+    "quotesHint": "Presupuestos abiertos, los más antiguos primero",
+    "quoteAge": "{days, plural, =0 {Hoy} one {Hace # día} other {Hace # días}}",
+    "staleTitle": "Maquetas paradas",
+    "staleHint": "Sin empezar desde hace más de 7 meses",
+    "staleAge": "{months, plural, one {# mes} other {# meses}}",
+    "andMore": "y {count} más"
   },
   "parts": {
     "title": "Piezas: {total}",
@@ -177,6 +197,9 @@
     "ownProject": "Proyecto propio",
     "paymentStatus": "Estado del pago",
     "payment": "Pago",
+    "paymentPending": "Pendiente de cobro (con precio)",
+    "phaseActive": "En curso (empezadas, sin terminar)",
+    "phaseStalled": "Paradas (sin empezar desde hace más de 7 meses)",
     "deposit": "Anticipo (€)",
     "depositHelp": "Un anticipo deja el pago como Pendiente; si es igual al precio, la maqueta se marca como pagada.",
     "phase": "Fase",
