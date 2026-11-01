@@ -87,10 +87,14 @@ export default async function Home() {
       .select({
         activeCount: sql<number>`count(*) filter (where ${ACTIVE})::int`,
         activeCents: sql<number>`coalesce(sum(${models.priceCents}) filter (where ${ACTIVE}), 0)::int`,
+        // Of that value, what has not come in yet: price minus any deposit, for active
+        // models not paid in full. This is the money still to be received.
+        activeToCollectCents: sql<number>`coalesce(sum(${models.priceCents} - coalesce(${models.depositCents}, 0)) filter (where ${ACTIVE} and ${models.paymentStatus} <> 'paid' and ${models.priceCents} is not null), 0)::int`,
         finishedCount: sql<number>`count(*) filter (where ${models.phase} = 'finished')::int`,
-        // Unpaid models with a price: price minus any deposit. Unpriced ones owe nothing yet.
-        pendingCount: sql<number>`count(*) filter (where ${models.paymentStatus} <> 'paid' and ${models.priceCents} is not null)::int`,
-        pendingCents: sql<number>`coalesce(sum(${models.priceCents} - coalesce(${models.depositCents}, 0)) filter (where ${models.paymentStatus} <> 'paid' and ${models.priceCents} is not null), 0)::int`,
+        // Finished models not paid in full, with a price: price minus any deposit. The
+        // ones still in progress are counted on the active work card instead.
+        pendingCount: sql<number>`count(*) filter (where ${models.phase} = 'finished' and ${models.paymentStatus} <> 'paid' and ${models.priceCents} is not null)::int`,
+        pendingCents: sql<number>`coalesce(sum(${models.priceCents} - coalesce(${models.depositCents}, 0)) filter (where ${models.phase} = 'finished' and ${models.paymentStatus} <> 'paid' and ${models.priceCents} is not null), 0)::int`,
         // Money actually received: the full price once paid, the deposit before that.
         incomeCents: sql<number>`coalesce(sum(case ${models.paymentStatus} when 'paid' then ${models.priceCents} when 'deposit_paid' then ${models.depositCents} else 0 end), 0)::int`,
       })
@@ -180,6 +184,11 @@ export default async function Home() {
           <div className="flex flex-wrap gap-x-10 gap-y-3">
             <Stat value={stats.activeCount} label={t("activeCount", { count: stats.activeCount })} />
             <Stat value={formatEuros(stats.activeCents, locale)} label={t("activeAmount")} />
+            <Stat
+              value={formatEuros(stats.activeToCollectCents, locale)}
+              valueClass={stats.activeToCollectCents > 0 ? "text-warn" : ""}
+              label={t("activeToCollect")}
+            />
           </div>
           <div>
             <h3 className="text-[13px] font-semibold text-ink-2">{t("deadlinesTitle")}</h3>
@@ -222,7 +231,7 @@ export default async function Home() {
         </Card>
 
         <Card>
-          <CardLinkTitle title={t("pendingTitle")} href="/models?payment=pending&scope=all" />
+          <CardLinkTitle title={t("pendingTitle")} href="/models?phase=finished&payment=pending&scope=all" />
           <Stat
             value={formatEuros(stats.pendingCents, locale)}
             label={t("pendingCount", { count: stats.pendingCount })}
