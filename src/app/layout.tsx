@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Figtree } from "next/font/google";
+import { SITE_NAME } from "@/lib/site";
 import "./globals.css";
 
 const figtree = Figtree({
@@ -11,7 +12,7 @@ const figtree = Figtree({
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("meta");
-  return { title: "scaleWorks", description: t("description") };
+  return { title: SITE_NAME, description: t("description") };
 }
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {

@@ -9,6 +9,7 @@
     "quotes": "Presupuestos",
     "clients": "Clientes",
     "consumables": "Consumibles",
+    "gallery": "Galería pública",
     "signedInAs": "Sesión iniciada como",
     "logOut": "Cerrar sesión",
     "signOutFailed": "No se pudo cerrar la sesión. Inténtalo de nuevo."
@@ -100,6 +101,14 @@
   },
   "home": {
     "subtitle": "Gestiona tus maquetas, presupuestos, piezas y horas."
+  },
+  "portfolio": {
+    "title": "Trabajos realizados",
+    "subtitle": "Una selección de las maquetas que he construido.",
+    "empty": "Todavía no hay nada que mostrar.",
+    "back": "← Todas las maquetas",
+    "noPhotos": "Aún no hay fotos.",
+    "alt": "Foto {n} de {name}"
   },
   "dashboard": {
     "activeTitle": "Trabajos en activo",
@@ -197,6 +206,28 @@
     "ownProject": "Proyecto propio",
     "paymentStatus": "Estado del pago",
     "payment": "Pago",
+    "photos": {
+      "title": "Fotos: {count}",
+      "empty": "Aún no hay fotos.",
+      "add": "Añadir fotos",
+      "hint": "Las fotos se redimensionan en tu navegador antes de subirse (hasta 20 por maqueta).",
+      "uploading": "Subiendo {done} de {total}…",
+      "uploadFailed": "No se pudo subir una foto. Revisa el archivo e inténtalo de nuevo.",
+      "notConfigured": "El almacenamiento de fotos aún no está configurado (variables de entorno S3_*).",
+      "cover": "Portada",
+      "makeCover": "Usar como portada",
+      "delete": "Eliminar foto",
+      "deleteMessage": "¿Eliminar esta foto? Esta acción no se puede deshacer.",
+      "alt": "Foto {n} de {name}",
+      "publicTitle": "Galería pública",
+      "publicInfo": "Una vez terminada, una maqueta publicada muestra su nombre, empresa y fotos a cualquiera que tenga el enlace. Nunca se muestran precios, clientes ni pagos.",
+      "publicOn": "Publicada",
+      "publicOff": "Sin publicar",
+      "publicPending": "Está publicada y aparecerá en la galería cuando la maqueta esté terminada.",
+      "publish": "Publicar",
+      "unpublish": "Dejar de publicar",
+      "viewPublic": "Ver página pública"
+    },
     "paymentPending": "Pendiente de cobro (con precio)",
     "phaseActive": "En curso (empezadas, sin terminar)",
     "phaseStalled": "Paradas (sin empezar desde hace más de 7 meses)",
@@ -294,6 +325,9 @@
     "invalidDate": "Fecha no válida",
     "clientNotFound": "Cliente no encontrado",
     "modelNotFound": "Maqueta no encontrada",
+    "imageInvalid": "El archivo no es una imagen válida",
+    "imageTooLarge": "La imagen es demasiado grande",
+    "imageLimit": "Una maqueta puede tener hasta 20 fotos",
     "consumableNotFound": "Consumible no encontrado",
     "consumableUsedUp": "Este consumible está agotado",
     "quoteNotFound": "Presupuesto no encontrado",

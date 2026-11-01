@@ -9,6 +9,7 @@
     "quotes": "Quotes",
     "clients": "Clients",
     "consumables": "Consumables",
+    "gallery": "Public gallery",
     "signedInAs": "Signed in as",
     "logOut": "Log out",
     "signOutFailed": "Could not sign out. Try again."
@@ -100,6 +101,14 @@
   },
   "home": {
     "subtitle": "Manage your scale models, quotes, parts and hours."
+  },
+  "portfolio": {
+    "title": "Completed work",
+    "subtitle": "A selection of scale models I have built.",
+    "empty": "Nothing to show yet.",
+    "back": "← All models",
+    "noPhotos": "No photos yet.",
+    "alt": "Photo {n} of {name}"
   },
   "dashboard": {
     "activeTitle": "Active work",
@@ -197,6 +206,28 @@
     "ownProject": "Own project",
     "paymentStatus": "Payment status",
     "payment": "Payment",
+    "photos": {
+      "title": "Photos: {count}",
+      "empty": "No photos yet.",
+      "add": "Add photos",
+      "hint": "Photos are resized in your browser before upload (up to 20 per model).",
+      "uploading": "Uploading {done} of {total}…",
+      "uploadFailed": "A photo could not be uploaded. Check the file and try again.",
+      "notConfigured": "Photo storage is not configured yet (S3_* environment variables).",
+      "cover": "Cover",
+      "makeCover": "Use as cover",
+      "delete": "Delete photo",
+      "deleteMessage": "Delete this photo? This cannot be undone.",
+      "alt": "Photo {n} of {name}",
+      "publicTitle": "Public gallery",
+      "publicInfo": "Once it is finished, a published model shows its name, company and photos to anyone with the link. Prices, clients and payments are never shown.",
+      "publicOn": "Published",
+      "publicOff": "Not published",
+      "publicPending": "It is published and will appear in the gallery once the model is finished.",
+      "publish": "Publish",
+      "unpublish": "Unpublish",
+      "viewPublic": "View public page"
+    },
     "paymentPending": "Pending payment (with a price)",
     "phaseActive": "In progress (started, not finished)",
     "phaseStalled": "Stalled (not started for over 7 months)",
@@ -294,6 +325,9 @@
     "invalidDate": "Invalid date",
     "clientNotFound": "Client not found",
     "modelNotFound": "Model not found",
+    "imageInvalid": "The file is not a valid image",
+    "imageTooLarge": "The image is too large",
+    "imageLimit": "A model can have up to 20 photos",
     "consumableNotFound": "Consumable not found",
     "consumableUsedUp": "This consumable is used up",
     "quoteNotFound": "Quote not found",

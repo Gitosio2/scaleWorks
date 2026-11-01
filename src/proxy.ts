@@ -33,8 +33,15 @@ function contentSecurityPolicy(nonce: string) {
 export function proxy(request: NextRequest) {
   // Optimistic check only (cookie presence). Real authorization must be
   // re-checked on the server wherever data is read or written.
-  const isLogin = request.nextUrl.pathname === "/login";
-  if (!isLogin && !getSessionCookie(request)) {
+  // Reachable without a session: the login page, the public gallery and the
+  // photo route (which decides per image whether it may be seen).
+  const { pathname } = request.nextUrl;
+  const isOpen =
+    pathname === "/login" ||
+    pathname === "/portfolio" ||
+    pathname.startsWith("/portfolio/") ||
+    pathname.startsWith("/img/");
+  if (!isOpen && !getSessionCookie(request)) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -52,8 +59,8 @@ export function proxy(request: NextRequest) {
   return response;
 }
 
-// The login page is included so it gets the policy too; the auth check above
-// skips it. Auth API responses and static assets do not need the header.
+// The open pages are included so they get the policy too; the auth check above
+// skips them. Auth API responses and static assets do not need the header.
 export const config = {
   matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico).*)"],
 };

@@ -40,6 +40,7 @@ import {
   secondaryButtonClass,
 } from "@/components/ui/styles";
 import { PartsSection } from "@/app/(app)/parts-section";
+import { PhotosSection } from "./photos-section";
 import { QuantityFields } from "./quantity-fields";
 
 export default async function ModelDetailPage({
@@ -148,6 +149,14 @@ export default async function ModelDetailPage({
             </form>
           </div>
         }
+      />
+
+      <PhotosSection
+        modelId={id}
+        modelName={m.name}
+        userId={user.id}
+        published={m.published}
+        finished={m.phase === "finished"}
       />
 
       <CollapsibleCard title={t("time.title", { total: formatDuration(Number(total ?? 0)) })}>

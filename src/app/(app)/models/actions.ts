@@ -5,10 +5,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
-import { clients, models, modelPhase, paymentStatus } from "@/db/schema";
+import { clients, modelImages, models, modelPhase, paymentStatus } from "@/db/schema";
 import { parseEuros } from "@/lib/labels";
 import { derivePayment } from "@/lib/payments";
 import { requireUser } from "@/lib/session";
+import { deleteObjects } from "@/lib/storage";
 
 async function parseModel(formData: FormData, userId: string) {
   const t = await getTranslations("actionErrors");
@@ -78,8 +79,23 @@ export async function updateModel(id: string, formData: FormData) {
 
 export async function deleteModel(id: string) {
   const user = await requireUser();
+  // Deleting the model cascades to its image rows but not to the stored files,
+  // so read their keys first and remove the files afterwards.
+  const images = await db
+    .select({ key: modelImages.key, thumbKey: modelImages.thumbKey })
+    .from(modelImages)
+    .where(and(eq(modelImages.modelId, id), eq(modelImages.userId, user.id)));
   await db
     .delete(models)
     .where(and(eq(models.id, id), eq(models.userId, user.id)));
+  // The model is already gone, so a storage failure must not fail the action or
+  // skip the revalidation: log the keys so the files can be removed by hand.
+  const keys = images.flatMap((i) => [i.key, i.thumbKey]);
+  try {
+    await deleteObjects(keys);
+  } catch (error) {
+    console.error("Stored photos of a deleted model could not be removed:", keys, error);
+  }
   revalidatePath("/models");
+  revalidatePath("/portfolio");
 }

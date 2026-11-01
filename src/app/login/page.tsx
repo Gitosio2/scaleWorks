@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth-client";
+import { SITE_INITIAL, SITE_NAME } from "@/lib/site";
 import { Card } from "@/components/ui/card";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import {
@@ -57,9 +58,9 @@ export default function LoginPage() {
               aria-hidden
               className="flex size-8 items-center justify-center rounded-[9px] bg-brand font-bold text-brand-fg"
             >
-              S
+              {SITE_INITIAL}
             </span>
-            <span className="text-lg font-bold tracking-tight">scaleWorks</span>
+            <span className="text-lg font-bold tracking-tight">{SITE_NAME}</span>
           </div>
           <h1 className="text-[28px] font-bold leading-tight tracking-tight">
             {mode === "signin" ? t("signIn") : t("createAccount")}
