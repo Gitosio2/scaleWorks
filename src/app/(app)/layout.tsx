@@ -1,9 +1,10 @@
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Brand } from "@/components/brand";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { LogoutButton } from "@/components/logout-button";
 import { LanguageSwitcher } from "@/components/language-switcher";
-import { cardClass, cx } from "@/components/ui/styles";
+import { cardClass, cx, linkActionClass } from "@/components/ui/styles";
 import { requireUser } from "@/lib/session";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -19,6 +20,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <p className="text-xs text-muted">{t("signedInAs")}</p>
           <p className="truncate font-semibold">{user.name}</p>
           <LanguageSwitcher />
+          <Link href="/backup" className={linkActionClass}>{t("backup")}</Link>
           <LogoutButton />
         </div>
       </aside>

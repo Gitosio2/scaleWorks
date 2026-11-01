@@ -9,7 +9,7 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { LogoutButton } from "@/components/logout-button";
 import { PortfolioNav } from "@/components/portfolio-nav";
 import { SidebarNav } from "@/components/sidebar-nav";
-import { cardClass, cx } from "@/components/ui/styles";
+import { cardClass, cx, linkActionClass } from "@/components/ui/styles";
 
 // Public pages. Same shell as the app, but the menu depends on who is looking:
 // a signed-in user also gets the normal options; everyone gets the text-only
@@ -53,6 +53,7 @@ export default async function PortfolioLayout({ children }: { children: React.Re
             <p className="text-xs text-muted">{t("signedInAs")}</p>
             <p className="truncate font-semibold">{user.name}</p>
             <LanguageSwitcher />
+            <Link href="/backup" className={linkActionClass}>{t("backup")}</Link>
             <LogoutButton />
           </div>
         ) : (
