@@ -8,8 +8,9 @@ const isDev = process.env.NODE_ENV === "development";
 //   the Next.js chunks, so no host allow-list is needed.
 // - Inline style="" attributes are forbidden (style-src-attr 'none'); the app
 //   has none, so keep it that way: use Tailwind classes or SVG attributes.
-// - Development needs 'unsafe-eval' (React debugging) and inline styles (HMR);
-//   upgrade-insecure-requests would break plain-http localhost.
+// - Development needs 'unsafe-eval' (React debugging), inline styles and a
+//   WebSocket connect-src (HMR); upgrade-insecure-requests would break
+//   plain-http localhost.
 function contentSecurityPolicy(nonce: string) {
   return [
     "default-src 'self'",
@@ -23,7 +24,9 @@ function contentSecurityPolicy(nonce: string) {
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
-    ...(isDev ? [] : ["upgrade-insecure-requests"]),
+    // 'self' does not cover WebSocket schemes in every browser (e.g. Safari), and
+    // the dev server hot-reloads over one.
+    ...(isDev ? ["connect-src 'self' ws: wss:"] : ["upgrade-insecure-requests"]),
   ].join("; ");
 }
 
