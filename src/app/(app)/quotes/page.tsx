@@ -19,9 +19,8 @@ import { CreateModal } from "@/components/ui/create-modal";
 import { FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filters";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge, quoteStatusVariant } from "@/components/ui/status-badge";
+import { DeleteIconButton, EditIconLink } from "@/components/ui/icon-actions";
 import {
-  dangerActionClass,
-  linkActionClass,
   listItemClass,
 } from "@/components/ui/styles";
 import { createQuote, deleteQuote } from "./actions";
@@ -121,7 +120,7 @@ export default async function QuotesPage({
         />
       </ListFilters>
 
-      <Card>
+      <Card className="py-0!">
         <ul className="flex flex-col">
           {rows.length === 0 && (
             <li className="text-muted">
@@ -141,10 +140,12 @@ export default async function QuotesPage({
                 <StatusBadge variant={quoteStatusVariant(q.status)}>
                   {tq(q.status)}
                 </StatusBadge>
-                <Link href={`/quotes/${q.id}/edit`} className={linkActionClass}>{tc("edit")}</Link>
-                <form action={deleteQuote.bind(null, q.id)}>
-                  <button type="submit" className={dangerActionClass}>{tc("delete")}</button>
-                </form>
+                <div className="flex items-center">
+                  <EditIconLink href={`/quotes/${q.id}/edit`} label={tc("edit")} />
+                  <form action={deleteQuote.bind(null, q.id)}>
+                    <DeleteIconButton label={tc("delete")} />
+                  </form>
+                </div>
               </div>
             </li>
           ))}

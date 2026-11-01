@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { and, asc, desc, eq, ilike, isNotNull, or, type SQL } from "drizzle-orm";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
@@ -14,9 +13,8 @@ import { Card } from "@/components/ui/card";
 import { CreateModal } from "@/components/ui/create-modal";
 import { FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filters";
 import { PageHeader } from "@/components/ui/page-header";
+import { DeleteIconButton, EditIconLink } from "@/components/ui/icon-actions";
 import {
-  dangerActionClass,
-  linkActionClass,
   listItemClass,
 } from "@/components/ui/styles";
 import { createClient, deleteClient } from "./actions";
@@ -97,7 +95,7 @@ export default async function ClientsPage({
         />
       </ListFilters>
 
-      <Card>
+      <Card className="py-0!">
         <ul className="flex flex-col">
           {rows.length === 0 && (
             <li className="text-muted">
@@ -114,10 +112,12 @@ export default async function ClientsPage({
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Link href={`/clients/${c.id}/edit`} className={linkActionClass}>{tc("edit")}</Link>
-                <form action={deleteClient.bind(null, c.id)}>
-                  <button type="submit" className={dangerActionClass}>{tc("delete")}</button>
-                </form>
+                <div className="flex items-center">
+                  <EditIconLink href={`/clients/${c.id}/edit`} label={tc("edit")} />
+                  <form action={deleteClient.bind(null, c.id)}>
+                    <DeleteIconButton label={tc("delete")} />
+                  </form>
+                </div>
               </div>
             </li>
           ))}

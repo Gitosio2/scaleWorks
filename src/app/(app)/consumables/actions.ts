@@ -53,12 +53,12 @@ export async function updateConsumable(id: string, formData: FormData) {
   redirect("/consumables");
 }
 
-export async function updateConsumableStatus(id: string, formData: FormData) {
+export async function updateConsumableStatus(id: string, status: string) {
   const user = await requireUser();
   const t = await getTranslations("actionErrors");
   await db
     .update(consumables)
-    .set({ status: parseStatus(String(formData.get("status")), t) })
+    .set({ status: parseStatus(status, t) })
     .where(and(eq(consumables.id, id), eq(consumables.userId, user.id)));
   revalidatePath("/consumables");
 }

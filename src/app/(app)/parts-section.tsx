@@ -4,11 +4,10 @@ import type { parts } from "@/db/schema";
 import { formatEuros } from "@/lib/labels";
 import { Card, CardTitle } from "@/components/ui/card";
 import { StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
+import { ConfirmIconButton, DeleteIconButton } from "@/components/ui/icon-actions";
 import {
-  dangerActionClass,
   inputClass,
   labelClass,
-  linkActionClass,
   listItemClass,
   primaryButtonClass,
 } from "@/components/ui/styles";
@@ -108,7 +107,7 @@ export function PartsSection({
                   {ts(p.status)}
                 </StatusBadge>
                 <form action={remove.bind(null, p.id)}>
-                  <button type="submit" className={dangerActionClass}>{tc("delete")}</button>
+                  <DeleteIconButton label={tc("delete")} />
                 </form>
               </div>
             </div>
@@ -118,7 +117,7 @@ export function PartsSection({
                   <option key={s} value={s}>{ts(s)}</option>
                 ))}
               </select>
-              <button type="submit" className={linkActionClass}>{t("updateStatus")}</button>
+              <ConfirmIconButton label={t("updateStatus")} />
             </form>
           </li>
         ))}

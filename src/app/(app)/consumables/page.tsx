@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { and, asc, eq, ilike, isNotNull, or, type SQL } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
@@ -18,10 +17,9 @@ import { CreateModal } from "@/components/ui/create-modal";
 import { FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filters";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
+import { SegmentedToggle } from "@/components/ui/segmented-toggle";
+import { DeleteIconButton, EditIconLink } from "@/components/ui/icon-actions";
 import {
-  dangerActionClass,
-  inputClass,
-  linkActionClass,
   listItemClass,
 } from "@/components/ui/styles";
 import {
@@ -117,7 +115,7 @@ export default async function ConsumablesPage({
         />
       </ListFilters>
 
-      <Card>
+      <Card className="py-0!">
         <ul className="flex flex-col">
           {rows.length === 0 && (
             <li className="text-muted">
@@ -135,24 +133,28 @@ export default async function ConsumablesPage({
                     {formatEuros(c.priceCents, locale)}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <SegmentedToggle
+                    value={c.status}
+                    options={supplyStatus.enumValues.map((s) => ({
+                      value: s,
+                      label: ts(s),
+                      variant: supplyStatusVariant(s),
+                    }))}
+                    action={updateConsumableStatus.bind(null, c.id)}
+                    label={tc("status")}
+                  />
                   <StatusBadge variant={supplyStatusVariant(c.status)}>
                     {ts(c.status)}
                   </StatusBadge>
-                  <Link href={`/consumables/${c.id}/edit`} className={linkActionClass}>{tc("edit")}</Link>
-                  <form action={deleteConsumable.bind(null, c.id)}>
-                    <button type="submit" className={dangerActionClass}>{tc("delete")}</button>
-                  </form>
+                  <div className="flex items-center">
+                    <EditIconLink href={`/consumables/${c.id}/edit`} label={tc("edit")} />
+                    <form action={deleteConsumable.bind(null, c.id)}>
+                      <DeleteIconButton label={tc("delete")} />
+                    </form>
+                  </div>
                 </div>
               </div>
-              <form action={updateConsumableStatus.bind(null, c.id)} className="flex flex-wrap items-center gap-2">
-                <select name="status" defaultValue={c.status} aria-label={tc("status")} className={`${inputClass} text-sm`}>
-                  {supplyStatus.enumValues.map((s) => (
-                    <option key={s} value={s}>{ts(s)}</option>
-                  ))}
-                </select>
-                <button type="submit" className={linkActionClass}>{t("updateStatus")}</button>
-              </form>
             </li>
           ))}
         </ul>
