@@ -20,9 +20,8 @@ import { FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filt
 import { PageHeader } from "@/components/ui/page-header";
 import { PhaseProgress } from "@/components/ui/phase-progress";
 import { PaymentBadge, PhaseBadge } from "@/components/ui/status-badge";
+import { DeleteIconButton, EditIconLink } from "@/components/ui/icon-actions";
 import {
-  dangerActionClass,
-  linkActionClass,
   listItemClass,
 } from "@/components/ui/styles";
 import { createModel, deleteModel } from "./actions";
@@ -157,7 +156,7 @@ export default async function ModelsPage({
         />
       </ListFilters>
 
-      <Card>
+      <Card className="py-0!">
         <ul className="flex flex-col">
           {rows.length === 0 && (
             <li className="text-muted">
@@ -169,33 +168,37 @@ export default async function ModelsPage({
             </li>
           )}
           {rows.map(({ model: m, clientName }) => (
-            <li key={m.id} className={`${listItemClass} flex flex-wrap items-center justify-between gap-4`}>
-              <div className="flex min-w-0 flex-col gap-0.5">
-                <p className="text-[13px] font-semibold text-brand">{clientName ?? t("ownProject")}</p>
-                <Link href={`/models/${m.id}`} className="font-bold hover:underline">
-                  {m.name}
-                </Link>
-                <p className="text-[13px] text-muted">
-                  {m.company ? `${m.company} · ` : ""}
-                  {formatEuros(m.priceCents, locale)}
-                </p>
-                <p className="text-[13px] text-muted">
-                  {t("dates", {
-                    requested: formatDate(m.requestedDate, locale),
-                    estimated: formatDate(m.estimatedDate, locale),
-                  })}
-                </p>
+            <li key={m.id} className={`${listItemClass} flex flex-col gap-3`}>
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex min-w-0 flex-col gap-0.5">
+                  <Link href={`/models/${m.id}`} className="font-bold hover:underline">
+                    {m.name}
+                  </Link>
+                  <p className="text-[13px] font-semibold text-brand">{clientName ?? t("ownProject")}</p>
+                  <p className="text-[13px] text-muted">
+                    {m.company ? `${m.company} · ` : ""}
+                    {formatEuros(m.priceCents, locale)}
+                  </p>
+                  <p className="text-[13px] text-muted">
+                    {t("dates", {
+                      requested: formatDate(m.requestedDate, locale),
+                      estimated: formatDate(m.estimatedDate, locale),
+                    })}
+                  </p>
+                </div>
+                <div className="-mt-1 flex shrink-0 items-center">
+                  <EditIconLink href={`/models/${m.id}/edit`} label={tc("edit")} />
+                  <form action={deleteModel.bind(null, m.id)}>
+                    <DeleteIconButton label={tc("delete")} />
+                  </form>
+                </div>
               </div>
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="flex flex-col items-start gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <PhaseBadge phase={m.phase} />
                   <PaymentBadge status={m.paymentStatus} priceCents={m.priceCents} depositCents={m.depositCents} />
-                  <PhaseProgress phase={m.phase} />
                 </div>
-                <Link href={`/models/${m.id}/edit`} className={linkActionClass}>{tc("edit")}</Link>
-                <form action={deleteModel.bind(null, m.id)}>
-                  <button type="submit" className={dangerActionClass}>{tc("delete")}</button>
-                </form>
+                <PhaseProgress phase={m.phase} />
               </div>
             </li>
           ))}

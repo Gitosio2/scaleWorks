@@ -133,7 +133,6 @@
     "searchPlaceholder": "Description, reference or store",
     "empty": "No consumables yet.",
     "emptyFiltered": "No consumables match these filters.",
-    "updateStatus": "Update status",
     "sort": {
       "description": "Description (A–Z)",
       "store": "Store (A–Z)",

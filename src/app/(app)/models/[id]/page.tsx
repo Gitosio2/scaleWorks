@@ -31,11 +31,10 @@ import { Card, CardTitle } from "@/components/ui/card";
 import { BackLink, PageHeader } from "@/components/ui/page-header";
 import { PhaseProgress } from "@/components/ui/phase-progress";
 import { PaymentBadge, PhaseBadge, StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
+import { ConfirmIconButton, DeleteIconButton } from "@/components/ui/icon-actions";
 import {
-  dangerActionClass,
   inputClass,
   labelClass,
-  linkActionClass,
   listItemClass,
   primaryButtonClass,
   secondaryButtonClass,
@@ -194,9 +193,7 @@ export default async function ModelDetailPage({
                 {formatDate(e.workedOn, locale)} · {formatDuration(e.minutes)}
               </span>
               <form action={deleteTimeEntry.bind(null, id, e.id)}>
-                <button type="submit" className={dangerActionClass}>
-                  {tc("delete")}
-                </button>
+                <DeleteIconButton label={tc("delete")} />
               </form>
             </li>
           ))}
@@ -266,9 +263,7 @@ export default async function ModelDetailPage({
                       {ts(c.status)}
                     </StatusBadge>
                     <form action={removeModelConsumable.bind(null, id, c.id)}>
-                      <button type="submit" className={dangerActionClass}>
-                        {tc("remove")}
-                      </button>
+                      <DeleteIconButton label={tc("remove")} />
                     </form>
                   </div>
                 </div>
@@ -277,9 +272,7 @@ export default async function ModelDetailPage({
                   className="flex flex-wrap items-center gap-2"
                 >
                   <QuantityFields />
-                  <button type="submit" className={linkActionClass}>
-                    {t("consumables.updateQuantity")}
-                  </button>
+                  <ConfirmIconButton label={t("consumables.updateQuantity")} />
                 </form>
               </li>
             );

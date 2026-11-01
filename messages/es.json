@@ -133,7 +133,6 @@
     "searchPlaceholder": "Descripción, referencia o tienda",
     "empty": "Aún no hay consumibles.",
     "emptyFiltered": "Ningún consumible coincide con estos filtros.",
-    "updateStatus": "Actualizar estado",
     "sort": {
       "description": "Descripción (A–Z)",
       "store": "Tienda (A–Z)",

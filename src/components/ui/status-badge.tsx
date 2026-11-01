@@ -16,6 +16,15 @@ const variants: Record<BadgeVariant, string> = {
   mute: "bg-mute-bg text-mute",
 };
 
+// Solid fill when selected, soft tint otherwise; used by compact toggles.
+export const variantSwatches: Record<BadgeVariant, { solid: string; tint: string }> = {
+  info: { solid: "bg-info", tint: "bg-info-bg" },
+  warn: { solid: "bg-warn", tint: "bg-warn-bg" },
+  ok: { solid: "bg-ok", tint: "bg-ok-bg" },
+  bad: { solid: "bg-bad", tint: "bg-bad-bg" },
+  mute: { solid: "bg-mute", tint: "bg-mute-bg" },
+};
+
 export function StatusBadge({
   variant,
   children,
