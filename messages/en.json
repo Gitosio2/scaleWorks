@@ -83,6 +83,11 @@
     "open": "Open",
     "rejected": "Rejected"
   },
+  "modelType": {
+    "truck": "Truck",
+    "crane": "Crane",
+    "machine": "Machine"
+  },
   "supplyStatus": {
     "to_order": "To order",
     "ordered": "Ordered",
@@ -200,7 +205,11 @@
     "add": "Add model",
     "back": "← Models",
     "editTitle": "Edit model",
-    "modelName": "Model name",
+    "brand": "Brand",
+    "brandPlaceholder": "Brand (optional)",
+    "modelName": "Model",
+    "type": "Type",
+    "noType": "— No type —",
     "companyPlaceholder": "Company of the real subject (optional)",
     "noClientOption": "— No client (own project) —",
     "ownProject": "Own project",
@@ -319,6 +328,7 @@
     "invalidCategory": "Invalid category",
     "invalidColor": "Invalid color",
     "invalidPhase": "Invalid phase",
+    "invalidType": "Invalid type",
     "invalidPaymentStatus": "Invalid payment status",
     "invalidLink": "Invalid link",
     "invalidDuration": "Duration must be hh:mm, up to 24:00",

@@ -35,6 +35,16 @@ function TrashIcon() {
   );
 }
 
+function BanknoteIcon() {
+  return (
+    <svg {...iconProps}>
+      <rect x="2.5" y="6" width="19" height="12" rx="2" />
+      <circle cx="12" cy="12" r="2.6" />
+      <path d="M6 9.5v.01M18 14.5v.01" />
+    </svg>
+  );
+}
+
 function CheckIcon() {
   return (
     <svg {...iconProps}>
@@ -104,6 +114,15 @@ export function TrashIconButton({
       )}
     >
       <TrashIcon />
+    </button>
+  );
+}
+
+// Banknote: create a quote from the current item. `label` keeps the full action text.
+export function QuoteIconButton({ label }: { label: string }) {
+  return (
+    <button type="submit" aria-label={label} title={label} className={cx(baseClass, "text-brand")}>
+      <BanknoteIcon />
     </button>
   );
 }

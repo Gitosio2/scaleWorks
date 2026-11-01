@@ -83,6 +83,11 @@
     "open": "Abierto",
     "rejected": "Rechazado"
   },
+  "modelType": {
+    "truck": "Camión",
+    "crane": "Grúa",
+    "machine": "Máquina"
+  },
   "supplyStatus": {
     "to_order": "Por pedir",
     "ordered": "Pedido",
@@ -200,7 +205,11 @@
     "add": "Añadir maqueta",
     "back": "← Maquetas",
     "editTitle": "Editar maqueta",
-    "modelName": "Nombre de la maqueta",
+    "brand": "Marca",
+    "brandPlaceholder": "Marca (opcional)",
+    "modelName": "Modelo",
+    "type": "Tipo",
+    "noType": "— Sin tipo —",
     "companyPlaceholder": "Empresa del modelo real (opcional)",
     "noClientOption": "— Sin cliente (proyecto propio) —",
     "ownProject": "Proyecto propio",
@@ -319,6 +328,7 @@
     "invalidCategory": "Categoría no válida",
     "invalidColor": "Color no válido",
     "invalidPhase": "Fase no válida",
+    "invalidType": "Tipo no válido",
     "invalidPaymentStatus": "Estado de pago no válido",
     "invalidLink": "Enlace no válido",
     "invalidDuration": "La duración debe tener el formato hh:mm, hasta 24:00",
