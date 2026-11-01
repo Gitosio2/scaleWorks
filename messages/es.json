@@ -9,6 +9,7 @@
     "quotes": "Presupuestos",
     "clients": "Clientes",
     "consumables": "Consumibles",
+    "expenses": "Gastos pendientes",
     "gallery": "Galería pública",
     "signedInAs": "Sesión iniciada como",
     "logOut": "Cerrar sesión",
@@ -88,6 +89,35 @@
     "crane": "Grúa",
     "machine": "Máquina"
   },
+  "expenses": {
+    "title": "Gastos pendientes",
+    "subtitle": "{count, plural, =0 {No queda nada por pagar.} one {# gasto por pagar: {amount}} other {# gastos por pagar: {amount}}}",
+    "searchPlaceholder": "Gasto, marca, tienda o maqueta",
+    "empty": "No hay nada pendiente.",
+    "emptyFiltered": "Nada coincide con estos filtros.",
+    "paymentFilter": "Pago",
+    "paid": "Pagada",
+    "unpaid": "Sin pagar",
+    "markPaid": "Marcar como pagada",
+    "markUnpaid": "Marcar como no pagada",
+    "filter": {
+      "pending": "Sin pagar",
+      "paid": "Pagadas",
+      "all": "Todas"
+    },
+    "sort": {
+      "model": "Maqueta (A–Z)",
+      "price_desc": "Precio (de mayor a menor)",
+      "description": "Descripción (A–Z)",
+      "store": "Tienda (A–Z)"
+    },
+    "add": "Añadir gasto",
+    "editTitle": "Editar gasto",
+    "descriptionPlaceholder": "¿Qué has comprado?",
+    "noModel": "Sin maqueta",
+    "deleteTitle": "Eliminar gasto",
+    "deleteMessage": "¿Eliminar \"{name}\"? Esta acción no se puede deshacer."
+  },
   "supplyStatus": {
     "to_order": "Por pedir",
     "ordered": "Pedido",
@@ -131,6 +161,7 @@
     "incomeLabel": "Ingresos cobrados (maquetas pagadas y anticipos)",
     "expensesLabel": "Gastos (piezas y consumibles pedidos o en mano)",
     "balanceLabel": "Balance",
+    "unpaidExpensesLabel": "{count, plural, =0 {Nada pendiente de pago} one {# gasto pendiente de pago} other {# gastos pendientes de pago}}",
     "quotesTitle": "Presupuestos por decidir",
     "quotesHint": "Presupuestos abiertos, los más antiguos primero",
     "quoteAge": "{days, plural, =0 {Hoy} one {Hace # día} other {Hace # días}}",
@@ -146,7 +177,10 @@
     "add": "Añadir pieza",
     "empty": "Aún no hay piezas.",
     "noStore": "Sin tienda",
-    "updateStatus": "Actualizar estado"
+    "paid": "Pagada",
+    "unpaid": "Sin pagar",
+    "markPaid": "Marcar como pagada",
+    "markUnpaid": "Marcar como no pagada"
   },
   "clients": {
     "subtitle": "Personas y empresas para las que trabajas.",
@@ -321,7 +355,6 @@
     "invalidQuantity": "Cantidad no válida",
     "nameRequired": "El nombre es obligatorio",
     "clientHasRecords": "El cliente tiene maquetas o presupuestos y no se puede eliminar",
-    "nameRequired": "El nombre es obligatorio",
     "titleRequired": "El título es obligatorio",
     "descriptionRequired": "La descripción es obligatoria",
     "invalidStatus": "Estado no válido",

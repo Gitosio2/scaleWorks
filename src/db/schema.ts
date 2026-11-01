@@ -144,8 +144,8 @@ export const quotes = pgTable(
   (t) => [index("quotes_user_idx").on(t.userId)],
 );
 
-// A part belongs to exactly one model OR one quote. Converting a quote
-// moves its parts to the new model.
+// A part belongs to one model OR one quote, or to neither (a loose purchase added
+// from Pending expenses). Converting a quote moves its parts to the new model.
 export const parts = pgTable(
   "parts",
   {
@@ -164,11 +164,16 @@ export const parts = pgTable(
     store: text("store"),
     url: text("url"),
     status: supplyStatus("status").notNull().default("to_order"),
+    // Payment is separate from supply: a part can be ordered or in hand and still
+    // unpaid. Unpaid parts of models that were bought feed "Pending expenses".
+    paid: boolean("paid").notNull().default(false),
   },
   (t) => [
+    // At most one owner. A part with neither is a "loose" purchase added from
+    // Pending expenses, not tied to any model or quote.
     check(
-      "parts_one_owner",
-      sql`(${t.modelId} IS NOT NULL) <> (${t.quoteId} IS NOT NULL)`,
+      "parts_at_most_one_owner",
+      sql`NOT (${t.modelId} IS NOT NULL AND ${t.quoteId} IS NOT NULL)`,
     ),
   ],
 );

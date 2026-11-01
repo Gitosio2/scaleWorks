@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { and, asc, eq, isNotNull, lt, lte, ne, notInArray, sql } from "drizzle-orm";
+import { and, asc, eq, isNotNull, isNull, lt, lte, ne, notInArray, sql } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { consumables, models, parts, quotes } from "@/db/schema";
@@ -74,7 +74,15 @@ export default async function Home() {
   const deadlineCutoff = horizon.toISOString().slice(0, 10);
   const staleCutoff = stalledCutoff(now);
 
-  const [[stats], deadlines, openQuotes, stalled, [partsSpent], [consumablesSpent]] = await Promise.all([
+  const [
+    [stats],
+    deadlines,
+    openQuotes,
+    stalled,
+    [partsSpent],
+    [consumablesSpent],
+    [unpaidExpenses],
+  ] = await Promise.all([
     db
       .select({
         activeCount: sql<number>`count(*) filter (where ${ACTIVE})::int`,
@@ -123,18 +131,33 @@ export default async function Home() {
         ),
       )
       .orderBy(asc(models.createdAt), asc(models.id)),
-    // Spent = bought (ordered or in hand), not merely planned. Parts only count
-    // on models: parts on a quote are an estimate for work not yet accepted.
+    // Spent = bought (ordered or in hand), not merely planned. Parts on a model or
+    // loose ones count; parts on a quote are an estimate for work not yet accepted.
     db
       .select({ cents: sql<number>`coalesce(sum(${parts.priceCents}), 0)::int` })
       .from(parts)
       .where(
-        and(eq(parts.userId, user.id), isNotNull(parts.modelId), ne(parts.status, "to_order")),
+        and(eq(parts.userId, user.id), isNull(parts.quoteId), ne(parts.status, "to_order")),
       ),
     db
       .select({ cents: sql<number>`coalesce(sum(${consumables.priceCents}), 0)::int` })
       .from(consumables)
       .where(and(eq(consumables.userId, user.id), ne(consumables.status, "to_order"))),
+    // Still to pay (the Pending expenses list): bought parts, of a model or loose, not marked paid.
+    db
+      .select({
+        count: sql<number>`count(*)::int`,
+        cents: sql<number>`coalesce(sum(${parts.priceCents}), 0)::int`,
+      })
+      .from(parts)
+      .where(
+        and(
+          eq(parts.userId, user.id),
+          isNull(parts.quoteId),
+          ne(parts.status, "to_order"),
+          eq(parts.paid, false),
+        ),
+      ),
   ]);
   const expensesCents = partsSpent.cents + consumablesSpent.cents;
   const balanceCents = stats.incomeCents - expensesCents;
@@ -259,6 +282,15 @@ export default async function Home() {
               value={formatEuros(balanceCents, locale)}
               label={t("balanceLabel")}
               valueClass={balanceCents < 0 ? "text-bad" : "text-ok"}
+            />
+            <Stat
+              value={formatEuros(unpaidExpenses.cents, locale)}
+              valueClass={unpaidExpenses.count > 0 ? "text-warn" : ""}
+              label={
+                <Link href="/expenses" className="font-semibold text-brand hover:underline">
+                  {t("unpaidExpensesLabel", { count: unpaidExpenses.count })}
+                </Link>
+              }
             />
           </div>
         </Card>

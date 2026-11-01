@@ -4,7 +4,8 @@ import type { parts } from "@/db/schema";
 import { formatEuros } from "@/lib/labels";
 import { CollapsibleCard } from "@/components/ui/card";
 import { StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
-import { ConfirmIconButton, DeleteIconButton } from "@/components/ui/icon-actions";
+import { DeleteIconButton, PaidCheckButton } from "@/components/ui/icon-actions";
+import { SegmentedToggle } from "@/components/ui/segmented-toggle";
 import {
   inputClass,
   labelClass,
@@ -21,11 +22,14 @@ export function PartsSection({
   add,
   updateStatus,
   remove,
+  setPaid,
 }: {
   parts: Part[];
   add: (formData: FormData) => Promise<void>;
-  updateStatus: (partId: string, formData: FormData) => Promise<void>;
+  updateStatus: (partId: string, status: string) => Promise<void>;
   remove: (partId: string) => Promise<void>;
+  // Only models track payment; quotes leave this out and show no paid check.
+  setPaid?: (partId: string, paid: boolean) => Promise<void>;
 }) {
   const t = useTranslations("parts");
   const tc = useTranslations("common");
@@ -33,6 +37,11 @@ export function PartsSection({
   const locale = useLocale();
   const totalCents = rows.reduce((acc, p) => acc + (p.priceCents ?? 0), 0);
   const pair = `${labelClass} min-w-40 flex-1`;
+  const statusOptions = supplyStatus.enumValues.map((s) => ({
+    value: s as string,
+    label: ts(s),
+    variant: supplyStatusVariant(s),
+  }));
 
   return (
     <CollapsibleCard title={t("title", { total: formatEuros(totalCents, locale) })}>
@@ -101,23 +110,32 @@ export function PartsSection({
                   )}
                 </p>
               </div>
-              <div className="flex shrink-0 items-center gap-2">
+              <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
                 <StatusBadge variant={supplyStatusVariant(p.status)}>
                   {ts(p.status)}
                 </StatusBadge>
+                {/* A part still "to order" is not owed yet, so only bought parts show or change their payment. */}
+                {setPaid && p.status !== "to_order" && (
+                  <>
+                    <StatusBadge variant={p.paid ? "ok" : "warn"}>
+                      {p.paid ? t("paid") : t("unpaid")}
+                    </StatusBadge>
+                    <form action={setPaid.bind(null, p.id, !p.paid)}>
+                      <PaidCheckButton paid={p.paid} label={p.paid ? t("markUnpaid") : t("markPaid")} />
+                    </form>
+                  </>
+                )}
                 <form action={remove.bind(null, p.id)}>
                   <DeleteIconButton label={tc("delete")} />
                 </form>
               </div>
             </div>
-            <form action={updateStatus.bind(null, p.id)} className="flex flex-wrap items-center gap-2">
-              <select name="status" defaultValue={p.status} aria-label={tc("status")} className={`${inputClass} text-sm`}>
-                {supplyStatus.enumValues.map((s) => (
-                  <option key={s} value={s}>{ts(s)}</option>
-                ))}
-              </select>
-              <ConfirmIconButton label={t("updateStatus")} />
-            </form>
+            <SegmentedToggle
+              value={p.status}
+              options={statusOptions}
+              action={updateStatus.bind(null, p.id)}
+              label={tc("status")}
+            />
           </li>
         ))}
       </ul>
