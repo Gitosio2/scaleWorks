@@ -6,11 +6,12 @@ import { variantSwatches, type BadgeVariant } from "./status-badge";
 
 type Option = { value: string; label: string; variant: BadgeVariant };
 
-// Track is w-[4.5rem] (72px) with a 1px border, thumb is 20px inset 3px: 22px between stops.
+// Thumb is 20px inset 3px inside a 1px border, with 22px between stops.
 const THUMB_STEP_PX = 22;
+const trackWidth = (stops: number) => 28 + THUMB_STEP_PX * (stops - 1);
 
 /**
- * Three-position switch: a light track with a thumb that slides between stops
+ * Multi-position switch: a light track with a thumb that slides between stops
  * and takes the color of the selected option. No visible text; labels are only
  * exposed to assistive tech. Clicking a stop saves it immediately.
  */
@@ -56,14 +57,18 @@ export function SegmentedToggle({
         role="radiogroup"
         aria-label={label}
         aria-busy={pending}
-        className="relative h-7 w-[4.5rem] rounded-full border border-input-border bg-line"
+        className="relative h-7 rounded-full border border-input-border bg-line"
+        style={{ width: trackWidth(options.length) }}
       >
         <span
           aria-hidden
           className={`pointer-events-none absolute top-[3px] left-[3px] size-5 rounded-full shadow transition-all duration-150 ${variantSwatches[options[index].variant].solid}`}
           style={{ transform: `translateX(${index * THUMB_STEP_PX}px)` }}
         />
-        <div className="absolute inset-0 grid grid-cols-3">
+        <div
+          className="absolute inset-0 grid"
+          style={{ gridTemplateColumns: `repeat(${options.length}, 1fr)` }}
+        >
           {options.map((o, i) => (
             <button
               key={o.value}

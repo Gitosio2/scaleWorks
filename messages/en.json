@@ -140,6 +140,13 @@
     "colorFromRal": "Detected from the RAL code in Reference",
     "colorHint": "Pick a color, or enter a RAL code in Reference",
     "colorClear": "Remove color",
+    "depleted": "Used up",
+    "activity": {
+      "label": "Show",
+      "active": "Active",
+      "inactive": "Used up",
+      "all": "All"
+    },
     "colorSwatch": "Color {color}",
     "searchPlaceholder": "Description, reference or store",
     "empty": "No consumables yet.",
@@ -207,7 +214,8 @@
       "quantityNotSet": "Quantity not set",
       "costWithUnit": "{cost} (unit {unit})",
       "unitOnly": "unit {unit}",
-      "updateQuantity": "Update quantity"
+      "updateQuantity": "Update quantity",
+      "inactive": "Used up"
     },
     "quantity": {
       "label": "Quantity",
@@ -257,6 +265,7 @@
     "clientNotFound": "Client not found",
     "modelNotFound": "Model not found",
     "consumableNotFound": "Consumable not found",
+    "consumableUsedUp": "This consumable is used up",
     "quoteNotFound": "Quote not found",
     "depositNotPositive": "Deposit amount must be greater than 0",
     "depositExceedsPrice": "Deposit cannot be greater than the price",
