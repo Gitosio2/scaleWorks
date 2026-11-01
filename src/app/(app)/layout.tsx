@@ -26,7 +26,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
       <div className="min-w-0 flex-1 bg-canvas px-4 py-6 md:px-10 md:py-8">
-        <main className="mx-auto flex w-full max-w-[1100px] flex-col gap-7">
+        <main className="mx-auto flex w-full max-w-[1100px] flex-col gap-7 pb-24">
           {children}
         </main>
       </div>

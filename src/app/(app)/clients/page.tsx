@@ -3,13 +3,13 @@ import { desc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { clients } from "@/db/schema";
 import { requireUser } from "@/lib/session";
-import { Card, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import { CreateModal } from "@/components/ui/create-modal";
 import { PageHeader } from "@/components/ui/page-header";
 import {
   dangerActionClass,
   linkActionClass,
   listItemClass,
-  primaryButtonClass,
 } from "@/components/ui/styles";
 import { createClient, deleteClient } from "./actions";
 import { ClientFields } from "./client-fields";
@@ -26,15 +26,9 @@ export default async function ClientsPage() {
     <>
       <PageHeader title="Clients" subtitle="People and companies you work for." />
 
-      <Card>
-        <CardTitle>Add client</CardTitle>
-        <form action={createClient} className="flex flex-col gap-3">
-          <ClientFields />
-          <button type="submit" className={`${primaryButtonClass} self-start`}>
-            Add client
-          </button>
-        </form>
-      </Card>
+      <CreateModal label="Add client" title="Add client" action={createClient}>
+        <ClientFields />
+      </CreateModal>
 
       <Card>
         <ul className="flex flex-col">

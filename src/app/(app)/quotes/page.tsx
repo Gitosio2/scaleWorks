@@ -4,14 +4,14 @@ import { db } from "@/db";
 import { clients, quotes } from "@/db/schema";
 import { formatEuros, quoteStatusLabels } from "@/lib/labels";
 import { requireUser } from "@/lib/session";
-import { Card, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import { CreateModal } from "@/components/ui/create-modal";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge, quoteStatusVariant } from "@/components/ui/status-badge";
 import {
   dangerActionClass,
   linkActionClass,
   listItemClass,
-  primaryButtonClass,
 } from "@/components/ui/styles";
 import { createQuote, deleteQuote } from "./actions";
 import { QuoteFields } from "./quote-fields";
@@ -36,15 +36,9 @@ export default async function QuotesPage() {
     <>
       <PageHeader title="Quotes" subtitle="Proposals for upcoming work." />
 
-      <Card>
-        <CardTitle>Add quote</CardTitle>
-        <form action={createQuote} className="flex flex-col gap-3">
-          <QuoteFields clients={clientRows} />
-          <button type="submit" className={`${primaryButtonClass} self-start`}>
-            Add quote
-          </button>
-        </form>
-      </Card>
+      <CreateModal label="Add quote" title="Add quote" action={createQuote}>
+        <QuoteFields clients={clientRows} />
+      </CreateModal>
 
       <Card>
         <ul className="flex flex-col">
