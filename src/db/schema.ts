@@ -31,6 +31,10 @@ export const consumableCategory = pgEnum("consumable_category", [
   "other",
 ]);
 
+// What kind of vehicle or machine a model depicts. Stable keys only; labels live
+// in messages/*.json under "modelType". Optional: existing models have none.
+export const modelType = pgEnum("model_type", ["truck", "crane", "machine"]);
+
 export const modelPhase = pgEnum("model_phase", [
   "not_started",
   "pending_decal_design",
@@ -74,7 +78,12 @@ export const models = pgTable(
     clientId: uuid("client_id").references(() => clients.id, {
       onDelete: "restrict",
     }),
+    // Manufacturer of the scale model (e.g. "Renault"). Optional: models created
+    // before this column kept the brand inside `name`. Show them together with
+    // modelTitle(brand, name).
+    brand: text("brand"),
     name: text("name").notNull(),
+    type: modelType("type"),
     // Company of the real-world subject (e.g. an airline or car brand).
     company: text("company"),
     priceCents: integer("price_cents"),

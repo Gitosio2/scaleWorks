@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { consumables, models, parts, quotes } from "@/db/schema";
 import { formatDate, formatEuros } from "@/lib/labels";
+import { modelTitle } from "@/lib/model-title";
 import { stalledCutoff } from "@/lib/stalled";
 import { requireUser } from "@/lib/session";
 import { Card, CardTitle } from "@/components/ui/card";
@@ -89,7 +90,12 @@ export default async function Home() {
       .where(eq(models.userId, user.id)),
     // Active models due within two months, overdue ones included.
     db
-      .select({ id: models.id, name: models.name, estimatedDate: models.estimatedDate })
+      .select({
+        id: models.id,
+        brand: models.brand,
+        name: models.name,
+        estimatedDate: models.estimatedDate,
+      })
       .from(models)
       .where(
         and(
@@ -107,7 +113,7 @@ export default async function Home() {
       .where(and(eq(quotes.userId, user.id), eq(quotes.status, "open")))
       .orderBy(asc(quotes.createdAt), asc(quotes.id)),
     db
-      .select({ id: models.id, name: models.name, createdAt: models.createdAt })
+      .select({ id: models.id, brand: models.brand, name: models.name, createdAt: models.createdAt })
       .from(models)
       .where(
         and(
@@ -165,7 +171,7 @@ export default async function Home() {
                     return (
                       <Row key={m.id}>
                         <Link href={`/models/${m.id}`} className={rowLinkClass}>
-                          {m.name}
+                          {modelTitle(m.brand, m.name)}
                         </Link>
                         <span className="flex shrink-0 flex-wrap items-center justify-end gap-2">
                           <span className="text-[13px] text-muted">
@@ -231,7 +237,7 @@ export default async function Home() {
                 {stalled.slice(0, MAX_ROWS).map((m) => (
                   <Row key={m.id}>
                     <Link href={`/models/${m.id}`} className={rowLinkClass}>
-                      {m.name}
+                      {modelTitle(m.brand, m.name)}
                     </Link>
                     <span className="shrink-0 text-[13px] text-muted">
                       {t("staleAge", { months: Math.floor(daysSince(m.createdAt) / 30) })}

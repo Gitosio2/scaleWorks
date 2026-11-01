@@ -4,6 +4,7 @@ import { and, asc, eq } from "drizzle-orm";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { models, modelImages } from "@/db/schema";
+import { modelTitle } from "@/lib/model-title";
 import { portfolioOwnerId, UUID_PATTERN } from "@/lib/portfolio";
 import { SITE_NAME } from "@/lib/site";
 import { PageHeader } from "@/components/ui/page-header";
@@ -14,7 +15,13 @@ async function findPublicModel(id: string) {
   const ownerId = await portfolioOwnerId();
   if (!ownerId || !UUID_PATTERN.test(id)) return null;
   const [model] = await db
-    .select({ id: models.id, name: models.name, company: models.company })
+    .select({
+      id: models.id,
+      brand: models.brand,
+      name: models.name,
+      type: models.type,
+      company: models.company,
+    })
     .from(models)
     .where(
       and(
@@ -29,7 +36,9 @@ async function findPublicModel(id: string) {
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const model = await findPublicModel((await params).id);
-  return { title: model ? `${model.name} · ${SITE_NAME}` : SITE_NAME };
+  return {
+    title: model ? `${modelTitle(model.brand, model.name)} · ${SITE_NAME}` : SITE_NAME,
+  };
 }
 
 export default async function PublicModelPage({
@@ -39,8 +48,10 @@ export default async function PublicModelPage({
 }) {
   const { id } = await params;
   const t = await getTranslations("portfolio");
+  const ttype = await getTranslations("modelType");
   const model = await findPublicModel(id);
   if (!model) notFound();
+  const title = modelTitle(model.brand, model.name);
 
   const images = await db
     .select({ id: modelImages.id })
@@ -56,7 +67,10 @@ export default async function PublicModelPage({
       >
         {t("back")}
       </Link>
-      <PageHeader title={model.name} subtitle={model.company} />
+      <PageHeader
+        title={title}
+        subtitle={[model.type ? ttype(model.type) : null, model.company].filter(Boolean).join(" · ")}
+      />
       {images.length === 0 ? (
         <p className="text-muted">{t("noPhotos")}</p>
       ) : (
@@ -71,7 +85,7 @@ export default async function PublicModelPage({
               >
                 <Photo
                   src={`/img/${image.id}/full`}
-                  alt={t("alt", { n: index + 1, name: model.name })}
+                  alt={t("alt", { n: index + 1, name: title })}
                 />
               </a>
             </li>

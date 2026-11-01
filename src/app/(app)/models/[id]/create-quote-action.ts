@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { models, parts, quotes } from "@/db/schema";
+import { modelTitle } from "@/lib/model-title";
 import { requireUser } from "@/lib/session";
 
 // Starts a new quote from a finished model: copies its client, price and
@@ -32,7 +33,7 @@ export async function createQuoteFromModel(modelId: string) {
     id: quoteId,
     userId: user.id,
     clientId: model.clientId,
-    title: model.name,
+    title: modelTitle(model.brand, model.name),
     priceCents: model.priceCents,
     status: "open",
   });

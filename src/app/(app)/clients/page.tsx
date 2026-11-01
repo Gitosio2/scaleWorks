@@ -16,6 +16,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { clients, models, quotes } from "@/db/schema";
 import { formatEuros } from "@/lib/labels";
+import { modelTitle } from "@/lib/model-title";
 import {
   containsPattern,
   enumParam,
@@ -110,10 +111,16 @@ export default async function ClientsPage({
   // Models of the listed clients, grouped for the expandable list on each card.
   const modelRows = rows.length
     ? await db
-        .select({ id: models.id, name: models.name, phase: models.phase, clientId: models.clientId })
+        .select({
+          id: models.id,
+          brand: models.brand,
+          name: models.name,
+          phase: models.phase,
+          clientId: models.clientId,
+        })
         .from(models)
         .where(inArray(models.clientId, rows.map((c) => c.id)))
-        .orderBy(asc(models.name), asc(models.id))
+        .orderBy(asc(sql`lower(concat_ws(' ', ${models.brand}, ${models.name}))`), asc(models.id))
     : [];
   const modelsByClient = Map.groupBy(modelRows, (m) => m.clientId);
 
@@ -194,7 +201,7 @@ export default async function ClientsPage({
                   {(modelsByClient.get(c.id) ?? []).map((m) => (
                     <li key={m.id} className="flex items-center justify-between gap-3 py-1.5">
                       <Link href={`/models/${m.id}`} className="min-w-0 font-semibold text-brand hover:underline">
-                        {m.name}
+                        {modelTitle(m.brand, m.name)}
                       </Link>
                       <PhaseBadge phase={m.phase} />
                     </li>

@@ -11,12 +11,14 @@ import {
   ne,
   notInArray,
   or,
+  sql,
   type SQL,
 } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
-import { clients, modelPhase, models, paymentStatus } from "@/db/schema";
+import { clients, modelPhase, models, modelType, paymentStatus } from "@/db/schema";
 import { formatDate, formatEuros } from "@/lib/labels";
+import { modelTitle } from "@/lib/model-title";
 import {
   ascNullsLast,
   containsPattern,
@@ -41,10 +43,13 @@ import {
 import { createModel, deleteModel } from "./actions";
 import { ModelFields } from "./model-fields";
 
+// "brand name" as shown on screen, for searching and sorting by what the user sees.
+const fullTitle = sql`lower(concat_ws(' ', ${models.brand}, ${models.name}))`;
+
 const sorts = {
   newest: { order: [desc(models.createdAt)] },
   oldest: { order: [asc(models.createdAt)] },
-  name: { order: [asc(models.name)] },
+  name: { order: [asc(fullTitle)] },
   price_desc: { order: [descNullsLast(models.priceCents)] },
   price_asc: { order: [ascNullsLast(models.priceCents)] },
   requested: { order: [ascNullsLast(models.requestedDate)] },
@@ -76,6 +81,7 @@ export default async function ModelsPage({
   const tn = await getTranslations("nav");
   const tp = await getTranslations("phase");
   const tpay = await getTranslations("paymentStatus");
+  const ttype = await getTranslations("modelType");
   const locale = await getLocale();
 
   const q = textParam(sp, "q");
@@ -83,6 +89,7 @@ export default async function ModelsPage({
   const company = textParam(sp, "company");
   const phase = enumParam(sp, "phase", phaseFilters);
   const payment = enumParam(sp, "payment", paymentFilters);
+  const type = enumParam(sp, "type", modelType.enumValues);
   const scope = textParam(sp, "scope") === "all" ? "all" : "open";
   const sort = enumParam(sp, "sort", sortKeys) ?? "newest";
 
@@ -90,13 +97,14 @@ export default async function ModelsPage({
     eq(models.userId, user.id),
     q
       ? or(
-          ilike(models.name, containsPattern(q)),
+          ilike(fullTitle, containsPattern(q)),
           ilike(models.company, containsPattern(q)),
           ilike(clients.name, containsPattern(q)),
         )
       : undefined,
     client === "none" ? isNull(models.clientId) : client ? eq(models.clientId, client) : undefined,
     company ? eq(models.company, company) : undefined,
+    type ? eq(models.type, type) : undefined,
     phase === "active"
       ? notInArray(models.phase, ["not_started", "finished"])
       : phase === "stalled"
@@ -113,8 +121,8 @@ export default async function ModelsPage({
       ? or(ne(models.phase, "finished"), ne(models.paymentStatus, "paid"))
       : undefined,
   ];
-  const activeCount = [q, client, company, phase, payment, scope === "open"].filter(Boolean).length;
-  const hasUserFilters = [q, client, company, phase, payment].some(Boolean);
+  const activeCount = [q, client, company, type, phase, payment, scope === "open"].filter(Boolean).length;
+  const hasUserFilters = [q, client, company, type, phase, payment].some(Boolean);
 
   const [rows, clientRows, companyRows] = await Promise.all([
     db
@@ -178,6 +186,12 @@ export default async function ModelsPage({
           ]}
         />
         <FilterSelect
+          name="type"
+          label={t("type")}
+          defaultValue={type ?? ""}
+          options={modelType.enumValues.map((v) => ({ value: v, label: ttype(v) }))}
+        />
+        <FilterSelect
           name="payment"
           label={t("payment")}
           defaultValue={payment ?? ""}
@@ -206,41 +220,53 @@ export default async function ModelsPage({
                   : t("empty")}
             </li>
           )}
-          {rows.map(({ model: m, clientName }) => (
+          {rows.map(({ model: m, clientName }) => {
+            // Finished and paid in full: the dates no longer matter, so they are hidden.
+            const done = m.phase === "finished" && m.paymentStatus === "paid";
+            const badges = (
+              <div className="flex flex-wrap items-center gap-2">
+                <PhaseBadge phase={m.phase} />
+                <PaymentBadge status={m.paymentStatus} priceCents={m.priceCents} depositCents={m.depositCents} />
+              </div>
+            );
+            return (
             <li key={m.id} className={`${listItemClass} flex flex-col gap-3`}>
               <div className="flex items-start justify-between gap-3">
                 <div className="flex min-w-0 flex-col gap-0.5">
                   <Link href={`/models/${m.id}`} className="font-bold hover:underline">
-                    {m.name}
+                    {modelTitle(m.brand, m.name)}
                   </Link>
                   <p className="text-[13px] font-semibold text-brand">{clientName ?? t("ownProject")}</p>
                   <p className="text-[13px] text-muted">
+                    {m.type ? `${ttype(m.type)} · ` : ""}
                     {m.company ? `${m.company} · ` : ""}
                     {formatEuros(m.priceCents, locale)}
                   </p>
-                  <p className="text-[13px] text-muted">
-                    {t("dates", {
-                      requested: formatDate(m.requestedDate, locale),
-                      estimated: formatDate(m.estimatedDate, locale),
-                    })}
-                  </p>
+                  {!done && (
+                    <p className="text-[13px] text-muted">
+                      {t("dates", {
+                        requested: formatDate(m.requestedDate, locale),
+                        estimated: formatDate(m.estimatedDate, locale),
+                      })}
+                    </p>
+                  )}
                 </div>
-                <div className="-mt-1 flex shrink-0 items-center">
-                  <EditIconLink href={`/models/${m.id}/edit`} label={tc("edit")} />
-                  <form action={deleteModel.bind(null, m.id)}>
-                    <DeleteIconButton label={tc("delete")} />
-                  </form>
+                <div className="-mt-1 flex min-w-0 flex-col items-end gap-1">
+                  <div className="flex shrink-0 items-center">
+                    <EditIconLink href={`/models/${m.id}/edit`} label={tc("edit")} />
+                    <form action={deleteModel.bind(null, m.id)}>
+                      <DeleteIconButton label={tc("delete")} />
+                    </form>
+                  </div>
+                  <div className="flex flex-col items-end gap-2 pt-0.5">
+                    {badges}
+                    <PhaseProgress phase={m.phase} />
+                  </div>
                 </div>
-              </div>
-              <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  <PhaseBadge phase={m.phase} />
-                  <PaymentBadge status={m.paymentStatus} priceCents={m.priceCents} depositCents={m.depositCents} />
-                </div>
-                <PhaseProgress phase={m.phase} />
               </div>
             </li>
-          ))}
+            );
+          })}
         </ul>
       </Card>
     </>
