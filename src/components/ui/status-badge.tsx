@@ -52,6 +52,11 @@ export function supplyStatusVariant(
   return status === "to_order" ? "warn" : status === "ordered" ? "info" : "ok";
 }
 
+// Pending expenses: still to be received, in hand but unpaid, settled.
+export function expenseStatusVariant(status: "ordered" | "received" | "paid"): BadgeVariant {
+  return status === "ordered" ? "warn" : status === "received" ? "info" : "ok";
+}
+
 export function phaseVariant(phase: ModelPhase): BadgeVariant {
   if (phase === "not_started") return "mute";
   if (phase === "finished") return "ok";

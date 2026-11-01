@@ -9,6 +9,7 @@
     "quotes": "Presupuestos",
     "clients": "Clientes",
     "consumables": "Consumibles",
+    "expenses": "Gastos pendientes",
     "gallery": "Galería pública",
     "signedInAs": "Sesión iniciada como",
     "logOut": "Cerrar sesión",
@@ -88,6 +89,33 @@
     "crane": "Grúa",
     "machine": "Máquina"
   },
+  "expenseStatus": {
+    "ordered": "Pedido",
+    "received": "Recibido",
+    "paid": "Pagado"
+  },
+  "expenses": {
+    "title": "Gastos pendientes",
+    "subtitle": "{count, plural, =0 {No queda nada por pagar.} one {# gasto por pagar: {amount}} other {# gastos por pagar: {amount}}}",
+    "add": "Añadir gasto",
+    "editTitle": "Editar gasto",
+    "descriptionPlaceholder": "¿Qué has comprado?",
+    "searchPlaceholder": "Descripción o tienda",
+    "empty": "No hay nada pendiente.",
+    "emptyFiltered": "Ningún gasto coincide con estos filtros.",
+    "deleteTitle": "Eliminar gasto",
+    "deleteMessage": "¿Eliminar \"{name}\"? Esta acción no se puede deshacer.",
+    "filter": {
+      "pending": "Pendientes (sin pagar)",
+      "all": "Todos"
+    },
+    "sort": {
+      "newest": "Más recientes primero",
+      "oldest": "Más antiguos primero",
+      "price_desc": "Precio (de mayor a menor)",
+      "description": "Descripción (A–Z)"
+    }
+  },
   "supplyStatus": {
     "to_order": "Por pedir",
     "ordered": "Pedido",
@@ -131,6 +159,7 @@
     "incomeLabel": "Ingresos cobrados (maquetas pagadas y anticipos)",
     "expensesLabel": "Gastos (piezas y consumibles pedidos o en mano)",
     "balanceLabel": "Balance",
+    "unpaidExpensesLabel": "{count, plural, =0 {Nada pendiente de pago} one {# gasto pendiente de pago} other {# gastos pendientes de pago}}",
     "quotesTitle": "Presupuestos por decidir",
     "quotesHint": "Presupuestos abiertos, los más antiguos primero",
     "quoteAge": "{days, plural, =0 {Hoy} one {Hace # día} other {Hace # días}}",
