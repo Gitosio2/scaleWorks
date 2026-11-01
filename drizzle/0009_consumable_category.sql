@@ -1,0 +1,2 @@
+CREATE TYPE "public"."consumable_category" AS ENUM('paint', 'tools', 'glue', 'other');--> statement-breakpoint
+ALTER TABLE "consumables" ADD COLUMN "category" "consumable_category" DEFAULT 'other' NOT NULL;

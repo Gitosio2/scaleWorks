@@ -53,6 +53,22 @@ export function EditIconLink({ href, label }: { href: string; label: string }) {
   );
 }
 
+// Non-submit variant of the pencil, for triggers that open a modal.
+export function EditIconButton({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-haspopup="dialog"
+      aria-label={label}
+      title={label}
+      className={cx(baseClass, "text-brand")}
+    >
+      <PencilIcon />
+    </button>
+  );
+}
+
 export function DeleteIconButton({ label }: { label: string }) {
   return (
     <button type="submit" aria-label={label} title={label} className={cx(baseClass, "text-danger")}>

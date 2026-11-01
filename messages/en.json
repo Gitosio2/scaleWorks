@@ -36,6 +36,8 @@
     "search": "Search",
     "sortBy": "Sort by",
     "status": "Status",
+    "category": "Category",
+    "color": "Color",
     "description": "Description",
     "brand": "Brand",
     "reference": "Reference",
@@ -85,6 +87,12 @@
     "ordered": "Ordered",
     "in_hand": "In hand"
   },
+  "consumableCategory": {
+    "paint": "Paints, varnishes & sprays",
+    "tools": "Tools",
+    "glue": "Glues",
+    "other": "Other"
+  },
   "paymentStatus": {
     "none": "No payment",
     "deposit_paid": "Pending",
@@ -127,9 +135,12 @@
   "consumables": {
     "subtitle": "Paints, glues and other supplies.",
     "add": "Add consumable",
-    "back": "← Consumables",
     "editTitle": "Edit consumable",
     "referencePlaceholder": "Reference (optional)",
+    "colorFromRal": "Detected from the RAL code in Reference",
+    "colorHint": "Pick a color, or enter a RAL code in Reference",
+    "colorClear": "Remove color",
+    "colorSwatch": "Color {color}",
     "searchPlaceholder": "Description, reference or store",
     "empty": "No consumables yet.",
     "emptyFiltered": "No consumables match these filters.",
@@ -138,7 +149,8 @@
       "store": "Store (A–Z)",
       "price_desc": "Price (high to low)",
       "price_asc": "Price (low to high)",
-      "status": "Status"
+      "status": "Status",
+      "category": "Category"
     }
   },
   "models": {
@@ -235,6 +247,8 @@
     "titleRequired": "Title is required",
     "descriptionRequired": "Description is required",
     "invalidStatus": "Invalid status",
+    "invalidCategory": "Invalid category",
+    "invalidColor": "Invalid color",
     "invalidPhase": "Invalid phase",
     "invalidPaymentStatus": "Invalid payment status",
     "invalidLink": "Invalid link",
