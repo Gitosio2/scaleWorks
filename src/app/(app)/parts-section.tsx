@@ -114,14 +114,12 @@ export function PartsSection({
                 <StatusBadge variant={supplyStatusVariant(p.status)}>
                   {ts(p.status)}
                 </StatusBadge>
-                {setPaid && (
+                {/* A part still "to order" is not owed yet, so only bought parts show or change their payment. */}
+                {setPaid && p.status !== "to_order" && (
                   <>
-                    {/* A part that is still "to order" is not owed yet, so only bought parts say if they are paid. */}
-                    {p.status !== "to_order" && (
-                      <StatusBadge variant={p.paid ? "ok" : "warn"}>
-                        {p.paid ? t("paid") : t("unpaid")}
-                      </StatusBadge>
-                    )}
+                    <StatusBadge variant={p.paid ? "ok" : "warn"}>
+                      {p.paid ? t("paid") : t("unpaid")}
+                    </StatusBadge>
                     <form action={setPaid.bind(null, p.id, !p.paid)}>
                       <PaidCheckButton paid={p.paid} label={p.paid ? t("markUnpaid") : t("markPaid")} />
                     </form>

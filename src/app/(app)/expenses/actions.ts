@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
@@ -44,13 +44,25 @@ function refresh(modelId?: string | null) {
   revalidatePath("/");
 }
 
-/** Marks a part as paid or not: a model's part or a loose one, never a quote's. */
+/**
+ * Marks a part as paid or not: a model's part or a loose one, never a quote's.
+ * A part that has not been bought ("to order") cannot be marked as paid, so a
+ * hidden paid flag cannot end up excluding it from what is owed once it is
+ * ordered. Clearing the flag is always allowed.
+ */
 export async function setPartPaid(partId: string, paid: boolean) {
   const user = await requireUser();
   const [part] = await db
     .update(parts)
     .set({ paid })
-    .where(and(eq(parts.id, partId), eq(parts.userId, user.id), isNull(parts.quoteId)))
+    .where(
+      and(
+        eq(parts.id, partId),
+        eq(parts.userId, user.id),
+        isNull(parts.quoteId),
+        paid ? ne(parts.status, "to_order") : undefined,
+      ),
+    )
     .returning({ modelId: parts.modelId });
   if (part) refresh(part.modelId);
 }
