@@ -7,6 +7,7 @@ import {
   ilike,
   isNotNull,
   isNull,
+  lt,
   ne,
   notInArray,
   or,
@@ -26,6 +27,7 @@ import {
   type SearchParams,
 } from "@/lib/list-filters";
 import { requireUser } from "@/lib/session";
+import { stalledCutoff } from "@/lib/stalled";
 import { Card } from "@/components/ui/card";
 import { CreateModal } from "@/components/ui/create-modal";
 import { FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filters";
@@ -51,9 +53,9 @@ const sorts = {
 type SortKey = keyof typeof sorts;
 const sortKeys = Object.keys(sorts) as SortKey[];
 
-// Phase filter: a phase, or "active" = started and not finished, which is what
-// the dashboard's active-work card counts.
-const phaseFilters = [...modelPhase.enumValues, "active"] as const;
+// Phase filter: a phase, or a group the dashboard cards count: "active" = started
+// and not finished, "stalled" = not started for over STALLED_MONTHS months.
+const phaseFilters = [...modelPhase.enumValues, "active", "stalled"] as const;
 
 // Payment filter: a payment status, or "pending" = still owed (not paid, with a
 // price), which is what the dashboard's pending-payment card counts.
@@ -97,9 +99,11 @@ export default async function ModelsPage({
     company ? eq(models.company, company) : undefined,
     phase === "active"
       ? notInArray(models.phase, ["not_started", "finished"])
-      : phase
-        ? eq(models.phase, phase)
-        : undefined,
+      : phase === "stalled"
+        ? and(eq(models.phase, "not_started"), lt(models.createdAt, stalledCutoff(new Date())))
+        : phase
+          ? eq(models.phase, phase)
+          : undefined,
     payment === "pending"
       ? and(ne(models.paymentStatus, "paid"), isNotNull(models.priceCents))
       : payment
@@ -169,6 +173,7 @@ export default async function ModelsPage({
           defaultValue={phase ?? ""}
           options={[
             { value: "active", label: t("phaseActive") },
+            { value: "stalled", label: t("phaseStalled") },
             ...modelPhase.enumValues.map((p) => ({ value: p as string, label: tp(p) })),
           ]}
         />

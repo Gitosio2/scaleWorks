@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { consumables, models, parts, quotes } from "@/db/schema";
 import { formatDate, formatEuros } from "@/lib/labels";
+import { stalledCutoff } from "@/lib/stalled";
 import { requireUser } from "@/lib/session";
 import { Card, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
@@ -70,8 +71,7 @@ export default async function Home() {
   const horizon = new Date(`${today}T00:00:00Z`);
   horizon.setUTCMonth(horizon.getUTCMonth() + 2);
   const deadlineCutoff = horizon.toISOString().slice(0, 10);
-  const staleCutoff = new Date(now);
-  staleCutoff.setMonth(staleCutoff.getMonth() - 7);
+  const staleCutoff = stalledCutoff(now);
 
   const [[stats], deadlines, openQuotes, stalled, [partsSpent], [consumablesSpent]] = await Promise.all([
     db
@@ -223,7 +223,7 @@ export default async function Home() {
         </Card>
 
         <Card>
-          <CardLinkTitle title={t("staleTitle")} href="/models?phase=not_started&sort=oldest" />
+          <CardLinkTitle title={t("staleTitle")} href="/models?phase=stalled&sort=oldest" />
           <Stat value={stalled.length} label={t("staleHint")} />
           {stalled.length > 0 && (
             <div>

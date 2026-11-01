@@ -199,6 +199,7 @@
     "payment": "Payment",
     "paymentPending": "Pending payment (with a price)",
     "phaseActive": "In progress (started, not finished)",
+    "phaseStalled": "Stalled (not started for over 7 months)",
     "deposit": "Deposit (€)",
     "depositHelp": "A deposit makes the payment Pending; if it equals the price the model is marked as paid.",
     "phase": "Phase",

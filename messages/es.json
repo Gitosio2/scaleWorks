@@ -199,6 +199,7 @@
     "payment": "Pago",
     "paymentPending": "Pendiente de cobro (con precio)",
     "phaseActive": "En curso (empezadas, sin terminar)",
+    "phaseStalled": "Paradas (sin empezar desde hace más de 7 meses)",
     "deposit": "Anticipo (€)",
     "depositHelp": "Un anticipo deja el pago como Pendiente; si es igual al precio, la maqueta se marca como pagada.",
     "phase": "Fase",
