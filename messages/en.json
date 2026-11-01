@@ -140,6 +140,13 @@
     "colorFromRal": "Detected from the RAL code in Reference",
     "colorHint": "Pick a color, or enter a RAL code in Reference",
     "colorClear": "Remove color",
+    "depleted": "Used up",
+    "activity": {
+      "label": "Show",
+      "active": "Active",
+      "inactive": "Used up",
+      "all": "All"
+    },
     "colorSwatch": "Color {color}",
     "searchPlaceholder": "Description, reference or store",
     "empty": "No consumables yet.",
@@ -207,7 +214,8 @@
       "quantityNotSet": "Quantity not set",
       "costWithUnit": "{cost} (unit {unit})",
       "unitOnly": "unit {unit}",
-      "updateQuantity": "Update quantity"
+      "updateQuantity": "Update quantity",
+      "inactive": "Used up"
     },
     "quantity": {
       "label": "Quantity",

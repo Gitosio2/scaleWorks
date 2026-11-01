@@ -7,6 +7,7 @@ import { db } from "@/db";
 import { consumableCategory, consumables, supplyStatus } from "@/db/schema";
 import { parseEuros, type ActionT } from "@/lib/labels";
 import { HEX_COLOR } from "@/lib/ral";
+import { DEPLETED } from "./depleted";
 import { requireUser } from "@/lib/session";
 
 type SupplyStatus = (typeof supplyStatus.enumValues)[number];
@@ -71,11 +72,16 @@ export async function updateConsumable(id: string, formData: FormData) {
 export async function updateConsumableStatus(id: string, status: string) {
   const user = await requireUser();
   const t = await getTranslations("actionErrors");
+  const change =
+    status === DEPLETED
+      ? { active: false }
+      : { status: parseStatus(status, t), active: true };
   await db
     .update(consumables)
-    .set({ status: parseStatus(status, t) })
+    .set(change)
     .where(and(eq(consumables.id, id), eq(consumables.userId, user.id)));
   revalidatePath("/consumables");
+  revalidatePath("/models");
 }
 
 export async function deleteConsumable(id: string) {

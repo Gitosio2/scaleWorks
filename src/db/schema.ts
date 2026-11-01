@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  boolean,
   check,
   date,
   index,
@@ -149,6 +150,9 @@ export const consumables = pgTable("consumables", {
   category: consumableCategory("category").notNull().default("other"),
   // Manual color as "#rrggbb"; when null the swatch falls back to a RAL code in `reference`.
   colorHex: text("color_hex"),
+  // Inactive = used up or broken. The row is kept so price and store stay
+  // consultable, and it can still be linked from models it was used on.
+  active: boolean("active").notNull().default(true),
 });
 
 // Many-to-many: which consumables were used on which model.

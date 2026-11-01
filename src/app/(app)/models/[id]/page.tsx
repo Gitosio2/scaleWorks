@@ -89,7 +89,7 @@ export default async function ModelDetailPage({
     db
       .select({ id: consumables.id, description: consumables.description })
       .from(consumables)
-      .where(eq(consumables.userId, user.id))
+      .where(and(eq(consumables.userId, user.id), eq(consumables.active, true)))
       .orderBy(consumables.description),
   ]);
   // Cost of a consumable on this model = unit price x fraction used.
@@ -259,9 +259,13 @@ export default async function ModelDetailPage({
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <StatusBadge variant={supplyStatusVariant(c.status)}>
-                      {ts(c.status)}
-                    </StatusBadge>
+                    {c.active ? (
+                      <StatusBadge variant={supplyStatusVariant(c.status)}>
+                        {ts(c.status)}
+                      </StatusBadge>
+                    ) : (
+                      <StatusBadge variant="mute">{t("consumables.inactive")}</StatusBadge>
+                    )}
                     <form action={removeModelConsumable.bind(null, id, c.id)}>
                       <DeleteIconButton label={tc("remove")} />
                     </form>

@@ -30,6 +30,7 @@ import {
   updateConsumableStatus,
 } from "./actions";
 import { ColorSwatch } from "./color-swatch";
+import { DEPLETED } from "./depleted";
 import { ConsumableFields } from "./consumable-fields";
 
 const sorts = {
@@ -40,6 +41,8 @@ const sorts = {
   status: { order: [asc(consumables.status), asc(consumables.description)] },
   category: { order: [asc(consumables.category), asc(consumables.description)] },
 };
+// Inactive consumables (used up or broken) are hidden unless asked for.
+const activityKeys = ["active", "inactive", "all"] as const;
 type SortKey = keyof typeof sorts;
 const sortKeys = Object.keys(sorts) as SortKey[];
 
@@ -57,10 +60,20 @@ export default async function ConsumablesPage({
   const tcat = await getTranslations("consumableCategory");
   const locale = await getLocale();
 
+  const statusOptions = [
+    ...supplyStatus.enumValues.map((s) => ({
+      value: s as string,
+      label: ts(s),
+      variant: supplyStatusVariant(s),
+    })),
+    { value: DEPLETED, label: t("depleted"), variant: "mute" as const },
+  ];
+
   const q = textParam(sp, "q");
   const store = textParam(sp, "store");
   const status = enumParam(sp, "status", supplyStatus.enumValues);
   const category = enumParam(sp, "category", consumableCategory.enumValues);
+  const activity = enumParam(sp, "activity", activityKeys) ?? "active";
   const sort = enumParam(sp, "sort", sortKeys) ?? "description";
 
   const conditions: Array<SQL | undefined> = [
@@ -75,8 +88,9 @@ export default async function ConsumablesPage({
     store ? eq(consumables.store, store) : undefined,
     status ? eq(consumables.status, status) : undefined,
     category ? eq(consumables.category, category) : undefined,
+    activity === "all" ? undefined : eq(consumables.active, activity === "active"),
   ];
-  const activeCount = [q, store, status, category].filter(Boolean).length;
+  const activeCount = [q, store, status, category, activity !== "active"].filter(Boolean).length;
 
   const [rows, storeRows] = await Promise.all([
     db
@@ -120,6 +134,13 @@ export default async function ConsumablesPage({
           options={consumableCategory.enumValues.map((c) => ({ value: c, label: tcat(c) }))}
         />
         <FilterSelect
+          name="activity"
+          label={t("activity.label")}
+          defaultValue={activity}
+          options={activityKeys.map((k) => ({ value: k, label: t(`activity.${k}`) }))}
+          allLabel={null}
+        />
+        <FilterSelect
           name="sort"
           label={tc("sortBy")}
           defaultValue={sort}
@@ -140,7 +161,7 @@ export default async function ConsumablesPage({
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="flex min-w-0 items-stretch gap-3">
                   <div className="min-w-0">
-                    <p className="font-bold">{c.description}</p>
+                    <p className={c.active ? "font-bold" : "font-bold text-muted"}>{c.description}</p>
                     <p className="text-[13px] text-muted">
                       {tcat(c.category)}
                       {" · "}
@@ -153,18 +174,18 @@ export default async function ConsumablesPage({
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <SegmentedToggle
-                    value={c.status}
-                    options={supplyStatus.enumValues.map((s) => ({
-                      value: s,
-                      label: ts(s),
-                      variant: supplyStatusVariant(s),
-                    }))}
+                    value={c.active ? c.status : DEPLETED}
+                    options={statusOptions}
                     action={updateConsumableStatus.bind(null, c.id)}
                     label={tc("status")}
                   />
-                  <StatusBadge variant={supplyStatusVariant(c.status)}>
-                    {ts(c.status)}
-                  </StatusBadge>
+                  {c.active ? (
+                    <StatusBadge variant={supplyStatusVariant(c.status)}>
+                      {ts(c.status)}
+                    </StatusBadge>
+                  ) : (
+                    <StatusBadge variant="mute">{t("depleted")}</StatusBadge>
+                  )}
                   <div className="flex items-center">
                     <EditModal
                       label={tc("edit")}

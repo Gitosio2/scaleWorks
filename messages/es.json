@@ -140,6 +140,13 @@
     "colorFromRal": "Detectado del código RAL en Referencia",
     "colorHint": "Elige un color o escribe un código RAL en Referencia",
     "colorClear": "Quitar color",
+    "depleted": "Agotado",
+    "activity": {
+      "label": "Mostrar",
+      "active": "Activos",
+      "inactive": "Agotados",
+      "all": "Todos"
+    },
     "colorSwatch": "Color {color}",
     "searchPlaceholder": "Descripción, referencia o tienda",
     "empty": "Aún no hay consumibles.",
@@ -207,7 +214,8 @@
       "quantityNotSet": "Cantidad sin definir",
       "costWithUnit": "{cost} (unidad {unit})",
       "unitOnly": "unidad {unit}",
-      "updateQuantity": "Actualizar cantidad"
+      "updateQuantity": "Actualizar cantidad",
+      "inactive": "Agotado"
     },
     "quantity": {
       "label": "Cantidad",
