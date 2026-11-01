@@ -4,7 +4,8 @@ import { db } from "@/db";
 import { clients, models } from "@/db/schema";
 import { formatEuros } from "@/lib/labels";
 import { requireUser } from "@/lib/session";
-import { Card, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import { CreateModal } from "@/components/ui/create-modal";
 import { PageHeader } from "@/components/ui/page-header";
 import { PhaseProgress } from "@/components/ui/phase-progress";
 import { PaymentBadge, PhaseBadge } from "@/components/ui/status-badge";
@@ -12,7 +13,6 @@ import {
   dangerActionClass,
   linkActionClass,
   listItemClass,
-  primaryButtonClass,
 } from "@/components/ui/styles";
 import { createModel, deleteModel } from "./actions";
 import { ModelFields } from "./model-fields";
@@ -37,15 +37,9 @@ export default async function ModelsPage() {
     <>
       <PageHeader title="Models" subtitle="Everything you are building or have built." />
 
-      <Card>
-        <CardTitle>Add model</CardTitle>
-        <form action={createModel} className="flex flex-col gap-3">
-          <ModelFields clients={clientRows} />
-          <button type="submit" className={`${primaryButtonClass} self-start`}>
-            Add model
-          </button>
-        </form>
-      </Card>
+      <CreateModal label="Add model" title="Add model" action={createModel}>
+        <ModelFields clients={clientRows} />
+      </CreateModal>
 
       <Card>
         <ul className="flex flex-col">

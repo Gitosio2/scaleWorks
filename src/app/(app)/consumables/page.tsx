@@ -4,7 +4,8 @@ import { db } from "@/db";
 import { consumables, supplyStatus } from "@/db/schema";
 import { formatEuros, supplyStatusLabels } from "@/lib/labels";
 import { requireUser } from "@/lib/session";
-import { Card, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import { CreateModal } from "@/components/ui/create-modal";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
 import {
@@ -12,7 +13,6 @@ import {
   inputClass,
   linkActionClass,
   listItemClass,
-  primaryButtonClass,
 } from "@/components/ui/styles";
 import {
   createConsumable,
@@ -33,15 +33,9 @@ export default async function ConsumablesPage() {
     <>
       <PageHeader title="Consumables" subtitle="Paints, glues and other supplies." />
 
-      <Card>
-        <CardTitle>Add consumable</CardTitle>
-        <form action={createConsumable} className="flex flex-col gap-3">
-          <ConsumableFields />
-          <button type="submit" className={`${primaryButtonClass} self-start`}>
-            Add consumable
-          </button>
-        </form>
-      </Card>
+      <CreateModal label="Add consumable" title="Add consumable" action={createConsumable}>
+        <ConsumableFields />
+      </CreateModal>
 
       <Card>
         <ul className="flex flex-col">
