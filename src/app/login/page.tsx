@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth-client";
 import { Card } from "@/components/ui/card";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import {
   cx,
   inputClass,
@@ -13,6 +15,7 @@ import {
 } from "@/components/ui/styles";
 
 export default function LoginPage() {
+  const t = useTranslations("login");
   const router = useRouter();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +40,7 @@ export default function LoginPage() {
 
     setPending(false);
     if (error) {
-      setError(error.message ?? "Something went wrong");
+      setError(error.message ?? t("genericError"));
       return;
     }
     router.push("/");
@@ -49,6 +52,7 @@ export default function LoginPage() {
       <Card as="div" className="w-full max-w-[400px] p-6!">
         <form onSubmit={onSubmit} className="flex flex-col gap-4">
           <div className="flex items-center gap-2.5">
+            <LanguageSwitcher className="order-last ml-auto" />
             <span
               aria-hidden
               className="flex size-8 items-center justify-center rounded-[9px] bg-brand font-bold text-brand-fg"
@@ -58,35 +62,35 @@ export default function LoginPage() {
             <span className="text-lg font-bold tracking-tight">scaleWorks</span>
           </div>
           <h1 className="text-[28px] font-bold leading-tight tracking-tight">
-            {mode === "signin" ? "Sign in" : "Create account"}
+            {mode === "signin" ? t("signIn") : t("createAccount")}
           </h1>
           {mode === "signup" && (
             <label className={labelClass}>
-              Name
+              {t("name")}
               <input
                 name="name"
-                placeholder="Name"
+                placeholder={t("name")}
                 required
                 className={cx(inputClass, "text-base font-normal")}
               />
             </label>
           )}
           <label className={labelClass}>
-            Email
+            {t("email")}
             <input
               name="email"
               type="email"
-              placeholder="Email"
+              placeholder={t("email")}
               required
               className={cx(inputClass, "text-base font-normal")}
             />
           </label>
           <label className={labelClass}>
-            Password
+            {t("password")}
             <input
               name="password"
               type="password"
-              placeholder="Password (min. 8 characters)"
+              placeholder={t("passwordPlaceholder")}
               required
               minLength={8}
               className={cx(inputClass, "text-base font-normal")}
@@ -102,16 +106,14 @@ export default function LoginPage() {
             disabled={pending}
             className={cx(primaryButtonClass, "w-full")}
           >
-            {mode === "signin" ? "Sign in" : "Sign up"}
+            {mode === "signin" ? t("signIn") : t("signUp")}
           </button>
           <button
             type="button"
             onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
             className={cx(linkActionClass, "justify-center")}
           >
-            {mode === "signin"
-              ? "No account? Create one"
-              : "Already have an account? Sign in"}
+            {mode === "signin" ? t("noAccount") : t("haveAccount")}
           </button>
         </form>
       </Card>

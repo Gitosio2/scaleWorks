@@ -1,0 +1,252 @@
+{
+  "meta": {
+    "description": "Manage your scale models, quotes, parts and hours."
+  },
+  "nav": {
+    "main": "Main",
+    "home": "Home",
+    "models": "Models",
+    "quotes": "Quotes",
+    "clients": "Clients",
+    "consumables": "Consumables",
+    "signedInAs": "Signed in as",
+    "logOut": "Log out",
+    "signOutFailed": "Could not sign out. Try again."
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "es": "Español"
+  },
+  "common": {
+    "all": "All",
+    "filters": "Filters",
+    "reset": "Reset",
+    "cancel": "Cancel",
+    "close": "Close",
+    "saving": "Saving…",
+    "saveFailed": "Could not save. Check the fields and try again.",
+    "remaining": "Remaining {amount}",
+    "progress": "Progress: {done} of {total} steps",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "add": "Add",
+    "remove": "Remove",
+    "search": "Search",
+    "sortBy": "Sort by",
+    "status": "Status",
+    "description": "Description",
+    "brand": "Brand",
+    "reference": "Reference",
+    "store": "Store",
+    "client": "Client",
+    "company": "Company",
+    "name": "Name",
+    "price": "Price (€)",
+    "moneyPlaceholder": "0.00",
+    "noValue": "—"
+  },
+  "login": {
+    "signIn": "Sign in",
+    "createAccount": "Create account",
+    "signUp": "Sign up",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "passwordPlaceholder": "Password (min. 8 characters)",
+    "noAccount": "No account? Create one",
+    "haveAccount": "Already have an account? Sign in",
+    "genericError": "Something went wrong"
+  },
+  "errors": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred while loading this page.",
+    "retry": "Try again",
+    "notFoundTitle": "Not found",
+    "notFoundDescription": "We could not find what you were looking for.",
+    "backHome": "Back to Home"
+  },
+  "phase": {
+    "not_started": "Not started",
+    "pending_decal_design": "Pending decal design",
+    "pending_painting": "Pending painting",
+    "pending_decals": "Pending decals",
+    "pending_varnish": "Pending varnish",
+    "pending_assembly": "Pending assembly",
+    "finished": "Finished"
+  },
+  "quoteStatus": {
+    "open": "Open",
+    "rejected": "Rejected"
+  },
+  "supplyStatus": {
+    "to_order": "To order",
+    "ordered": "Ordered",
+    "in_hand": "In hand"
+  },
+  "paymentStatus": {
+    "none": "No payment",
+    "deposit_paid": "Pending",
+    "paid": "Paid in full"
+  },
+  "home": {
+    "subtitle": "Manage your scale models, quotes, parts and hours.",
+    "models": "Track phases, time, parts and consumables.",
+    "quotes": "Prepare quotes and convert accepted ones to models.",
+    "clients": "Keep your clients and their contact details.",
+    "consumables": "Paints, glues and other supplies you use."
+  },
+  "parts": {
+    "title": "Parts: {total}",
+    "storeLink": "Store link",
+    "storeLinkPlaceholder": "Store link (https://...)",
+    "add": "Add part",
+    "empty": "No parts yet.",
+    "noStore": "No store",
+    "updateStatus": "Update status"
+  },
+  "clients": {
+    "subtitle": "People and companies you work for.",
+    "add": "Add client",
+    "back": "← Clients",
+    "editTitle": "Edit client",
+    "contact": "Contact",
+    "contactPlaceholder": "Contact (email or phone)",
+    "companyPlaceholder": "Company (optional)",
+    "searchPlaceholder": "Name, contact or company",
+    "empty": "No clients yet.",
+    "emptyFiltered": "No clients match these filters.",
+    "sort": {
+      "newest": "Newest first",
+      "oldest": "Oldest first",
+      "name": "Name (A–Z)",
+      "company": "Company (A–Z)"
+    }
+  },
+  "consumables": {
+    "subtitle": "Paints, glues and other supplies.",
+    "add": "Add consumable",
+    "back": "← Consumables",
+    "editTitle": "Edit consumable",
+    "referencePlaceholder": "Reference (optional)",
+    "searchPlaceholder": "Description, reference or store",
+    "empty": "No consumables yet.",
+    "emptyFiltered": "No consumables match these filters.",
+    "updateStatus": "Update status",
+    "sort": {
+      "description": "Description (A–Z)",
+      "store": "Store (A–Z)",
+      "price_desc": "Price (high to low)",
+      "price_asc": "Price (low to high)",
+      "status": "Status"
+    }
+  },
+  "models": {
+    "subtitle": "Everything you are building or have built.",
+    "add": "Add model",
+    "back": "← Models",
+    "editTitle": "Edit model",
+    "modelName": "Model name",
+    "companyPlaceholder": "Company of the real subject (optional)",
+    "noClientOption": "— No client (own project) —",
+    "ownProject": "Own project",
+    "paymentStatus": "Payment status",
+    "payment": "Payment",
+    "deposit": "Deposit (€)",
+    "depositHelp": "A deposit makes the payment Pending; if it equals the price the model is marked as paid.",
+    "phase": "Phase",
+    "requestedDate": "Requested date (from client)",
+    "estimatedDate": "Estimated date",
+    "searchPlaceholder": "Name, company or client",
+    "show": "Show",
+    "scope": {
+      "open": "Unfinished or not fully paid",
+      "all": "Everything"
+    },
+    "empty": "No models yet.",
+    "emptyFiltered": "No models match these filters.",
+    "emptyOpen": "No unfinished or unpaid models. Finished and fully paid ones are hidden.",
+    "dates": "Requested: {requested} · Estimated: {estimated}",
+    "depositSummary": "Deposit: {deposit} · Remaining: {remaining}",
+    "createQuote": "Create quote from this model",
+    "sort": {
+      "newest": "Newest first",
+      "oldest": "Oldest first",
+      "name": "Name (A–Z)",
+      "price_desc": "Price (high to low)",
+      "price_asc": "Price (low to high)",
+      "requested": "Requested date",
+      "estimated": "Estimated date"
+    },
+    "time": {
+      "title": "Time: {total}",
+      "date": "Date",
+      "duration": "Duration",
+      "durationPlaceholder": "hh:mm",
+      "durationHint": "Format hh:mm, e.g. 01:30",
+      "empty": "No time logged yet."
+    },
+    "consumables": {
+      "title": "Consumables: {total}",
+      "addFirst": "Add consumables first in <link>Consumables</link>.",
+      "select": "Consumable",
+      "empty": "No consumables linked yet.",
+      "quantityValue": "{quantity} {count, plural, one {unit} other {units}}",
+      "quantityNotSet": "Quantity not set",
+      "costWithUnit": "{cost} (unit {unit})",
+      "unitOnly": "unit {unit}",
+      "updateQuantity": "Update quantity"
+    },
+    "quantity": {
+      "label": "Quantity",
+      "optional": "Quantity (optional)",
+      "oneUnit": "1 unit",
+      "customPlaceholder": "Custom (3/8, 0,3...)",
+      "customLabel": "Custom quantity"
+    }
+  },
+  "quotes": {
+    "subtitle": "Proposals for upcoming work.",
+    "add": "Add quote",
+    "back": "← Quotes",
+    "editTitle": "Edit quote",
+    "editQuote": "Edit quote",
+    "acceptConvert": "Accept and convert to model",
+    "title": "Title",
+    "titlePlaceholder": "Quote title",
+    "noClient": "No client",
+    "noClientOption": "— No client —",
+    "searchPlaceholder": "Title or client",
+    "empty": "No quotes yet.",
+    "emptyFiltered": "No quotes match these filters.",
+    "sort": {
+      "newest": "Newest first",
+      "oldest": "Oldest first",
+      "title": "Title (A–Z)",
+      "price_desc": "Price (high to low)",
+      "price_asc": "Price (low to high)"
+    }
+  },
+  "actionErrors": {
+    "invalidPrice": "Invalid price",
+    "invalidQuantity": "Invalid quantity",
+    "nameAndContactRequired": "Name and contact are required",
+    "nameRequired": "Name is required",
+    "titleRequired": "Title is required",
+    "descriptionRequired": "Description is required",
+    "invalidStatus": "Invalid status",
+    "invalidPhase": "Invalid phase",
+    "invalidPaymentStatus": "Invalid payment status",
+    "invalidLink": "Invalid link",
+    "invalidDuration": "Duration must be hh:mm, up to 24:00",
+    "invalidDate": "Invalid date",
+    "clientNotFound": "Client not found",
+    "modelNotFound": "Model not found",
+    "consumableNotFound": "Consumable not found",
+    "quoteNotFound": "Quote not found",
+    "depositNotPositive": "Deposit amount must be greater than 0",
+    "depositExceedsPrice": "Deposit cannot be greater than the price",
+    "depositRequired": "Enter the deposit amount for a pending payment"
+  }
+}

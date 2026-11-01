@@ -3,6 +3,7 @@
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { clients, models, modelPhase, paymentStatus } from "@/db/schema";
 import { parseEuros } from "@/lib/labels";
@@ -10,25 +11,29 @@ import { derivePayment } from "@/lib/payments";
 import { requireUser } from "@/lib/session";
 
 async function parseModel(formData: FormData, userId: string) {
+  const t = await getTranslations("actionErrors");
   const name = String(formData.get("name") ?? "").trim();
-  if (!name) throw new Error("Name is required");
+  if (!name) throw new Error(t("nameRequired"));
 
   const phase = String(formData.get("phase"));
   if (!(modelPhase.enumValues as readonly string[]).includes(phase)) {
-    throw new Error("Invalid phase");
+    throw new Error(t("invalidPhase"));
   }
 
-  const priceCents = parseEuros(String(formData.get("price") ?? ""));
+  const priceCents = parseEuros(String(formData.get("price") ?? ""), t);
 
   const payment = String(formData.get("paymentStatus") ?? "none");
   if (!(paymentStatus.enumValues as readonly string[]).includes(payment)) {
-    throw new Error("Invalid payment status");
+    throw new Error(t("invalidPaymentStatus"));
   }
-  const { status, depositCents } = derivePayment({
-    status: payment as (typeof paymentStatus.enumValues)[number],
-    depositCents: parseEuros(String(formData.get("deposit") ?? "")),
-    priceCents,
-  });
+  const { status, depositCents } = derivePayment(
+    {
+      status: payment as (typeof paymentStatus.enumValues)[number],
+      depositCents: parseEuros(String(formData.get("deposit") ?? ""), t),
+      priceCents,
+    },
+    t,
+  );
 
   // The client must belong to the current user.
   const clientId = String(formData.get("clientId") ?? "") || null;
@@ -37,7 +42,7 @@ async function parseModel(formData: FormData, userId: string) {
       .select({ id: clients.id })
       .from(clients)
       .where(and(eq(clients.id, clientId), eq(clients.userId, userId)));
-    if (!owned) throw new Error("Client not found");
+    if (!owned) throw new Error(t("clientNotFound"));
   }
 
   return {

@@ -1,0 +1,252 @@
+{
+  "meta": {
+    "description": "Gestiona tus maquetas, presupuestos, piezas y horas."
+  },
+  "nav": {
+    "main": "Principal",
+    "home": "Inicio",
+    "models": "Maquetas",
+    "quotes": "Presupuestos",
+    "clients": "Clientes",
+    "consumables": "Consumibles",
+    "signedInAs": "Sesión iniciada como",
+    "logOut": "Cerrar sesión",
+    "signOutFailed": "No se pudo cerrar la sesión. Inténtalo de nuevo."
+  },
+  "language": {
+    "label": "Idioma",
+    "en": "English",
+    "es": "Español"
+  },
+  "common": {
+    "all": "Todos",
+    "filters": "Filtros",
+    "reset": "Restablecer",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "saving": "Guardando…",
+    "saveFailed": "No se pudo guardar. Revisa los campos e inténtalo de nuevo.",
+    "remaining": "Restante {amount}",
+    "progress": "Progreso: {done} de {total} pasos",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "save": "Guardar",
+    "add": "Añadir",
+    "remove": "Quitar",
+    "search": "Buscar",
+    "sortBy": "Ordenar por",
+    "status": "Estado",
+    "description": "Descripción",
+    "brand": "Marca",
+    "reference": "Referencia",
+    "store": "Tienda",
+    "client": "Cliente",
+    "company": "Empresa",
+    "name": "Nombre",
+    "price": "Precio (€)",
+    "moneyPlaceholder": "0,00",
+    "noValue": "—"
+  },
+  "login": {
+    "signIn": "Iniciar sesión",
+    "createAccount": "Crear cuenta",
+    "signUp": "Registrarse",
+    "name": "Nombre",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Contraseña (mín. 8 caracteres)",
+    "noAccount": "¿No tienes cuenta? Crea una",
+    "haveAccount": "¿Ya tienes cuenta? Inicia sesión",
+    "genericError": "Algo salió mal"
+  },
+  "errors": {
+    "title": "Algo salió mal",
+    "description": "Se produjo un error inesperado al cargar esta página.",
+    "retry": "Reintentar",
+    "notFoundTitle": "No encontrado",
+    "notFoundDescription": "No pudimos encontrar lo que buscabas.",
+    "backHome": "Volver al inicio"
+  },
+  "phase": {
+    "not_started": "Sin empezar",
+    "pending_decal_design": "Pendiente de diseño de calcas",
+    "pending_painting": "Pendiente de pintura",
+    "pending_decals": "Pendiente de calcas",
+    "pending_varnish": "Pendiente de barniz",
+    "pending_assembly": "Pendiente de montaje",
+    "finished": "Terminada"
+  },
+  "quoteStatus": {
+    "open": "Abierto",
+    "rejected": "Rechazado"
+  },
+  "supplyStatus": {
+    "to_order": "Por pedir",
+    "ordered": "Pedido",
+    "in_hand": "En mano"
+  },
+  "paymentStatus": {
+    "none": "Sin pago",
+    "deposit_paid": "Pendiente",
+    "paid": "Pagado por completo"
+  },
+  "home": {
+    "subtitle": "Gestiona tus maquetas, presupuestos, piezas y horas.",
+    "models": "Sigue las fases, el tiempo, las piezas y los consumibles.",
+    "quotes": "Prepara presupuestos y convierte los aceptados en maquetas.",
+    "clients": "Guarda tus clientes y sus datos de contacto.",
+    "consumables": "Pinturas, pegamentos y otros materiales que utilizas."
+  },
+  "parts": {
+    "title": "Piezas: {total}",
+    "storeLink": "Enlace de la tienda",
+    "storeLinkPlaceholder": "Enlace de la tienda (https://...)",
+    "add": "Añadir pieza",
+    "empty": "Aún no hay piezas.",
+    "noStore": "Sin tienda",
+    "updateStatus": "Actualizar estado"
+  },
+  "clients": {
+    "subtitle": "Personas y empresas para las que trabajas.",
+    "add": "Añadir cliente",
+    "back": "← Clientes",
+    "editTitle": "Editar cliente",
+    "contact": "Contacto",
+    "contactPlaceholder": "Contacto (correo o teléfono)",
+    "companyPlaceholder": "Empresa (opcional)",
+    "searchPlaceholder": "Nombre, contacto o empresa",
+    "empty": "Aún no hay clientes.",
+    "emptyFiltered": "Ningún cliente coincide con estos filtros.",
+    "sort": {
+      "newest": "Más recientes primero",
+      "oldest": "Más antiguos primero",
+      "name": "Nombre (A–Z)",
+      "company": "Empresa (A–Z)"
+    }
+  },
+  "consumables": {
+    "subtitle": "Pinturas, pegamentos y otros materiales.",
+    "add": "Añadir consumible",
+    "back": "← Consumibles",
+    "editTitle": "Editar consumible",
+    "referencePlaceholder": "Referencia (opcional)",
+    "searchPlaceholder": "Descripción, referencia o tienda",
+    "empty": "Aún no hay consumibles.",
+    "emptyFiltered": "Ningún consumible coincide con estos filtros.",
+    "updateStatus": "Actualizar estado",
+    "sort": {
+      "description": "Descripción (A–Z)",
+      "store": "Tienda (A–Z)",
+      "price_desc": "Precio (de mayor a menor)",
+      "price_asc": "Precio (de menor a mayor)",
+      "status": "Estado"
+    }
+  },
+  "models": {
+    "subtitle": "Todo lo que estás construyendo o has construido.",
+    "add": "Añadir maqueta",
+    "back": "← Maquetas",
+    "editTitle": "Editar maqueta",
+    "modelName": "Nombre de la maqueta",
+    "companyPlaceholder": "Empresa del modelo real (opcional)",
+    "noClientOption": "— Sin cliente (proyecto propio) —",
+    "ownProject": "Proyecto propio",
+    "paymentStatus": "Estado del pago",
+    "payment": "Pago",
+    "deposit": "Anticipo (€)",
+    "depositHelp": "Un anticipo deja el pago como Pendiente; si es igual al precio, la maqueta se marca como pagada.",
+    "phase": "Fase",
+    "requestedDate": "Fecha solicitada (por el cliente)",
+    "estimatedDate": "Fecha estimada",
+    "searchPlaceholder": "Nombre, empresa o cliente",
+    "show": "Mostrar",
+    "scope": {
+      "open": "Sin terminar o sin pagar del todo",
+      "all": "Todo"
+    },
+    "empty": "Aún no hay maquetas.",
+    "emptyFiltered": "Ninguna maqueta coincide con estos filtros.",
+    "emptyOpen": "No hay maquetas sin terminar ni sin pagar. Las terminadas y pagadas por completo están ocultas.",
+    "dates": "Solicitada: {requested} · Estimada: {estimated}",
+    "depositSummary": "Anticipo: {deposit} · Restante: {remaining}",
+    "createQuote": "Crear presupuesto a partir de esta maqueta",
+    "sort": {
+      "newest": "Más recientes primero",
+      "oldest": "Más antiguos primero",
+      "name": "Nombre (A–Z)",
+      "price_desc": "Precio (de mayor a menor)",
+      "price_asc": "Precio (de menor a mayor)",
+      "requested": "Fecha solicitada",
+      "estimated": "Fecha estimada"
+    },
+    "time": {
+      "title": "Tiempo: {total}",
+      "date": "Fecha",
+      "duration": "Duración",
+      "durationPlaceholder": "hh:mm",
+      "durationHint": "Formato hh:mm, por ejemplo 01:30",
+      "empty": "Aún no se ha registrado tiempo."
+    },
+    "consumables": {
+      "title": "Consumibles: {total}",
+      "addFirst": "Primero añade consumibles en <link>Consumibles</link>.",
+      "select": "Consumible",
+      "empty": "Aún no hay consumibles vinculados.",
+      "quantityValue": "{quantity} {count, plural, one {unidad} other {unidades}}",
+      "quantityNotSet": "Cantidad sin definir",
+      "costWithUnit": "{cost} (unidad {unit})",
+      "unitOnly": "unidad {unit}",
+      "updateQuantity": "Actualizar cantidad"
+    },
+    "quantity": {
+      "label": "Cantidad",
+      "optional": "Cantidad (opcional)",
+      "oneUnit": "1 unidad",
+      "customPlaceholder": "Personalizada (3/8, 0,3...)",
+      "customLabel": "Cantidad personalizada"
+    }
+  },
+  "quotes": {
+    "subtitle": "Propuestas para próximos trabajos.",
+    "add": "Añadir presupuesto",
+    "back": "← Presupuestos",
+    "editTitle": "Editar presupuesto",
+    "editQuote": "Editar presupuesto",
+    "acceptConvert": "Aceptar y convertir en maqueta",
+    "title": "Título",
+    "titlePlaceholder": "Título del presupuesto",
+    "noClient": "Sin cliente",
+    "noClientOption": "— Sin cliente —",
+    "searchPlaceholder": "Título o cliente",
+    "empty": "Aún no hay presupuestos.",
+    "emptyFiltered": "Ningún presupuesto coincide con estos filtros.",
+    "sort": {
+      "newest": "Más recientes primero",
+      "oldest": "Más antiguos primero",
+      "title": "Título (A–Z)",
+      "price_desc": "Precio (de mayor a menor)",
+      "price_asc": "Precio (de menor a mayor)"
+    }
+  },
+  "actionErrors": {
+    "invalidPrice": "Precio no válido",
+    "invalidQuantity": "Cantidad no válida",
+    "nameAndContactRequired": "El nombre y el contacto son obligatorios",
+    "nameRequired": "El nombre es obligatorio",
+    "titleRequired": "El título es obligatorio",
+    "descriptionRequired": "La descripción es obligatoria",
+    "invalidStatus": "Estado no válido",
+    "invalidPhase": "Fase no válida",
+    "invalidPaymentStatus": "Estado de pago no válido",
+    "invalidLink": "Enlace no válido",
+    "invalidDuration": "La duración debe tener el formato hh:mm, hasta 24:00",
+    "invalidDate": "Fecha no válida",
+    "clientNotFound": "Cliente no encontrado",
+    "modelNotFound": "Maqueta no encontrada",
+    "consumableNotFound": "Consumible no encontrado",
+    "quoteNotFound": "Presupuesto no encontrado",
+    "depositNotPositive": "El importe del anticipo debe ser mayor que 0",
+    "depositExceedsPrice": "El anticipo no puede ser mayor que el precio",
+    "depositRequired": "Indica el importe del anticipo para un pago pendiente"
+  }
+}

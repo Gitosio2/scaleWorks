@@ -1,5 +1,5 @@
+import { useTranslations } from "next-intl";
 import { quoteStatus } from "@/db/schema";
-import { quoteStatusLabels } from "@/lib/labels";
 import { inputClass, labelClass } from "@/components/ui/styles";
 
 type Defaults = {
@@ -16,36 +16,39 @@ export function QuoteFields({
   clients: { id: string; name: string }[];
   defaults?: Defaults;
 }) {
+  const t = useTranslations("quotes");
+  const tc = useTranslations("common");
+  const tq = useTranslations("quoteStatus");
   return (
     <>
       <label className={labelClass}>
-        Title
-        <input name="title" placeholder="Quote title" required defaultValue={defaults.title} className={inputClass} />
+        {t("title")}
+        <input name="title" placeholder={t("titlePlaceholder")} required defaultValue={defaults.title} className={inputClass} />
       </label>
       <label className={labelClass}>
-        Client
+        {tc("client")}
         <select name="clientId" defaultValue={defaults.clientId ?? ""} className={inputClass}>
-          <option value="">— No client —</option>
+          <option value="">{t("noClientOption")}</option>
           {clients.map((c) => (
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
         </select>
       </label>
       <label className={labelClass}>
-        Price (€)
+        {tc("price")}
         <input
           name="price"
           inputMode="decimal"
-          placeholder="0.00"
+          placeholder={tc("moneyPlaceholder")}
           defaultValue={defaults.priceCents != null ? (defaults.priceCents / 100).toFixed(2) : ""}
           className={inputClass}
         />
       </label>
       <label className={labelClass}>
-        Status
+        {tc("status")}
         <select name="status" defaultValue={defaults.status ?? "open"} className={inputClass}>
           {quoteStatus.enumValues.map((s) => (
-            <option key={s} value={s}>{quoteStatusLabels[s]}</option>
+            <option key={s} value={s}>{tq(s)}</option>
           ))}
         </select>
       </label>

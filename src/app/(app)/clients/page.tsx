@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { and, asc, desc, eq, ilike, isNotNull, or, type SQL } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { clients } from "@/db/schema";
 import {
@@ -22,10 +23,10 @@ import { createClient, deleteClient } from "./actions";
 import { ClientFields } from "./client-fields";
 
 const sorts = {
-  newest: { label: "Newest first", order: [desc(clients.createdAt)] },
-  oldest: { label: "Oldest first", order: [asc(clients.createdAt)] },
-  name: { label: "Name (A–Z)", order: [asc(clients.name)] },
-  company: { label: "Company (A–Z)", order: [asc(clients.company), asc(clients.name)] },
+  newest: { order: [desc(clients.createdAt)] },
+  oldest: { order: [asc(clients.createdAt)] },
+  name: { order: [asc(clients.name)] },
+  company: { order: [asc(clients.company), asc(clients.name)] },
 };
 type SortKey = keyof typeof sorts;
 const sortKeys = Object.keys(sorts) as SortKey[];
@@ -37,6 +38,9 @@ export default async function ClientsPage({
 }) {
   const sp = await searchParams;
   const user = await requireUser();
+  const t = await getTranslations("clients");
+  const tc = await getTranslations("common");
+  const tn = await getTranslations("nav");
 
   const q = textParam(sp, "q");
   const company = textParam(sp, "company");
@@ -70,25 +74,25 @@ export default async function ClientsPage({
 
   return (
     <>
-      <PageHeader title="Clients" subtitle="People and companies you work for." />
+      <PageHeader title={tn("clients")} subtitle={t("subtitle")} />
 
-      <CreateModal label="Add client" title="Add client" action={createClient}>
+      <CreateModal label={t("add")} title={t("add")} action={createClient}>
         <ClientFields />
       </CreateModal>
 
       <ListFilters action="/clients" activeCount={activeCount}>
-        <FilterText name="q" label="Search" defaultValue={q} placeholder="Name, contact or company" />
+        <FilterText name="q" label={tc("search")} defaultValue={q} placeholder={t("searchPlaceholder")} />
         <FilterSelect
           name="company"
-          label="Company"
+          label={tc("company")}
           defaultValue={company}
           options={companyRows.map((r) => ({ value: r.company!, label: r.company! }))}
         />
         <FilterSelect
           name="sort"
-          label="Sort by"
+          label={tc("sortBy")}
           defaultValue={sort}
-          options={sortKeys.map((k) => ({ value: k, label: sorts[k].label }))}
+          options={sortKeys.map((k) => ({ value: k, label: t(`sort.${k}`) }))}
           allLabel={null}
         />
       </ListFilters>
@@ -97,7 +101,7 @@ export default async function ClientsPage({
         <ul className="flex flex-col">
           {rows.length === 0 && (
             <li className="text-muted">
-              {activeCount > 0 ? "No clients match these filters." : "No clients yet."}
+              {activeCount > 0 ? t("emptyFiltered") : t("empty")}
             </li>
           )}
           {rows.map((c) => (
@@ -110,9 +114,9 @@ export default async function ClientsPage({
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Link href={`/clients/${c.id}/edit`} className={linkActionClass}>Edit</Link>
+                <Link href={`/clients/${c.id}/edit`} className={linkActionClass}>{tc("edit")}</Link>
                 <form action={deleteClient.bind(null, c.id)}>
-                  <button type="submit" className={dangerActionClass}>Delete</button>
+                  <button type="submit" className={dangerActionClass}>{tc("delete")}</button>
                 </form>
               </div>
             </li>

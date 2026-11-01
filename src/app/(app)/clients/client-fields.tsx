@@ -1,21 +1,24 @@
+import { useTranslations } from "next-intl";
 import { inputClass, labelClass } from "@/components/ui/styles";
 
 type Defaults = { name?: string; contact?: string; company?: string | null };
 
 export function ClientFields({ defaults = {} }: { defaults?: Defaults }) {
+  const t = useTranslations("clients");
+  const tc = useTranslations("common");
   return (
     <>
       <label className={labelClass}>
-        Name
-        <input name="name" placeholder="Name" required defaultValue={defaults.name} className={inputClass} />
+        {tc("name")}
+        <input name="name" placeholder={tc("name")} required defaultValue={defaults.name} className={inputClass} />
       </label>
       <label className={labelClass}>
-        Contact
-        <input name="contact" placeholder="Contact (email or phone)" required defaultValue={defaults.contact} className={inputClass} />
+        {t("contact")}
+        <input name="contact" placeholder={t("contactPlaceholder")} required defaultValue={defaults.contact} className={inputClass} />
       </label>
       <label className={labelClass}>
-        Company
-        <input name="company" placeholder="Company (optional)" defaultValue={defaults.company ?? ""} className={inputClass} />
+        {tc("company")}
+        <input name="company" placeholder={t("companyPlaceholder")} defaultValue={defaults.company ?? ""} className={inputClass} />
       </label>
     </>
   );

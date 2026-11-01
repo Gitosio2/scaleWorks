@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { and, desc, eq, sum } from "drizzle-orm";
+import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import {
   clients,
@@ -11,11 +12,11 @@ import {
   timeEntries,
 } from "@/db/schema";
 import {
+  formatDate,
   formatDuration,
   formatEuros,
   formatQuantity,
   remainingCents,
-  supplyStatusLabels,
 } from "@/lib/labels";
 import { requireUser } from "@/lib/session";
 import { addTimeEntry, deleteTimeEntry } from "./actions";
@@ -49,6 +50,10 @@ export default async function ModelDetailPage({
 }) {
   const { id } = await params;
   const user = await requireUser();
+  const t = await getTranslations("models");
+  const tc = await getTranslations("common");
+  const ts = await getTranslations("supplyStatus");
+  const locale = await getLocale();
 
   const [row] = await db
     .select({ model: models, clientName: clients.name })
@@ -103,7 +108,7 @@ export default async function ModelDetailPage({
   });
   return (
     <>
-      <BackLink href="/models">← Models</BackLink>
+      <BackLink href="/models">{t("back")}</BackLink>
       <PageHeader
         title={
           <>
@@ -113,18 +118,23 @@ export default async function ModelDetailPage({
         }
         subtitle={
           <>
-            <span className="font-semibold text-brand">{clientName ?? "Own project"}</span>
+            <span className="font-semibold text-brand">{clientName ?? t("ownProject")}</span>
             {" · "}
-            {formatEuros(m.priceCents)}
+            {formatEuros(m.priceCents, locale)}
             <br />
             {m.paymentStatus === "deposit_paid" && (
               <>
-                Deposit: {formatEuros(m.depositCents)} · Remaining:{" "}
-                {formatEuros(remainingCents(m.priceCents, m.depositCents))}
+                {t("depositSummary", {
+                  deposit: formatEuros(m.depositCents, locale),
+                  remaining: formatEuros(remainingCents(m.priceCents, m.depositCents), locale),
+                })}
                 <br />
               </>
             )}
-            Requested: {m.requestedDate ?? "—"} · Estimated: {m.estimatedDate ?? "—"}
+            {t("dates", {
+              requested: formatDate(m.requestedDate, locale),
+              estimated: formatDate(m.estimatedDate, locale),
+            })}
           </>
         }
         action={
@@ -134,7 +144,7 @@ export default async function ModelDetailPage({
             <PhaseProgress phase={m.phase} />
             <form action={createQuoteFromModel.bind(null, id)}>
               <button type="submit" className={secondaryButtonClass}>
-                Create quote from this model
+                {t("createQuote")}
               </button>
             </form>
           </div>
@@ -142,11 +152,11 @@ export default async function ModelDetailPage({
       />
 
       <Card>
-        <CardTitle>Time: {formatDuration(Number(total ?? 0))}</CardTitle>
+        <CardTitle>{t("time.title", { total: formatDuration(Number(total ?? 0)) })}</CardTitle>
 
         <form action={addTimeEntry.bind(null, id)} className="flex flex-wrap items-end gap-3">
           <label className={labelClass}>
-            Date
+            {t("time.date")}
             <input
               name="workedOn"
               type="date"
@@ -156,24 +166,24 @@ export default async function ModelDetailPage({
             />
           </label>
           <label className={labelClass}>
-            Duration
+            {t("time.duration")}
             <input
               name="duration"
-              placeholder="hh:mm"
+              placeholder={t("time.durationPlaceholder")}
               pattern="\d{1,2}:[0-5]\d"
-              title="Format hh:mm, e.g. 01:30"
+              title={t("time.durationHint")}
               required
               className={`${inputClass} w-28`}
             />
           </label>
           <button type="submit" className={primaryButtonClass}>
-            Add
+            {tc("add")}
           </button>
         </form>
 
         <ul className="flex flex-col">
           {entries.length === 0 && (
-            <li className="py-4 text-muted">No time logged yet.</li>
+            <li className="py-4 text-muted">{t("time.empty")}</li>
           )}
           {entries.map((e) => (
             <li
@@ -181,11 +191,11 @@ export default async function ModelDetailPage({
               className={`${listItemClass} flex items-center justify-between gap-3`}
             >
               <span className="font-semibold">
-                {e.workedOn} · {formatDuration(e.minutes)}
+                {formatDate(e.workedOn, locale)} · {formatDuration(e.minutes)}
               </span>
               <form action={deleteTimeEntry.bind(null, id, e.id)}>
                 <button type="submit" className={dangerActionClass}>
-                  Delete
+                  {tc("delete")}
                 </button>
               </form>
             </li>
@@ -201,33 +211,35 @@ export default async function ModelDetailPage({
       />
 
       <Card>
-        <CardTitle>Consumables: {formatEuros(consumablesTotalCents)}</CardTitle>
+        <CardTitle>{t("consumables.title", { total: formatEuros(consumablesTotalCents, locale) })}</CardTitle>
 
         {consumableOptions.length === 0 ? (
           <p className="text-muted">
-            Add consumables first in{" "}
-            <Link href="/consumables" className="font-semibold text-brand hover:underline">
-              Consumables
-            </Link>
-            .
+            {t.rich("consumables.addFirst", {
+              link: (chunks) => (
+                <Link href="/consumables" className="font-semibold text-brand hover:underline">
+                  {chunks}
+                </Link>
+              ),
+            })}
           </p>
         ) : (
           <form action={setModelConsumable.bind(null, id)} className="flex flex-wrap gap-3">
-            <select name="consumableId" required aria-label="Consumable" className={inputClass}>
+            <select name="consumableId" required aria-label={t("consumables.select")} className={inputClass}>
               {consumableOptions.map((c) => (
                 <option key={c.id} value={c.id}>{c.description}</option>
               ))}
             </select>
             <QuantityFields />
             <button type="submit" className={primaryButtonClass}>
-              Add
+              {tc("add")}
             </button>
           </form>
         )}
 
         <ul className="flex flex-col">
           {linkedRows.length === 0 && (
-            <li className="py-4 text-muted">No consumables linked yet.</li>
+            <li className="py-4 text-muted">{t("consumables.empty")}</li>
           )}
           {linkedRows.map(({ consumable: c, quantity }) => {
             const cost = consumableCost(c.priceCents, quantity);
@@ -238,21 +250,24 @@ export default async function ModelDetailPage({
                     <p className="font-bold">{c.description}</p>
                     <p className="text-[13px] text-muted">
                       {quantity !== null
-                        ? `${formatQuantity(Number(quantity))} unit`
-                        : "Quantity not set"}
+                        ? t("consumables.quantityValue", { quantity: formatQuantity(Number(quantity)), count: Number(quantity) })
+                        : t("consumables.quantityNotSet")}
                       {" · "}
                       {cost !== null
-                        ? `${formatEuros(cost)} (unit ${formatEuros(c.priceCents)})`
-                        : `unit ${formatEuros(c.priceCents)}`}
+                        ? t("consumables.costWithUnit", {
+                            cost: formatEuros(cost, locale),
+                            unit: formatEuros(c.priceCents, locale),
+                          })
+                        : t("consumables.unitOnly", { unit: formatEuros(c.priceCents, locale) })}
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
                     <StatusBadge variant={supplyStatusVariant(c.status)}>
-                      {supplyStatusLabels[c.status]}
+                      {ts(c.status)}
                     </StatusBadge>
                     <form action={removeModelConsumable.bind(null, id, c.id)}>
                       <button type="submit" className={dangerActionClass}>
-                        Remove
+                        {tc("remove")}
                       </button>
                     </form>
                   </div>
@@ -263,7 +278,7 @@ export default async function ModelDetailPage({
                 >
                   <QuantityFields />
                   <button type="submit" className={linkActionClass}>
-                    Update quantity
+                    {t("consumables.updateQuantity")}
                   </button>
                 </form>
               </li>

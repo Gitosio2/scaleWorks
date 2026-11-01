@@ -1,5 +1,5 @@
+import { useTranslations } from "next-intl";
 import { modelPhase, paymentStatus } from "@/db/schema";
-import { paymentStatusLabels, phaseLabels } from "@/lib/labels";
 import { inputClass, labelClass } from "@/components/ui/styles";
 
 type Defaults = {
@@ -21,73 +21,77 @@ export function ModelFields({
   clients: { id: string; name: string }[];
   defaults?: Defaults;
 }) {
+  const t = useTranslations("models");
+  const tc = useTranslations("common");
+  const tp = useTranslations("phase");
+  const tpay = useTranslations("paymentStatus");
   return (
     <>
       <label className={labelClass}>
-        Model name
-        <input name="name" placeholder="Model name" required defaultValue={defaults.name} className={inputClass} />
+        {t("modelName")}
+        <input name="name" placeholder={t("modelName")} required defaultValue={defaults.name} className={inputClass} />
       </label>
       <label className={labelClass}>
-        Company
+        {tc("company")}
         <input
           name="company"
-          placeholder="Company of the real subject (optional)"
+          placeholder={t("companyPlaceholder")}
           defaultValue={defaults.company ?? ""}
           className={inputClass}
         />
       </label>
       <label className={labelClass}>
-        Client
+        {tc("client")}
         <select name="clientId" defaultValue={defaults.clientId ?? ""} className={inputClass}>
-          <option value="">— No client (own project) —</option>
+          <option value="">{t("noClientOption")}</option>
           {clients.map((c) => (
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
         </select>
       </label>
       <label className={labelClass}>
-        Price (€)
+        {tc("price")}
         <input
           name="price"
           inputMode="decimal"
-          placeholder="0.00"
+          placeholder={tc("moneyPlaceholder")}
           defaultValue={defaults.priceCents != null ? (defaults.priceCents / 100).toFixed(2) : ""}
           className={inputClass}
         />
       </label>
       <label className={labelClass}>
-        Payment status
+        {t("paymentStatus")}
         <select name="paymentStatus" defaultValue={defaults.paymentStatus ?? "none"} className={inputClass}>
           {paymentStatus.enumValues.map((p) => (
-            <option key={p} value={p}>{paymentStatusLabels[p]}</option>
+            <option key={p} value={p}>{tpay(p)}</option>
           ))}
         </select>
       </label>
       <label className={labelClass}>
-        Deposit (€)
+        {t("deposit")}
         <input
           name="deposit"
           inputMode="decimal"
-          placeholder="0,00"
+          placeholder={tc("moneyPlaceholder")}
           defaultValue={defaults.depositCents != null ? (defaults.depositCents / 100).toFixed(2) : ""}
           className={inputClass}
         />
-        <span className="text-xs font-normal text-muted">A deposit makes the payment Pending; if it equals the price the model is marked as paid.</span>
+        <span className="text-xs font-normal text-muted">{t("depositHelp")}</span>
       </label>
       <label className={labelClass}>
-        Phase
+        {t("phase")}
         <select name="phase" defaultValue={defaults.phase ?? "not_started"} className={inputClass}>
           {modelPhase.enumValues.map((p) => (
-            <option key={p} value={p}>{phaseLabels[p]}</option>
+            <option key={p} value={p}>{tp(p)}</option>
           ))}
         </select>
       </label>
       <label className={labelClass}>
-        Requested date (from client)
+        {t("requestedDate")}
         <input name="requestedDate" type="date" defaultValue={defaults.requestedDate ?? ""} className={inputClass} />
       </label>
       <label className={labelClass}>
-        Estimated date
+        {t("estimatedDate")}
         <input name="estimatedDate" type="date" defaultValue={defaults.estimatedDate ?? ""} className={inputClass} />
       </label>
     </>

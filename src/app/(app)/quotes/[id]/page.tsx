@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
 import { and, eq } from "drizzle-orm";
+import { getLocale, getTranslations } from "next-intl/server";
 import { PartsSection } from "@/app/(app)/parts-section";
 import { db } from "@/db";
 import { clients, parts, quotes } from "@/db/schema";
-import { formatEuros, quoteStatusLabels } from "@/lib/labels";
+import { formatEuros } from "@/lib/labels";
 import { requireUser } from "@/lib/session";
 import { BackLink, PageHeader } from "@/components/ui/page-header";
 import { StatusBadge, quoteStatusVariant } from "@/components/ui/status-badge";
@@ -23,6 +24,9 @@ export default async function QuoteDetailPage({
 }) {
   const { id } = await params;
   const user = await requireUser();
+  const t = await getTranslations("quotes");
+  const tq = await getTranslations("quoteStatus");
+  const locale = await getLocale();
 
   const [row] = await db
     .select({ quote: quotes, clientName: clients.name })
@@ -40,25 +44,25 @@ export default async function QuoteDetailPage({
 
   return (
     <>
-      <BackLink href="/quotes">← Quotes</BackLink>
+      <BackLink href="/quotes">{t("back")}</BackLink>
       <PageHeader
         title={q.title}
         subtitle={
           <span className="flex flex-wrap items-center gap-2">
-            {clientName ?? "No client"} · {formatEuros(q.priceCents)}
+            {clientName ?? t("noClient")} · {formatEuros(q.priceCents, locale)}
             <StatusBadge variant={quoteStatusVariant(q.status)}>
-              {quoteStatusLabels[q.status]}
+              {tq(q.status)}
             </StatusBadge>
           </span>
         }
         action={
           <div className="flex flex-wrap gap-3">
             <Link href={`/quotes/${id}/edit`} className={secondaryButtonClass}>
-              Edit quote
+              {t("editQuote")}
             </Link>
             <form action={convertQuoteToModel.bind(null, id)}>
               <button type="submit" className={primaryButtonClass}>
-                Accept and convert to model
+                {t("acceptConvert")}
               </button>
             </form>
           </div>

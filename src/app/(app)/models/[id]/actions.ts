@@ -2,6 +2,7 @@
 
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { models, timeEntries } from "@/db/schema";
 import { parseDuration } from "@/lib/labels";
@@ -9,20 +10,21 @@ import { requireUser } from "@/lib/session";
 
 export async function addTimeEntry(modelId: string, formData: FormData) {
   const user = await requireUser();
+  const t = await getTranslations("actionErrors");
 
   // The model must belong to the current user.
   const [owned] = await db
     .select({ id: models.id })
     .from(models)
     .where(and(eq(models.id, modelId), eq(models.userId, user.id)));
-  if (!owned) throw new Error("Model not found");
+  if (!owned) throw new Error(t("modelNotFound"));
 
   const minutes = parseDuration(String(formData.get("duration") ?? ""));
   if (minutes === null || minutes <= 0 || minutes > 24 * 60) {
-    throw new Error("Duration must be hh:mm, up to 24:00");
+    throw new Error(t("invalidDuration"));
   }
   const workedOn = String(formData.get("workedOn") ?? "");
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(workedOn)) throw new Error("Invalid date");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(workedOn)) throw new Error(t("invalidDate"));
 
   await db.insert(timeEntries).values({
     userId: user.id,

@@ -3,6 +3,7 @@
 import Form from "next/form";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { inputClass, labelClass, secondaryButtonClass } from "./styles";
 
 const TYPING_DEBOUNCE_MS = 400;
@@ -37,6 +38,7 @@ export function ListFilters({
   activeCount: number;
   children: React.ReactNode;
 }) {
+  const t = useTranslations("common");
   const router = useRouter();
   const typingTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -71,7 +73,7 @@ export function ListFilters({
           >
             <path d="M3 4h14l-5.5 6.5V16l-3 1.5v-7L3 4z" />
           </svg>
-          Filters
+          {t("filters")}
           {activeCount > 0 && (
             <span className="inline-flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-brand-fg px-1.5 text-xs font-semibold text-brand">
               {activeCount}
@@ -91,7 +93,7 @@ export function ListFilters({
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{children}</div>
         <div className="flex flex-wrap justify-end gap-2">
           <button type="button" onClick={reset} className={secondaryButtonClass}>
-            Reset
+            {t("reset")}
           </button>
         </div>
       </Form>
@@ -131,15 +133,16 @@ export function FilterSelect({
   label,
   defaultValue,
   options,
-  allLabel = "All",
+  allLabel,
 }: {
   name: string;
   label: string;
   defaultValue: string;
   options: ReadonlyArray<{ value: string; label: string }>;
-  // Label of the empty option; pass null when a value must always be chosen.
+  // Label of the empty option (default: "All"); pass null when a value must always be chosen.
   allLabel?: string | null;
 }) {
+  const t = useTranslations("common");
   const ref = useSyncedField<HTMLSelectElement>(defaultValue);
   // A bookmarked value that is no longer offered must still show as selected.
   const shown =
@@ -150,7 +153,7 @@ export function FilterSelect({
     <label className={labelClass}>
       {label}
       <select ref={ref} name={name} defaultValue={defaultValue} className={inputClass}>
-        {allLabel !== null && <option value="">{allLabel}</option>}
+        {allLabel !== null && <option value="">{allLabel ?? t("all")}</option>}
         {shown.map((o) => (
           <option key={o.value} value={o.value}>
             {o.label}

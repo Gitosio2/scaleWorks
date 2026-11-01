@@ -1,5 +1,5 @@
+import { useTranslations } from "next-intl";
 import { supplyStatus } from "@/db/schema";
-import { supplyStatusLabels } from "@/lib/labels";
 import { inputClass, labelClass } from "@/components/ui/styles";
 
 type Defaults = {
@@ -11,37 +11,40 @@ type Defaults = {
 };
 
 export function ConsumableFields({ defaults = {} }: { defaults?: Defaults }) {
+  const t = useTranslations("consumables");
+  const tc = useTranslations("common");
+  const ts = useTranslations("supplyStatus");
   return (
     <>
       <label className={labelClass}>
-        Description
-        <input name="description" placeholder="Description" required defaultValue={defaults.description} className={inputClass} />
+        {tc("description")}
+        <input name="description" placeholder={tc("description")} required defaultValue={defaults.description} className={inputClass} />
       </label>
       <div className="flex flex-wrap gap-3">
         <label className={`${labelClass} min-w-40 flex-1`}>
-          Store
-          <input name="store" placeholder="Store" defaultValue={defaults.store ?? ""} className={inputClass} />
+          {tc("store")}
+          <input name="store" placeholder={tc("store")} defaultValue={defaults.store ?? ""} className={inputClass} />
         </label>
         <label className={`${labelClass} min-w-40 flex-1`}>
-          Reference
-          <input name="reference" placeholder="Reference (optional)" defaultValue={defaults.reference ?? ""} className={inputClass} />
+          {tc("reference")}
+          <input name="reference" placeholder={t("referencePlaceholder")} defaultValue={defaults.reference ?? ""} className={inputClass} />
         </label>
       </div>
       <label className={labelClass}>
-        Price (€)
+        {tc("price")}
         <input
           name="price"
           inputMode="decimal"
-          placeholder="Price (€)"
+          placeholder={tc("price")}
           defaultValue={defaults.priceCents != null ? (defaults.priceCents / 100).toFixed(2) : ""}
           className={inputClass}
         />
       </label>
       <label className={labelClass}>
-        Status
+        {tc("status")}
         <select name="status" defaultValue={defaults.status ?? "to_order"} className={inputClass}>
           {supplyStatus.enumValues.map((s) => (
-            <option key={s} value={s}>{supplyStatusLabels[s]}</option>
+            <option key={s} value={s}>{ts(s)}</option>
           ))}
         </select>
       </label>

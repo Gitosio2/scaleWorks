@@ -1,4 +1,4 @@
-import type { PaymentStatus } from "@/lib/labels";
+import type { ActionT, PaymentStatus } from "@/lib/labels";
 
 type PaymentInput = {
   status: PaymentStatus;
@@ -17,17 +17,16 @@ type PaymentResult = {
 //   deposit <  price (or unknown price) -> deposit_paid ("Pending")
 //   deposit >  price -> error
 // Without a deposit, "deposit_paid" is invalid; "none"/"paid" keep no deposit.
-export function derivePayment({
-  status,
-  depositCents,
-  priceCents,
-}: PaymentInput): PaymentResult {
+export function derivePayment(
+  { status, depositCents, priceCents }: PaymentInput,
+  t: ActionT,
+): PaymentResult {
   if (depositCents !== null && depositCents < 0) {
-    throw new Error("Deposit amount must be greater than 0");
+    throw new Error(t("depositNotPositive"));
   }
   if (depositCents !== null && depositCents > 0) {
     if (priceCents !== null && depositCents > priceCents) {
-      throw new Error("Deposit cannot be greater than the price");
+      throw new Error(t("depositExceedsPrice"));
     }
     if (priceCents !== null && depositCents === priceCents) {
       return { status: "paid", depositCents: null };
@@ -35,7 +34,7 @@ export function derivePayment({
     return { status: "deposit_paid", depositCents };
   }
   if (status === "deposit_paid") {
-    throw new Error("Enter the deposit amount for a pending payment");
+    throw new Error(t("depositRequired"));
   }
   return { status, depositCents: null };
 }

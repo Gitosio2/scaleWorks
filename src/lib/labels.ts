@@ -1,35 +1,14 @@
 import type { modelPhase, paymentStatus } from "@/db/schema";
+import { intlLocales, type Locale } from "@/i18n/config";
+import type messages from "../../messages/en.json";
 
 export type ModelPhase = (typeof modelPhase.enumValues)[number];
 
 export type PaymentStatus = (typeof paymentStatus.enumValues)[number];
 
-export const phaseLabels: Record<ModelPhase, string> = {
-  not_started: "Not started",
-  pending_decal_design: "Pending decal design",
-  pending_painting: "Pending painting",
-  pending_decals: "Pending decals",
-  pending_varnish: "Pending varnish",
-  pending_assembly: "Pending assembly",
-  finished: "Finished",
-};
-
-export const quoteStatusLabels = {
-  open: "Open",
-  rejected: "Rejected",
-} as const;
-
-export const supplyStatusLabels = {
-  to_order: "To order",
-  ordered: "Ordered",
-  in_hand: "In hand",
-} as const;
-
-export const paymentStatusLabels = {
-  none: "No payment",
-  deposit_paid: "Pending",
-  paid: "Paid in full",
-} as const;
+// Translator for the `actionErrors` namespace, so validation helpers can throw
+// messages in the active locale (e.g. `await getTranslations("actionErrors")`).
+export type ActionT = (key: keyof (typeof messages)["actionErrors"]) => string;
 
 // Remaining = price - deposit. Null when the price is unknown.
 export function remainingCents(
@@ -40,22 +19,22 @@ export function remainingCents(
 }
 
 // "12,50" or "12.5" -> 1250 (cents). Empty -> null. Invalid -> throws.
-export function parseEuros(raw: string) {
+export function parseEuros(raw: string, t: ActionT) {
   const value = raw.trim().replace(",", ".");
   if (!value) return null;
   const cents = Math.round(Number(value) * 100);
-  if (!Number.isFinite(cents) || cents < 0) throw new Error("Invalid price");
+  if (!Number.isFinite(cents) || cents < 0) throw new Error(t("invalidPrice"));
   return cents;
 }
 
 // "1/4", "3/8", "0,3" or "2" -> number. Empty -> null. Invalid -> throws.
-export function parseQuantity(raw: string) {
+export function parseQuantity(raw: string, t: ActionT) {
   const value = raw.trim().replace(",", ".");
   if (!value) return null;
   const fraction = /^(\d+)\s*\/\s*(\d+)$/.exec(value);
   const n = fraction ? Number(fraction[1]) / Number(fraction[2]) : Number(value);
   if (!Number.isFinite(n) || n <= 0 || n > 100) {
-    throw new Error("Invalid quantity");
+    throw new Error(t("invalidQuantity"));
   }
   return n;
 }
@@ -89,10 +68,21 @@ export function parseDuration(value: string) {
   return Number(match[1]) * 60 + Number(match[2]);
 }
 
-export function formatEuros(cents: number | null) {
+export function formatEuros(cents: number | null, locale: Locale) {
   if (cents === null) return "—";
-  return new Intl.NumberFormat("es-ES", {
+  return new Intl.NumberFormat(intlLocales[locale], {
     style: "currency",
     currency: "EUR",
   }).format(cents / 100);
+}
+
+// "2026-03-05" (a calendar date, no time zone) -> "Mar 5, 2026" / "5 mar 2026".
+export function formatDate(date: string | null, locale: Locale) {
+  if (date === null) return "—";
+  const parsed = new Date(`${date}T00:00:00Z`);
+  if (Number.isNaN(parsed.getTime())) return date;
+  return new Intl.DateTimeFormat(intlLocales[locale], {
+    dateStyle: "medium",
+    timeZone: "UTC",
+  }).format(parsed);
 }

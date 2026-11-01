@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { and, eq } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { consumables } from "@/db/schema";
 import { requireUser } from "@/lib/session";
@@ -16,6 +17,8 @@ export default async function EditConsumablePage({
 }) {
   const { id } = await params;
   const user = await requireUser();
+  const t = await getTranslations("consumables");
+  const tc = await getTranslations("common");
   const [consumable] = await db
     .select()
     .from(consumables)
@@ -24,13 +27,13 @@ export default async function EditConsumablePage({
 
   return (
     <>
-      <BackLink href="/consumables">← Consumables</BackLink>
-      <PageHeader title="Edit consumable" />
+      <BackLink href="/consumables">{t("back")}</BackLink>
+      <PageHeader title={t("editTitle")} />
       <Card>
         <form action={updateConsumable.bind(null, id)} className="flex flex-col gap-3">
           <ConsumableFields defaults={consumable} />
           <button type="submit" className={`${primaryButtonClass} self-start`}>
-            Save
+            {tc("save")}
           </button>
         </form>
       </Card>

@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { and, asc, eq, ilike, isNotNull, or, type SQL } from "drizzle-orm";
+import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { consumables, supplyStatus } from "@/db/schema";
-import { formatEuros, supplyStatusLabels } from "@/lib/labels";
+import { formatEuros } from "@/lib/labels";
 import {
   ascNullsLast,
   containsPattern,
@@ -31,14 +32,11 @@ import {
 import { ConsumableFields } from "./consumable-fields";
 
 const sorts = {
-  description: { label: "Description (A–Z)", order: [asc(consumables.description)] },
-  store: {
-    label: "Store (A–Z)",
-    order: [ascNullsLast(consumables.store), asc(consumables.description)],
-  },
-  price_desc: { label: "Price (high to low)", order: [descNullsLast(consumables.priceCents)] },
-  price_asc: { label: "Price (low to high)", order: [ascNullsLast(consumables.priceCents)] },
-  status: { label: "Status", order: [asc(consumables.status), asc(consumables.description)] },
+  description: { order: [asc(consumables.description)] },
+  store: { order: [ascNullsLast(consumables.store), asc(consumables.description)] },
+  price_desc: { order: [descNullsLast(consumables.priceCents)] },
+  price_asc: { order: [ascNullsLast(consumables.priceCents)] },
+  status: { order: [asc(consumables.status), asc(consumables.description)] },
 };
 type SortKey = keyof typeof sorts;
 const sortKeys = Object.keys(sorts) as SortKey[];
@@ -50,6 +48,11 @@ export default async function ConsumablesPage({
 }) {
   const sp = await searchParams;
   const user = await requireUser();
+  const t = await getTranslations("consumables");
+  const tc = await getTranslations("common");
+  const tn = await getTranslations("nav");
+  const ts = await getTranslations("supplyStatus");
+  const locale = await getLocale();
 
   const q = textParam(sp, "q");
   const store = textParam(sp, "store");
@@ -85,31 +88,31 @@ export default async function ConsumablesPage({
 
   return (
     <>
-      <PageHeader title="Consumables" subtitle="Paints, glues and other supplies." />
+      <PageHeader title={tn("consumables")} subtitle={t("subtitle")} />
 
-      <CreateModal label="Add consumable" title="Add consumable" action={createConsumable}>
+      <CreateModal label={t("add")} title={t("add")} action={createConsumable}>
         <ConsumableFields />
       </CreateModal>
 
       <ListFilters action="/consumables" activeCount={activeCount}>
-        <FilterText name="q" label="Search" defaultValue={q} placeholder="Description, reference or store" />
+        <FilterText name="q" label={tc("search")} defaultValue={q} placeholder={t("searchPlaceholder")} />
         <FilterSelect
           name="store"
-          label="Store"
+          label={tc("store")}
           defaultValue={store}
           options={storeRows.map((r) => ({ value: r.store!, label: r.store! }))}
         />
         <FilterSelect
           name="status"
-          label="Status"
+          label={tc("status")}
           defaultValue={status ?? ""}
-          options={supplyStatus.enumValues.map((s) => ({ value: s, label: supplyStatusLabels[s] }))}
+          options={supplyStatus.enumValues.map((s) => ({ value: s, label: ts(s) }))}
         />
         <FilterSelect
           name="sort"
-          label="Sort by"
+          label={tc("sortBy")}
           defaultValue={sort}
-          options={sortKeys.map((k) => ({ value: k, label: sorts[k].label }))}
+          options={sortKeys.map((k) => ({ value: k, label: t(`sort.${k}`) }))}
           allLabel={null}
         />
       </ListFilters>
@@ -118,7 +121,7 @@ export default async function ConsumablesPage({
         <ul className="flex flex-col">
           {rows.length === 0 && (
             <li className="text-muted">
-              {activeCount > 0 ? "No consumables match these filters." : "No consumables yet."}
+              {activeCount > 0 ? t("emptyFiltered") : t("empty")}
             </li>
           )}
           {rows.map((c) => (
@@ -127,28 +130,28 @@ export default async function ConsumablesPage({
                 <div className="min-w-0">
                   <p className="font-bold">{c.description}</p>
                   <p className="text-[13px] text-muted">
-                    {[c.store, c.reference].filter(Boolean).join(" · ") || "—"}
+                    {[c.store, c.reference].filter(Boolean).join(" · ") || tc("noValue")}
                     {" · "}
-                    {formatEuros(c.priceCents)}
+                    {formatEuros(c.priceCents, locale)}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <StatusBadge variant={supplyStatusVariant(c.status)}>
-                    {supplyStatusLabels[c.status]}
+                    {ts(c.status)}
                   </StatusBadge>
-                  <Link href={`/consumables/${c.id}/edit`} className={linkActionClass}>Edit</Link>
+                  <Link href={`/consumables/${c.id}/edit`} className={linkActionClass}>{tc("edit")}</Link>
                   <form action={deleteConsumable.bind(null, c.id)}>
-                    <button type="submit" className={dangerActionClass}>Delete</button>
+                    <button type="submit" className={dangerActionClass}>{tc("delete")}</button>
                   </form>
                 </div>
               </div>
               <form action={updateConsumableStatus.bind(null, c.id)} className="flex flex-wrap items-center gap-2">
-                <select name="status" defaultValue={c.status} aria-label="Status" className={`${inputClass} text-sm`}>
+                <select name="status" defaultValue={c.status} aria-label={tc("status")} className={`${inputClass} text-sm`}>
                   {supplyStatus.enumValues.map((s) => (
-                    <option key={s} value={s}>{supplyStatusLabels[s]}</option>
+                    <option key={s} value={s}>{ts(s)}</option>
                   ))}
                 </select>
-                <button type="submit" className={linkActionClass}>Update status</button>
+                <button type="submit" className={linkActionClass}>{t("updateStatus")}</button>
               </form>
             </li>
           ))}

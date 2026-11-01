@@ -1,10 +1,13 @@
+import { getTranslations } from "next-intl/server";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { LogoutButton } from "@/components/logout-button";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { cardClass, cx } from "@/components/ui/styles";
 import { requireUser } from "@/lib/session";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
+  const t = await getTranslations("nav");
 
   return (
     <div className="flex flex-1 flex-col md:flex-row">
@@ -20,8 +23,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
         <SidebarNav />
         <div className={cx(cardClass, "gap-0.5! p-3! md:mt-auto")}>
-          <p className="text-xs text-muted">Signed in as</p>
+          <p className="text-xs text-muted">{t("signedInAs")}</p>
           <p className="truncate font-semibold">{user.name}</p>
+          <LanguageSwitcher />
           <LogoutButton />
         </div>
       </aside>

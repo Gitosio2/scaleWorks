@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import type { ModelPhase } from "@/lib/labels";
 
 const STEPS = 6;
@@ -13,12 +14,13 @@ const completed: Record<ModelPhase, number> = {
 };
 
 export function PhaseProgress({ phase }: { phase: ModelPhase }) {
+  const t = useTranslations("common");
   const done = completed[phase];
   const fill = phase === "finished" ? "bg-progress-done" : "bg-progress";
   return (
     <span
       role="img"
-      aria-label={`Progress: ${done} of ${STEPS} steps`}
+      aria-label={t("progress", { done, total: STEPS })}
       className="inline-flex gap-1"
     >
       {Array.from({ length: STEPS }, (_, i) => (
