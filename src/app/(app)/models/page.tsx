@@ -1,5 +1,17 @@
 import Link from "next/link";
-import { and, asc, desc, eq, ilike, isNotNull, isNull, ne, or, type SQL } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  ilike,
+  isNotNull,
+  isNull,
+  ne,
+  notInArray,
+  or,
+  type SQL,
+} from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { clients, modelPhase, models, paymentStatus } from "@/db/schema";
@@ -39,6 +51,14 @@ const sorts = {
 type SortKey = keyof typeof sorts;
 const sortKeys = Object.keys(sorts) as SortKey[];
 
+// Phase filter: a phase, or "active" = started and not finished, which is what
+// the dashboard's active-work card counts.
+const phaseFilters = [...modelPhase.enumValues, "active"] as const;
+
+// Payment filter: a payment status, or "pending" = still owed (not paid, with a
+// price), which is what the dashboard's pending-payment card counts.
+const paymentFilters = [...paymentStatus.enumValues, "pending"] as const;
+
 // "open" (the default) hides models that are both finished and paid in full.
 const scopes = ["open", "all"] as const;
 
@@ -59,8 +79,8 @@ export default async function ModelsPage({
   const q = textParam(sp, "q");
   const client = uuidParam(sp, "client") ?? (textParam(sp, "client") === "none" ? "none" : null);
   const company = textParam(sp, "company");
-  const phase = enumParam(sp, "phase", modelPhase.enumValues);
-  const payment = enumParam(sp, "payment", paymentStatus.enumValues);
+  const phase = enumParam(sp, "phase", phaseFilters);
+  const payment = enumParam(sp, "payment", paymentFilters);
   const scope = textParam(sp, "scope") === "all" ? "all" : "open";
   const sort = enumParam(sp, "sort", sortKeys) ?? "newest";
 
@@ -75,8 +95,16 @@ export default async function ModelsPage({
       : undefined,
     client === "none" ? isNull(models.clientId) : client ? eq(models.clientId, client) : undefined,
     company ? eq(models.company, company) : undefined,
-    phase ? eq(models.phase, phase) : undefined,
-    payment ? eq(models.paymentStatus, payment) : undefined,
+    phase === "active"
+      ? notInArray(models.phase, ["not_started", "finished"])
+      : phase
+        ? eq(models.phase, phase)
+        : undefined,
+    payment === "pending"
+      ? and(ne(models.paymentStatus, "paid"), isNotNull(models.priceCents))
+      : payment
+        ? eq(models.paymentStatus, payment)
+        : undefined,
     scope === "open"
       ? or(ne(models.phase, "finished"), ne(models.paymentStatus, "paid"))
       : undefined,
@@ -139,13 +167,19 @@ export default async function ModelsPage({
           name="phase"
           label={t("phase")}
           defaultValue={phase ?? ""}
-          options={modelPhase.enumValues.map((p) => ({ value: p, label: tp(p) }))}
+          options={[
+            { value: "active", label: t("phaseActive") },
+            ...modelPhase.enumValues.map((p) => ({ value: p as string, label: tp(p) })),
+          ]}
         />
         <FilterSelect
           name="payment"
           label={t("payment")}
           defaultValue={payment ?? ""}
-          options={paymentStatus.enumValues.map((p) => ({ value: p, label: tpay(p) }))}
+          options={[
+            ...paymentStatus.enumValues.map((p) => ({ value: p as string, label: tpay(p) })),
+            { value: "pending", label: t("paymentPending") },
+          ]}
         />
         <FilterSelect
           name="sort"

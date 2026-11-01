@@ -99,11 +99,31 @@
     "paid": "Paid in full"
   },
   "home": {
-    "subtitle": "Manage your scale models, quotes, parts and hours.",
-    "models": "Track phases, time, parts and consumables.",
-    "quotes": "Prepare quotes and convert accepted ones to models.",
-    "clients": "Keep your clients and their contact details.",
-    "consumables": "Paints, glues and other supplies you use."
+    "subtitle": "Manage your scale models, quotes, parts and hours."
+  },
+  "dashboard": {
+    "activeTitle": "Active work",
+    "activeCount": "{count, plural, one {model in progress} other {models in progress}}",
+    "activeAmount": "Total value of active work",
+    "deadlinesTitle": "Deadlines within two months",
+    "deadlinesEmpty": "No deadlines in the next two months.",
+    "overdue": "{days, plural, one {# day overdue} other {# days overdue}}",
+    "dueIn": "{days, plural, =0 {Due today} one {Due in # day} other {Due in # days}}",
+    "finishedTitle": "Models completed",
+    "finishedHint": "Finished models in total",
+    "pendingTitle": "Pending payment",
+    "pendingCount": "{count, plural, one {# model awaiting payment} other {# models awaiting payment}}",
+    "financesTitle": "Income and expenses",
+    "incomeLabel": "Income received (paid models and deposits)",
+    "expensesLabel": "Expenses (parts and consumables ordered or in hand)",
+    "balanceLabel": "Balance",
+    "quotesTitle": "Quotes to decide",
+    "quotesHint": "Open quotes, oldest first",
+    "quoteAge": "{days, plural, =0 {Today} one {# day old} other {# days old}}",
+    "staleTitle": "Stalled models",
+    "staleHint": "Not started for over 7 months",
+    "staleAge": "{months, plural, one {# month} other {# months}}",
+    "andMore": "and {count} more"
   },
   "parts": {
     "title": "Parts: {total}",
@@ -177,6 +197,8 @@
     "ownProject": "Own project",
     "paymentStatus": "Payment status",
     "payment": "Payment",
+    "paymentPending": "Pending payment (with a price)",
+    "phaseActive": "In progress (started, not finished)",
     "deposit": "Deposit (€)",
     "depositHelp": "A deposit makes the payment Pending; if it equals the price the model is marked as paid.",
     "phase": "Phase",
