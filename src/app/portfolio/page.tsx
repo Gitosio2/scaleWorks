@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { modelTitle } from "@/lib/model-title";
 import { getPublicModels } from "@/lib/portfolio";
 import { SITE_NAME } from "@/lib/site";
 import { PageHeader } from "@/components/ui/page-header";
@@ -12,6 +13,7 @@ export async function generateMetadata() {
 
 export default async function PortfolioPage() {
   const t = await getTranslations("portfolio");
+  const ttype = await getTranslations("modelType");
   const rows = await getPublicModels();
 
   return (
@@ -28,13 +30,17 @@ export default async function PortfolioPage() {
                   {m.coverId && (
                     <Photo
                       src={`/img/${m.coverId}/thumb`}
-                      alt={m.name}
+                      alt={modelTitle(m.brand, m.name)}
                       className="transition-transform group-hover:scale-[1.03]"
                     />
                   )}
                 </div>
-                <span className="font-bold group-hover:text-brand">{m.name}</span>
-                {m.company && <span className="-mt-1.5 text-[13px] text-muted">{m.company}</span>}
+                <span className="font-bold group-hover:text-brand">{modelTitle(m.brand, m.name)}</span>
+                {(m.type || m.company) && (
+                  <span className="-mt-1.5 text-[13px] text-muted">
+                    {[m.type ? ttype(m.type) : null, m.company].filter(Boolean).join(" · ")}
+                  </span>
+                )}
               </Link>
             </li>
           ))}

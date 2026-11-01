@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { auth } from "@/lib/auth";
+import { modelTitle } from "@/lib/model-title";
 import { getPublicModels } from "@/lib/portfolio";
 import { Brand } from "@/components/brand";
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -38,7 +39,11 @@ export default async function PortfolioLayout({ children }: { children: React.Re
             <p className="px-3 text-sm text-muted">{tp("empty")}</p>
           ) : (
             <PortfolioNav
-              models={publicModels.map(({ id, name, company }) => ({ id, name, company }))}
+              models={publicModels.map(({ id, brand, name, company }) => ({
+                id,
+                name: modelTitle(brand, name),
+                company,
+              }))}
               label={tp("title")}
             />
           )}

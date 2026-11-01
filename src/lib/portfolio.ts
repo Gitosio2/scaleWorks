@@ -34,7 +34,9 @@ export const getPublicModels = cache(async () => {
   return db
     .select({
       id: models.id,
+      brand: models.brand,
       name: models.name,
+      type: models.type,
       company: models.company,
       coverId: sql<string | null>`(
         select ${modelImages.id} from ${modelImages}
@@ -55,5 +57,5 @@ export const getPublicModels = cache(async () => {
         )`,
       ),
     )
-    .orderBy(asc(models.name), asc(models.id));
+    .orderBy(asc(sql`lower(concat_ws(' ', ${models.brand}, ${models.name}))`), asc(models.id));
 });

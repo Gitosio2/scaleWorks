@@ -1,9 +1,11 @@
 import { useTranslations } from "next-intl";
-import { modelPhase, paymentStatus } from "@/db/schema";
+import { modelPhase, modelType, paymentStatus } from "@/db/schema";
 import { inputClass, labelClass } from "@/components/ui/styles";
 
 type Defaults = {
+  brand?: string | null;
   name?: string;
+  type?: (typeof modelType.enumValues)[number] | null;
   company?: string | null;
   clientId?: string | null;
   priceCents?: number | null;
@@ -25,11 +27,25 @@ export function ModelFields({
   const tc = useTranslations("common");
   const tp = useTranslations("phase");
   const tpay = useTranslations("paymentStatus");
+  const ttype = useTranslations("modelType");
   return (
     <>
       <label className={labelClass}>
+        {t("brand")}
+        <input name="brand" placeholder={t("brandPlaceholder")} defaultValue={defaults.brand ?? ""} className={inputClass} />
+      </label>
+      <label className={labelClass}>
         {t("modelName")}
         <input name="name" placeholder={t("modelName")} required defaultValue={defaults.name} className={inputClass} />
+      </label>
+      <label className={labelClass}>
+        {t("type")}
+        <select name="type" defaultValue={defaults.type ?? ""} className={inputClass}>
+          <option value="">{t("noType")}</option>
+          {modelType.enumValues.map((v) => (
+            <option key={v} value={v}>{ttype(v)}</option>
+          ))}
+        </select>
       </label>
       <label className={labelClass}>
         {tc("company")}

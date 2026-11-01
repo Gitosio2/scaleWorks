@@ -5,7 +5,14 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
-import { clients, modelImages, models, modelPhase, paymentStatus } from "@/db/schema";
+import {
+  clients,
+  modelImages,
+  models,
+  modelPhase,
+  modelType,
+  paymentStatus,
+} from "@/db/schema";
 import { parseEuros } from "@/lib/labels";
 import { derivePayment } from "@/lib/payments";
 import { requireUser } from "@/lib/session";
@@ -19,6 +26,12 @@ async function parseModel(formData: FormData, userId: string) {
   const phase = String(formData.get("phase"));
   if (!(modelPhase.enumValues as readonly string[]).includes(phase)) {
     throw new Error(t("invalidPhase"));
+  }
+
+  // Optional; an empty value means "no type".
+  const type = String(formData.get("type") ?? "");
+  if (type && !(modelType.enumValues as readonly string[]).includes(type)) {
+    throw new Error(t("invalidType"));
   }
 
   const priceCents = parseEuros(String(formData.get("price") ?? ""), t);
@@ -47,7 +60,9 @@ async function parseModel(formData: FormData, userId: string) {
   }
 
   return {
+    brand: String(formData.get("brand") ?? "").trim() || null,
     name,
+    type: (type || null) as (typeof modelType.enumValues)[number] | null,
     company: String(formData.get("company") ?? "").trim() || null,
     clientId,
     priceCents,

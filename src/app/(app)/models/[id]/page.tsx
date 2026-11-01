@@ -18,6 +18,7 @@ import {
   formatQuantity,
   remainingCents,
 } from "@/lib/labels";
+import { modelTitle } from "@/lib/model-title";
 import { requireUser } from "@/lib/session";
 import { addTimeEntry, deleteTimeEntry } from "./actions";
 import { createQuoteFromModel } from "./create-quote-action";
@@ -31,13 +32,17 @@ import { CollapsibleCard } from "@/components/ui/card";
 import { BackLink, PageHeader } from "@/components/ui/page-header";
 import { PhaseProgress } from "@/components/ui/phase-progress";
 import { PaymentBadge, PhaseBadge, StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
-import { ConfirmIconButton, DeleteIconButton } from "@/components/ui/icon-actions";
+import {
+  ConfirmIconButton,
+  DeleteIconButton,
+  EditIconLink,
+  QuoteIconButton,
+} from "@/components/ui/icon-actions";
 import {
   inputClass,
   labelClass,
   listItemClass,
   primaryButtonClass,
-  secondaryButtonClass,
 } from "@/components/ui/styles";
 import { PartsSection } from "@/app/(app)/parts-section";
 import { PhotosSection } from "./photos-section";
@@ -53,6 +58,7 @@ export default async function ModelDetailPage({
   const t = await getTranslations("models");
   const tc = await getTranslations("common");
   const ts = await getTranslations("supplyStatus");
+  const ttype = await getTranslations("modelType");
   const locale = await getLocale();
 
   const [row] = await db
@@ -106,13 +112,28 @@ export default async function ModelDetailPage({
   const today = new Date().toLocaleDateString("sv-SE", {
     timeZone: "Europe/Madrid",
   });
+  const done = m.phase === "finished" && m.paymentStatus === "paid";
+  const badges = (
+    <div className="flex flex-wrap items-center justify-end gap-2">
+      <PhaseBadge phase={m.phase} />
+      <PaymentBadge status={m.paymentStatus} priceCents={m.priceCents} depositCents={m.depositCents} />
+    </div>
+  );
+  const actions = (
+    <div className="flex items-center gap-2">
+      <form action={createQuoteFromModel.bind(null, id)}>
+        <QuoteIconButton label={t("createQuote")} />
+      </form>
+      <EditIconLink href={`/models/${id}/edit`} label={tc("edit")} />
+    </div>
+  );
   return (
     <>
       <BackLink href="/models">{t("back")}</BackLink>
       <PageHeader
         title={
           <>
-            {m.name}
+            {modelTitle(m.brand, m.name)}
             {m.company ? ` · ${m.company}` : ""}
           </>
         }
@@ -120,40 +141,40 @@ export default async function ModelDetailPage({
           <>
             <span className="font-semibold text-brand">{clientName ?? t("ownProject")}</span>
             {" · "}
+            {m.type ? `${ttype(m.type)} · ` : ""}
             {formatEuros(m.priceCents, locale)}
-            <br />
             {m.paymentStatus === "deposit_paid" && (
               <>
+                <br />
                 {t("depositSummary", {
                   deposit: formatEuros(m.depositCents, locale),
                   remaining: formatEuros(remainingCents(m.priceCents, m.depositCents), locale),
                 })}
-                <br />
               </>
             )}
-            {t("dates", {
-              requested: formatDate(m.requestedDate, locale),
-              estimated: formatDate(m.estimatedDate, locale),
-            })}
+            {!done && (
+              <>
+                <br />
+                {t("dates", {
+                  requested: formatDate(m.requestedDate, locale),
+                  estimated: formatDate(m.estimatedDate, locale),
+                })}
+              </>
+            )}
           </>
         }
         action={
-          <div className="flex flex-col items-start gap-2 sm:items-end">
-            <PhaseBadge phase={m.phase} />
-            <PaymentBadge status={m.paymentStatus} priceCents={m.priceCents} depositCents={m.depositCents} />
+          <div className="flex flex-col items-end gap-2">
+            {badges}
             <PhaseProgress phase={m.phase} />
-            <form action={createQuoteFromModel.bind(null, id)}>
-              <button type="submit" className={secondaryButtonClass}>
-                {t("createQuote")}
-              </button>
-            </form>
+            {actions}
           </div>
         }
       />
 
       <PhotosSection
         modelId={id}
-        modelName={m.name}
+        modelName={modelTitle(m.brand, m.name)}
         userId={user.id}
         published={m.published}
         finished={m.phase === "finished"}
