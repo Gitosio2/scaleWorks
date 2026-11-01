@@ -265,6 +265,7 @@
     "clientNotFound": "Cliente no encontrado",
     "modelNotFound": "Maqueta no encontrada",
     "consumableNotFound": "Consumible no encontrado",
+    "consumableUsedUp": "Este consumible está agotado",
     "quoteNotFound": "Presupuesto no encontrado",
     "depositNotPositive": "El importe del anticipo debe ser mayor que 0",
     "depositExceedsPrice": "El anticipo no puede ser mayor que el precio",

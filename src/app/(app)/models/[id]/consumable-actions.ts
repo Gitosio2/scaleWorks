@@ -32,10 +32,12 @@ export async function setModelConsumable(modelId: string, formData: FormData) {
 
   const consumableId = String(formData.get("consumableId") ?? "");
   const [owned] = await db
-    .select({ id: consumables.id })
+    .select({ id: consumables.id, active: consumables.active })
     .from(consumables)
     .where(and(eq(consumables.id, consumableId), eq(consumables.userId, user.id)));
   if (!owned) throw new Error(t("consumableNotFound"));
+  // A picker left open before the consumable was marked used up can still post it.
+  if (!owned.active) throw new Error(t("consumableUsedUp"));
 
   // Upsert: choosing an already linked consumable just updates its quantity.
   const quantity = readQuantity(formData, t);

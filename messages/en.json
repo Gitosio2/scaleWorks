@@ -265,6 +265,7 @@
     "clientNotFound": "Client not found",
     "modelNotFound": "Model not found",
     "consumableNotFound": "Consumable not found",
+    "consumableUsedUp": "This consumable is used up",
     "quoteNotFound": "Quote not found",
     "depositNotPositive": "Deposit amount must be greater than 0",
     "depositExceedsPrice": "Deposit cannot be greater than the price",
