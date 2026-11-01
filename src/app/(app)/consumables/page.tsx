@@ -1,11 +1,20 @@
 import Link from "next/link";
-import { eq } from "drizzle-orm";
+import { and, asc, eq, ilike, isNotNull, or, type SQL } from "drizzle-orm";
 import { db } from "@/db";
 import { consumables, supplyStatus } from "@/db/schema";
 import { formatEuros, supplyStatusLabels } from "@/lib/labels";
+import {
+  ascNullsLast,
+  containsPattern,
+  descNullsLast,
+  enumParam,
+  textParam,
+  type SearchParams,
+} from "@/lib/list-filters";
 import { requireUser } from "@/lib/session";
 import { Card } from "@/components/ui/card";
 import { CreateModal } from "@/components/ui/create-modal";
+import { FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filters";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
 import {
@@ -21,13 +30,58 @@ import {
 } from "./actions";
 import { ConsumableFields } from "./consumable-fields";
 
-export default async function ConsumablesPage() {
+const sorts = {
+  description: { label: "Description (A–Z)", order: [asc(consumables.description)] },
+  store: {
+    label: "Store (A–Z)",
+    order: [ascNullsLast(consumables.store), asc(consumables.description)],
+  },
+  price_desc: { label: "Price (high to low)", order: [descNullsLast(consumables.priceCents)] },
+  price_asc: { label: "Price (low to high)", order: [ascNullsLast(consumables.priceCents)] },
+  status: { label: "Status", order: [asc(consumables.status), asc(consumables.description)] },
+};
+type SortKey = keyof typeof sorts;
+const sortKeys = Object.keys(sorts) as SortKey[];
+
+export default async function ConsumablesPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const sp = await searchParams;
   const user = await requireUser();
-  const rows = await db
-    .select()
-    .from(consumables)
-    .where(eq(consumables.userId, user.id))
-    .orderBy(consumables.description);
+
+  const q = textParam(sp, "q");
+  const store = textParam(sp, "store");
+  const status = enumParam(sp, "status", supplyStatus.enumValues);
+  const sort = enumParam(sp, "sort", sortKeys) ?? "description";
+
+  const conditions: Array<SQL | undefined> = [
+    eq(consumables.userId, user.id),
+    q
+      ? or(
+          ilike(consumables.description, containsPattern(q)),
+          ilike(consumables.reference, containsPattern(q)),
+          ilike(consumables.store, containsPattern(q)),
+        )
+      : undefined,
+    store ? eq(consumables.store, store) : undefined,
+    status ? eq(consumables.status, status) : undefined,
+  ];
+  const activeCount = [q, store, status].filter(Boolean).length;
+
+  const [rows, storeRows] = await Promise.all([
+    db
+      .select()
+      .from(consumables)
+      .where(and(...conditions))
+      .orderBy(...sorts[sort].order, asc(consumables.id)),
+    db
+      .selectDistinct({ store: consumables.store })
+      .from(consumables)
+      .where(and(eq(consumables.userId, user.id), isNotNull(consumables.store)))
+      .orderBy(consumables.store),
+  ]);
 
   return (
     <>
@@ -37,9 +91,36 @@ export default async function ConsumablesPage() {
         <ConsumableFields />
       </CreateModal>
 
+      <ListFilters action="/consumables" activeCount={activeCount}>
+        <FilterText name="q" label="Search" defaultValue={q} placeholder="Description, reference or store" />
+        <FilterSelect
+          name="store"
+          label="Store"
+          defaultValue={store}
+          options={storeRows.map((r) => ({ value: r.store!, label: r.store! }))}
+        />
+        <FilterSelect
+          name="status"
+          label="Status"
+          defaultValue={status ?? ""}
+          options={supplyStatus.enumValues.map((s) => ({ value: s, label: supplyStatusLabels[s] }))}
+        />
+        <FilterSelect
+          name="sort"
+          label="Sort by"
+          defaultValue={sort}
+          options={sortKeys.map((k) => ({ value: k, label: sorts[k].label }))}
+          allLabel={null}
+        />
+      </ListFilters>
+
       <Card>
         <ul className="flex flex-col">
-          {rows.length === 0 && <li className="text-muted">No consumables yet.</li>}
+          {rows.length === 0 && (
+            <li className="text-muted">
+              {activeCount > 0 ? "No consumables match these filters." : "No consumables yet."}
+            </li>
+          )}
           {rows.map((c) => (
             <li key={c.id} className={`${listItemClass} flex flex-col gap-2`}>
               <div className="flex flex-wrap items-start justify-between gap-4">

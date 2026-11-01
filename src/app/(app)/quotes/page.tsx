@@ -1,11 +1,21 @@
 import Link from "next/link";
-import { desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, isNull, or, type SQL } from "drizzle-orm";
 import { db } from "@/db";
-import { clients, quotes } from "@/db/schema";
+import { clients, quoteStatus, quotes } from "@/db/schema";
 import { formatEuros, quoteStatusLabels } from "@/lib/labels";
+import {
+  ascNullsLast,
+  containsPattern,
+  descNullsLast,
+  enumParam,
+  textParam,
+  uuidParam,
+  type SearchParams,
+} from "@/lib/list-filters";
 import { requireUser } from "@/lib/session";
 import { Card } from "@/components/ui/card";
 import { CreateModal } from "@/components/ui/create-modal";
+import { FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filters";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge, quoteStatusVariant } from "@/components/ui/status-badge";
 import {
@@ -16,15 +26,54 @@ import {
 import { createQuote, deleteQuote } from "./actions";
 import { QuoteFields } from "./quote-fields";
 
-export default async function QuotesPage() {
+const sorts = {
+  newest: { label: "Newest first", order: [desc(quotes.createdAt)] },
+  oldest: { label: "Oldest first", order: [asc(quotes.createdAt)] },
+  title: { label: "Title (A–Z)", order: [asc(quotes.title)] },
+  price_desc: { label: "Price (high to low)", order: [descNullsLast(quotes.priceCents)] },
+  price_asc: { label: "Price (low to high)", order: [ascNullsLast(quotes.priceCents)] },
+};
+type SortKey = keyof typeof sorts;
+const sortKeys = Object.keys(sorts) as SortKey[];
+
+export default async function QuotesPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const sp = await searchParams;
   const user = await requireUser();
+
+  const q = textParam(sp, "q");
+  const client =
+    uuidParam(sp, "client") ?? (textParam(sp, "client") === "none" ? "none" : null);
+  const status = enumParam(sp, "status", quoteStatus.enumValues);
+  const sort = enumParam(sp, "sort", sortKeys) ?? "newest";
+
+  const conditions: Array<SQL | undefined> = [
+    eq(quotes.userId, user.id),
+    q
+      ? or(
+          ilike(quotes.title, containsPattern(q)),
+          ilike(clients.name, containsPattern(q)),
+        )
+      : undefined,
+    client === "none"
+      ? isNull(quotes.clientId)
+      : client
+        ? eq(quotes.clientId, client)
+        : undefined,
+    status ? eq(quotes.status, status) : undefined,
+  ];
+  const activeCount = [q, client, status].filter(Boolean).length;
+
   const [rows, clientRows] = await Promise.all([
     db
       .select({ quote: quotes, clientName: clients.name })
       .from(quotes)
       .leftJoin(clients, eq(quotes.clientId, clients.id))
-      .where(eq(quotes.userId, user.id))
-      .orderBy(desc(quotes.createdAt)),
+      .where(and(...conditions))
+      .orderBy(...sorts[sort].order, asc(quotes.id)),
     db
       .select({ id: clients.id, name: clients.name })
       .from(clients)
@@ -40,9 +89,39 @@ export default async function QuotesPage() {
         <QuoteFields clients={clientRows} />
       </CreateModal>
 
+      <ListFilters action="/quotes" activeCount={activeCount}>
+        <FilterText name="q" label="Search" defaultValue={q} placeholder="Title or client" />
+        <FilterSelect
+          name="client"
+          label="Client"
+          defaultValue={client ?? ""}
+          options={[
+            { value: "none", label: "No client" },
+            ...clientRows.map((c) => ({ value: c.id, label: c.name })),
+          ]}
+        />
+        <FilterSelect
+          name="status"
+          label="Status"
+          defaultValue={status ?? ""}
+          options={quoteStatus.enumValues.map((s) => ({ value: s, label: quoteStatusLabels[s] }))}
+        />
+        <FilterSelect
+          name="sort"
+          label="Sort by"
+          defaultValue={sort}
+          options={sortKeys.map((k) => ({ value: k, label: sorts[k].label }))}
+          allLabel={null}
+        />
+      </ListFilters>
+
       <Card>
         <ul className="flex flex-col">
-          {rows.length === 0 && <li className="text-muted">No quotes yet.</li>}
+          {rows.length === 0 && (
+            <li className="text-muted">
+              {activeCount > 0 ? "No quotes match these filters." : "No quotes yet."}
+            </li>
+          )}
           {rows.map(({ quote: q, clientName }) => (
             <li key={q.id} className={`${listItemClass} flex flex-wrap items-center justify-between gap-4`}>
               <div className="min-w-0">
