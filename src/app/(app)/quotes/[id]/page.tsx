@@ -14,6 +14,7 @@ import { convertQuoteToModel } from "./convert-action";
 import {
   addQuotePart,
   deleteQuotePart,
+  updateQuotePart,
   updateQuotePartStatus,
 } from "./part-actions";
 
@@ -72,6 +73,7 @@ export default async function QuoteDetailPage({
       <PartsSection
         parts={partRows}
         add={addQuotePart.bind(null, id)}
+        update={updateQuotePart.bind(null, id)}
         updateStatus={updateQuotePartStatus.bind(null, id)}
         remove={deleteQuotePart.bind(null, id)}
       />

@@ -29,7 +29,7 @@ import {
   setModelConsumable,
   updateModelConsumableQuantity,
 } from "./consumable-actions";
-import { addPart, deletePart, updatePartStatus } from "./part-actions";
+import { addPart, deletePart, updatePart, updatePartStatus } from "./part-actions";
 import { setPartPaid } from "../../expenses/actions";
 import { profitability } from "@/lib/profitability";
 import { Card, CardTitle, CollapsibleCard } from "@/components/ui/card";
@@ -282,6 +282,7 @@ export default async function ModelDetailPage({
       <PartsSection
         parts={partRows}
         add={addPart.bind(null, id)}
+        update={updatePart.bind(null, id)}
         updateStatus={updatePartStatus.bind(null, id)}
         remove={deletePart.bind(null, id)}
         setPaid={setPartPaid}

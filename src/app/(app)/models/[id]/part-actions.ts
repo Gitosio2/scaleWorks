@@ -59,6 +59,40 @@ export async function addPart(modelId: string, formData: FormData) {
   revalidatePath(`/models/${modelId}`);
 }
 
+export async function updatePart(
+  modelId: string,
+  partId: string,
+  formData: FormData,
+) {
+  const user = await requireUser();
+  const t = await getTranslations("actionErrors");
+
+  const description = text(formData, "description");
+  if (!description) throw new Error(t("descriptionRequired"));
+
+  await db
+    .update(parts)
+    .set({
+      brand: text(formData, "brand"),
+      reference: text(formData, "reference"),
+      description,
+      priceCents: parseEuros(String(formData.get("price") ?? ""), t),
+      store: text(formData, "store"),
+      url: parseUrl(text(formData, "url"), t),
+    })
+    .where(
+      and(
+        eq(parts.id, partId),
+        eq(parts.modelId, modelId),
+        eq(parts.userId, user.id),
+      ),
+    );
+  revalidatePath(`/models/${modelId}`);
+  // A corrected price changes the pending-expenses and dashboard totals.
+  revalidatePath("/expenses");
+  revalidatePath("/");
+}
+
 export async function updatePartStatus(
   modelId: string,
   partId: string,
