@@ -100,10 +100,12 @@ export default async function ModelDetailPage({
       .where(and(eq(consumables.userId, user.id), eq(consumables.active, true)))
       .orderBy(consumables.description),
   ]);
-  // Cost of a consumable on this model = unit price x fraction used.
+  // Cost of a consumable on this model = unit price x fraction used. The product is
+  // trimmed to 9 decimals before rounding so a float artefact (25 x 0.58 = 14.4999...)
+  // rounds like the exact decimal the models list computes in SQL (14.5 -> 15).
   const consumableCost = (priceCents: number | null, quantity: string | null) =>
     priceCents !== null && quantity !== null
-      ? Math.round(priceCents * Number(quantity))
+      ? Math.round(Number((priceCents * Number(quantity)).toFixed(9)))
       : null;
   const consumablesTotalCents = linkedRows.reduce(
     (acc, r) => acc + (consumableCost(r.consumable.priceCents, r.quantity) ?? 0),
