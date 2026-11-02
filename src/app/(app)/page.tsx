@@ -8,6 +8,7 @@ import {
   models,
   parts,
   quotes,
+  stockComponents,
   timeEntries,
 } from "@/db/schema";
 import { formatDate, formatEuros } from "@/lib/labels";
@@ -91,6 +92,7 @@ export default async function Home() {
     [consumablesSpent],
     [unpaidExpenses],
     finishedRows,
+    [componentsStock],
   ] = await Promise.all([
     db
       .select({
@@ -193,6 +195,15 @@ export default async function Home() {
       })
       .from(models)
       .where(and(eq(models.userId, user.id), eq(models.phase, "finished"))),
+    // Value of the loose components in stock: unit price times units on hand.
+    db
+      .select({
+        // Widened before multiplying: price * units overflows int4 well within the allowed ranges.
+        cents: sql<number>`coalesce(sum(${stockComponents.priceCents}::bigint * ${stockComponents.quantity}), 0)::float8`,
+        units: sql<number>`coalesce(sum(${stockComponents.quantity}), 0)::float8`,
+      })
+      .from(stockComponents)
+      .where(eq(stockComponents.userId, user.id)),
   ]);
   const expensesCents = partsSpent.cents + consumablesSpent.cents;
   const profit = aggregateProfitability(finishedRows);
@@ -319,6 +330,14 @@ export default async function Home() {
               {more(stalled.length)}
             </div>
           )}
+        </Card>
+
+        <Card>
+          <CardLinkTitle title={t("componentsTitle")} href="/components" />
+          <Stat
+            value={formatEuros(componentsStock.cents, locale)}
+            label={t("componentsHint", { count: componentsStock.units })}
+          />
         </Card>
 
         {profit.avgProfitCents !== null && (
