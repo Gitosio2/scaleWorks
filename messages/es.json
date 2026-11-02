@@ -146,7 +146,8 @@
     "empty": "Todavía no hay nada que mostrar.",
     "back": "← Todas las maquetas",
     "noPhotos": "Aún no hay fotos.",
-    "alt": "Foto {n} de {name}"
+    "alt": "Foto {n} de {name}",
+    "followTitle": "Sígueme, maquinaria real y maquetas en mis redes"
   },
   "dashboard": {
     "activeTitle": "Trabajos en activo",

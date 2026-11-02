@@ -4,13 +4,17 @@ import { getTranslations } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { modelTitle } from "@/lib/model-title";
 import { getPublicModels } from "@/lib/portfolio";
+import { socialLinks } from "@/lib/share";
 import { Brand } from "@/components/brand";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { LogoutButton } from "@/components/logout-button";
 import { PortfolioNav } from "@/components/portfolio-nav";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { SidebarShell } from "@/components/sidebar-shell";
-import { cardClass, cx, linkActionClass } from "@/components/ui/styles";
+import { SocialIcon } from "@/components/ui/social-icon";
+import { cardClass, cx, linkActionClass, secondaryButtonClass } from "@/components/ui/styles";
+
+const SOCIAL_NAMES = { tiktok: "TikTok", instagram: "Instagram", facebook: "Facebook" } as const;
 
 // Public pages. Same shell as the app, but the menu depends on who is looking:
 // a signed-in user also gets the normal options; everyone gets the text-only
@@ -24,6 +28,11 @@ export default async function PortfolioLayout({ children }: { children: React.Re
     getTranslations("portfolio"),
   ]);
   const user = session?.user ?? null;
+  const socials = socialLinks({
+    tiktok: process.env.PORTFOLIO_TIKTOK,
+    instagram: process.env.PORTFOLIO_INSTAGRAM,
+    facebook: process.env.PORTFOLIO_FACEBOOK,
+  });
 
   return (
     <div className="flex flex-1 flex-col md:flex-row">
@@ -69,6 +78,27 @@ export default async function PortfolioLayout({ children }: { children: React.Re
       <div className="min-w-0 flex-1 bg-canvas px-4 py-6 md:px-10 md:py-8">
         <main className="mx-auto flex w-full max-w-[1100px] flex-col gap-7 pb-12">
           {children}
+          {socials.length > 0 && (
+            <section className={cx(cardClass, "items-start")}>
+              <h2 className="text-lg font-bold">{tp("followTitle")}</h2>
+              <ul className="flex flex-wrap gap-3">
+                {socials.map(({ key, href }) => (
+                  <li key={key}>
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={SOCIAL_NAMES[key]}
+                      title={SOCIAL_NAMES[key]}
+                      className={cx(secondaryButtonClass, "size-16 px-0")}
+                    >
+                      <SocialIcon name={key} />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
         </main>
       </div>
     </div>

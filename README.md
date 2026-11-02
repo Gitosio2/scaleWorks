@@ -98,3 +98,12 @@ Planned once the project is scaffolded: prerequisites, install, environment vari
 - **Lost password**: run `npx tsx scripts/reset-password.ts <email>` from the project root. It reads `DATABASE_URL` from `.env.local`, asks for the new password (hidden) and signs the user out everywhere.
 - **Close public sign-up**: set `DISABLE_SIGNUP=true` in the environment. The sign-up endpoint is rejected and the login page hides the "Create one" link. It is off by default.
 - **Login rate limit**: at most 5 sign-in attempts per minute per client. Counters are kept in memory, so on serverless hosting each instance counts separately.
+
+## Public gallery: sharing and social links
+
+Environment variables for `/portfolio` (all optional):
+
+- `SITE_URL`: public origin of the site (for example `https://works.example.com`). Link previews (Open Graph / Twitter cards) need absolute image URLs. When unset, the origin is taken from the request host, which works on most hosts.
+- `PORTFOLIO_TIKTOK`, `PORTFOLIO_INSTAGRAM`, `PORTFOLIO_FACEBOOK`: full `https://` URLs of your profiles. The gallery pages show a "Follow me" card with a button for each one that is set; empty or invalid values are skipped.
+
+Previews use the model's first photo (thumbnail), served by `/img/[id]/thumb` under the same rules as the gallery: only published, finished models of the `PORTFOLIO_EMAIL` account. The site icon is generated from `SITE_NAME` and the brand colour (`src/app/icon.tsx`, `src/app/apple-icon.tsx`).
