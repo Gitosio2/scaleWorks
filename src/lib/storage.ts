@@ -45,7 +45,9 @@ export async function putObject(key: string, body: Uint8Array, contentType: stri
   const res = await client.fetch(objectUrl(base, key), {
     method: "PUT",
     body: body as BodyInit,
-    headers: { "Content-Type": contentType },
+    // Explicit length: on Vercel the request went out chunked and R2 answered
+    // 411 Length Required, which S3-compatible stores do not accept for a PUT.
+    headers: { "Content-Type": contentType, "Content-Length": String(body.byteLength) },
   });
   if (!res.ok) throw new Error(`Storage upload failed (${res.status})`);
 }
