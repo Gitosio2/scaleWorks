@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Figtree } from "next/font/google";
@@ -9,6 +9,8 @@ const figtree = Figtree({
   variable: "--font-figtree",
   subsets: ["latin"],
 });
+
+export const viewport: Viewport = { themeColor: "#3e5e58" };
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("meta");

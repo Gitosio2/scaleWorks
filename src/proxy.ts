@@ -44,7 +44,9 @@ export function proxy(request: NextRequest) {
     pathname.startsWith("/portfolio/") ||
     pathname.startsWith("/img/") ||
     pathname === "/icon" ||
-    pathname === "/apple-icon";
+    pathname === "/apple-icon" ||
+    pathname === "/manifest.webmanifest" ||
+    pathname.startsWith("/pwa-icon/");
   if (!isOpen && !getSessionCookie(request)) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
