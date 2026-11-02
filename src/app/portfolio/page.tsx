@@ -1,14 +1,21 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { modelTitle } from "@/lib/model-title";
 import { getPublicModels } from "@/lib/portfolio";
-import { SITE_NAME } from "@/lib/site";
+import { shareMetadata } from "@/lib/share-metadata";
 import { PageHeader } from "@/components/ui/page-header";
 import { Photo } from "@/components/ui/photo";
 
-export async function generateMetadata() {
+export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("portfolio");
-  return { title: `${t("title")} · ${SITE_NAME}` };
+  const [first] = await getPublicModels();
+  return shareMetadata({
+    title: t("title"),
+    description: t("subtitle"),
+    path: "/portfolio",
+    coverId: first?.coverId,
+  });
 }
 
 export default async function PortfolioPage() {

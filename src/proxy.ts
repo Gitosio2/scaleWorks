@@ -34,14 +34,17 @@ function contentSecurityPolicy(nonce: string) {
 export function proxy(request: NextRequest) {
   // Optimistic check only (cookie presence). Real authorization must be
   // re-checked on the server wherever data is read or written.
-  // Reachable without a session: the login page, the public gallery and the
-  // photo route (which decides per image whether it may be seen).
+  // Reachable without a session: the login page, the public gallery, the
+  // photo route (which decides per image whether it may be seen) and the site
+  // icons (browsers and link-preview crawlers fetch them anonymously).
   const { pathname } = request.nextUrl;
   const isOpen =
     pathname === "/login" ||
     pathname === "/portfolio" ||
     pathname.startsWith("/portfolio/") ||
-    pathname.startsWith("/img/");
+    pathname.startsWith("/img/") ||
+    pathname === "/icon" ||
+    pathname === "/apple-icon";
   if (!isOpen && !getSessionCookie(request)) {
     return NextResponse.redirect(new URL("/login", request.url));
   }

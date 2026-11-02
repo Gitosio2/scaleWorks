@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { and, asc, eq } from "drizzle-orm";
@@ -6,6 +7,7 @@ import { db } from "@/db";
 import { models, modelImages } from "@/db/schema";
 import { modelTitle } from "@/lib/model-title";
 import { portfolioOwnerId, UUID_PATTERN } from "@/lib/portfolio";
+import { shareMetadata } from "@/lib/share-metadata";
 import { SITE_NAME } from "@/lib/site";
 import { PageHeader } from "@/components/ui/page-header";
 import { Photo } from "@/components/ui/photo";
@@ -34,11 +36,28 @@ async function findPublicModel(id: string) {
   return model ?? null;
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
-  const model = await findPublicModel((await params).id);
-  return {
-    title: model ? `${modelTitle(model.brand, model.name)} Â· ${SITE_NAME}` : SITE_NAME,
-  };
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const model = await findPublicModel(id);
+  if (!model) return { title: SITE_NAME };
+  const [t, ttype] = await Promise.all([getTranslations("portfolio"), getTranslations("modelType")]);
+  const [cover] = await db
+    .select({ id: modelImages.id })
+    .from(modelImages)
+    .where(eq(modelImages.modelId, model.id))
+    .orderBy(asc(modelImages.position), asc(modelImages.createdAt))
+    .limit(1);
+  const details = [model.type ? ttype(model.type) : null, model.company].filter(Boolean).join(" · ");
+  return shareMetadata({
+    title: modelTitle(model.brand, model.name),
+    description: details || t("subtitle"),
+    path: `/portfolio/${model.id}`,
+    coverId: cover?.id,
+  });
 }
 
 export default async function PublicModelPage({

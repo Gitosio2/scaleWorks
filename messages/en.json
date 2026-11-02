@@ -146,7 +146,10 @@
     "empty": "Nothing to show yet.",
     "back": "← All models",
     "noPhotos": "No photos yet.",
-    "alt": "Photo {n} of {name}"
+    "alt": "Photo {n} of {name}",
+    "contactTitle": "Get in touch",
+    "contactText": "Want to commission a model or have a question? Send me a message.",
+    "contactButton": "Contact me"
   },
   "dashboard": {
     "activeTitle": "Active work",
