@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { and, asc, desc, eq, ilike, isNull, or, type SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, isNull, or, type SQL } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { clients, quoteStatus, quotes } from "@/db/schema";
@@ -13,11 +13,13 @@ import {
   uuidParam,
   type SearchParams,
 } from "@/lib/list-filters";
+import { pageWindow, parsePage } from "@/lib/pagination";
 import { requireUser } from "@/lib/session";
 import { Card } from "@/components/ui/card";
 import { CreateModal } from "@/components/ui/create-modal";
 import { FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filters";
 import { PageHeader } from "@/components/ui/page-header";
+import { Pagination } from "@/components/ui/pagination";
 import { StatusBadge, quoteStatusVariant } from "@/components/ui/status-badge";
 import { DeleteIconButton, EditIconLink } from "@/components/ui/icon-actions";
 import {
@@ -72,13 +74,23 @@ export default async function QuotesPage({
   ];
   const activeCount = [q, client, status].filter(Boolean).length;
 
+  // Total matches, so the requested page can be clamped to the last one.
+  const [{ total }] = await db
+    .select({ total: count() })
+    .from(quotes)
+    .leftJoin(clients, eq(quotes.clientId, clients.id))
+    .where(and(...conditions));
+  const win = pageWindow(parsePage(sp), total);
+
   const [rows, clientRows] = await Promise.all([
     db
       .select({ quote: quotes, clientName: clients.name })
       .from(quotes)
       .leftJoin(clients, eq(quotes.clientId, clients.id))
       .where(and(...conditions))
-      .orderBy(...sorts[sort].order, asc(quotes.id)),
+      .orderBy(...sorts[sort].order, asc(quotes.id))
+      .limit(win.limit)
+      .offset(win.offset),
     db
       .select({ id: clients.id, name: clients.name })
       .from(clients)
@@ -151,6 +163,8 @@ export default async function QuotesPage({
           ))}
         </ul>
       </Card>
+
+      <Pagination pathname="/quotes" searchParams={sp} pageInfo={win} total={total} />
     </>
   );
 }
