@@ -291,6 +291,8 @@
     "empty": "No models yet.",
     "emptyFiltered": "No models match these filters.",
     "emptyOpen": "No unfinished or unpaid models. Finished and fully paid ones are hidden.",
+    "profit": "Profit",
+    "profitBreakdown": "{income} price − {cost} cost",
     "dates": "Requested: {requested} · Estimated: {estimated}",
     "depositSummary": "Deposit: {deposit} · Remaining: {remaining}",
     "createQuote": "Create quote from this model",

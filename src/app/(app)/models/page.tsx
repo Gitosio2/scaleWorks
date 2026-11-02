@@ -16,7 +16,16 @@ import {
 } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
-import { clients, modelPhase, models, modelType, paymentStatus } from "@/db/schema";
+import {
+  clients,
+  consumables,
+  modelConsumables,
+  modelPhase,
+  models,
+  modelType,
+  parts,
+  paymentStatus,
+} from "@/db/schema";
 import { formatDate, formatEuros } from "@/lib/labels";
 import { modelTitle } from "@/lib/model-title";
 import {
@@ -126,7 +135,21 @@ export default async function ModelsPage({
 
   const [rows, clientRows, companyRows] = await Promise.all([
     db
-      .select({ model: models, clientName: clients.name })
+      .select({
+        model: models,
+        clientName: clients.name,
+        // What the model costs: its parts plus the consumables used on it (unit
+        // price x fraction used), the same figures its detail page totals.
+        costCents: sql<number>`(
+          coalesce((select sum(${parts.priceCents}) from ${parts} where ${parts.modelId} = ${models.id}), 0)
+          + coalesce((
+              select sum(round(${consumables.priceCents} * ${modelConsumables.quantity}))
+              from ${modelConsumables}
+              inner join ${consumables} on ${consumables.id} = ${modelConsumables.consumableId}
+              where ${modelConsumables.modelId} = ${models.id}
+            ), 0)
+        )::int`,
+      })
       .from(models)
       .leftJoin(clients, eq(models.clientId, clients.id))
       .where(and(...conditions))
@@ -220,7 +243,9 @@ export default async function ModelsPage({
                   : t("empty")}
             </li>
           )}
-          {rows.map(({ model: m, clientName }) => {
+          {rows.map(({ model: m, clientName, costCents }) => {
+            // Profit = what the model is sold for minus what it cost; unknown without a price.
+            const profitCents = m.priceCents !== null ? m.priceCents - costCents : null;
             // Finished and paid in full: the dates no longer matter, so they are hidden.
             const done = m.phase === "finished" && m.paymentStatus === "paid";
             const badges = (
@@ -242,6 +267,20 @@ export default async function ModelsPage({
                     {m.company ? `${m.company} · ` : ""}
                     {formatEuros(m.priceCents, locale)}
                   </p>
+                  {profitCents !== null && (
+                    <p className="text-[13px] text-muted">
+                      {t("profit")}{" "}
+                      <span className={`font-semibold ${profitCents < 0 ? "text-danger" : "text-ok"}`}>
+                        {profitCents > 0 ? "+" : ""}
+                        {formatEuros(profitCents, locale)}
+                      </span>
+                      {" · "}
+                      {t("profitBreakdown", {
+                        income: formatEuros(m.priceCents, locale),
+                        cost: formatEuros(costCents, locale),
+                      })}
+                    </p>
+                  )}
                   {!done && (
                     <p className="text-[13px] text-muted">
                       {t("dates", {
