@@ -59,3 +59,34 @@ export const getPublicModels = cache(async () => {
     )
     .orderBy(asc(sql`lower(concat_ws(' ', ${models.brand}, ${models.name}))`), asc(models.id));
 });
+
+/**
+ * Every photo of the public models, in the same model order as the list and in
+ * each model's own photo order. Same exposure rule: only ids and the title parts.
+ */
+export const getPublicPhotos = cache(async () => {
+  const ownerId = await portfolioOwnerId();
+  if (!ownerId) return [];
+  return db
+    .select({
+      id: modelImages.id,
+      modelId: models.id,
+      brand: models.brand,
+      name: models.name,
+    })
+    .from(modelImages)
+    .innerJoin(models, eq(models.id, modelImages.modelId))
+    .where(
+      and(
+        eq(models.userId, ownerId),
+        eq(models.published, true),
+        eq(models.phase, "finished"),
+      ),
+    )
+    .orderBy(
+      asc(sql`lower(concat_ws(' ', ${models.brand}, ${models.name}))`),
+      asc(models.id),
+      asc(modelImages.position),
+      asc(modelImages.createdAt),
+    );
+});

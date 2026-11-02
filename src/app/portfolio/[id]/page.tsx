@@ -10,7 +10,7 @@ import { portfolioOwnerId, UUID_PATTERN } from "@/lib/portfolio";
 import { shareMetadata } from "@/lib/share-metadata";
 import { SITE_NAME } from "@/lib/site";
 import { PageHeader } from "@/components/ui/page-header";
-import { Photo } from "@/components/ui/photo";
+import { PhotoViewer } from "@/components/photo-viewer";
 
 // Public page: only these columns are ever read for a model.
 async function findPublicModel(id: string) {
@@ -93,23 +93,13 @@ export default async function PublicModelPage({
       {images.length === 0 ? (
         <p className="text-muted">{t("noPhotos")}</p>
       ) : (
-        <ul className="grid gap-4 sm:grid-cols-2">
-          {images.map((image, index) => (
-            <li key={image.id}>
-              <a
-                href={`/img/${image.id}/full`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative block aspect-[4/3] overflow-hidden rounded-[14px] border border-line bg-canvas"
-              >
-                <Photo
-                  src={`/img/${image.id}/full`}
-                  alt={t("alt", { n: index + 1, name: title })}
-                />
-              </a>
-            </li>
-          ))}
-        </ul>
+        <PhotoViewer
+          className="grid gap-4 sm:grid-cols-2"
+          photos={images.map((image, index) => ({
+            id: image.id,
+            alt: t("alt", { n: index + 1, name: title }),
+          }))}
+        />
       )}
     </>
   );
