@@ -433,6 +433,8 @@
     "invalidType": "Tipo no válido",
     "invalidPaymentStatus": "Estado de pago no válido",
     "invalidLink": "Enlace no válido",
+    "invalidId": "Identificador no válido",
+    "textTooLong": "El texto es demasiado largo",
     "invalidDuration": "La duración debe tener el formato hh:mm, hasta 24:00",
     "invalidDate": "Fecha no válida",
     "clientNotFound": "Cliente no encontrado",
@@ -466,7 +468,8 @@
       "parts": "Piezas y gastos sueltos",
       "consumables": "Consumibles",
       "modelConsumables": "Consumibles usados en maquetas",
-      "timeEntries": "Registros de tiempo"
+      "timeEntries": "Registros de tiempo",
+      "stockComponents": "Componentes del almacén"
     },
     "noteTitle": "Conviene saber",
     "noteSensitive": "Los archivos contienen los datos de tus clientes y tus precios. Guárdalos en un sitio privado.",

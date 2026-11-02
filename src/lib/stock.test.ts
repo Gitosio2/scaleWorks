@@ -21,6 +21,11 @@ describe("parseStockQuantity", () => {
     }
   });
 
+  it("accepts exactly 1,000,000 and rejects 1,000,001", () => {
+    expect(parseStockQuantity("1000000", t)).toBe(1_000_000);
+    expect(() => parseStockQuantity("1000001", t)).toThrow("invalidStockQuantity");
+  });
+
   it("rejects absurdly large values", () => {
     expect(() => parseStockQuantity("100000000", t)).toThrow("invalidStockQuantity");
   });

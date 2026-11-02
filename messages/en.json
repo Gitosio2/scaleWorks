@@ -433,6 +433,8 @@
     "invalidType": "Invalid type",
     "invalidPaymentStatus": "Invalid payment status",
     "invalidLink": "Invalid link",
+    "invalidId": "Invalid id",
+    "textTooLong": "Text is too long",
     "invalidDuration": "Duration must be hh:mm, up to 24:00",
     "invalidDate": "Invalid date",
     "clientNotFound": "Client not found",
@@ -466,7 +468,8 @@
       "parts": "Parts and loose purchases",
       "consumables": "Consumables",
       "modelConsumables": "Consumables used on models",
-      "timeEntries": "Time entries"
+      "timeEntries": "Time entries",
+      "stockComponents": "Warehouse components"
     },
     "noteTitle": "Good to know",
     "noteSensitive": "The files contain your clients' data and your prices. Keep them somewhere private.",
