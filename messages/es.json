@@ -33,7 +33,6 @@
     "close": "Cerrar",
     "saving": "Guardando…",
     "saveFailed": "No se pudo guardar. Revisa los campos e inténtalo de nuevo.",
-    "remaining": "Restante {amount}",
     "progress": "Progreso: {done} de {total} pasos",
     "edit": "Editar",
     "delete": "Eliminar",
@@ -142,7 +141,8 @@
   "paymentStatus": {
     "none": "Sin pago",
     "deposit_paid": "Pendiente",
-    "paid": "Pagado por completo"
+    "paid": "Pagado por completo",
+    "pendingAmount": "Pendiente: {amount}"
   },
   "paymentHold": {
     "hold": "Pausar: el cliente no ha pagado",

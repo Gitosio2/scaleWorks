@@ -33,7 +33,6 @@
     "close": "Close",
     "saving": "Saving…",
     "saveFailed": "Could not save. Check the fields and try again.",
-    "remaining": "Remaining {amount}",
     "progress": "Progress: {done} of {total} steps",
     "edit": "Edit",
     "delete": "Delete",
@@ -142,7 +141,8 @@
   "paymentStatus": {
     "none": "No payment",
     "deposit_paid": "Pending",
-    "paid": "Paid in full"
+    "paid": "Paid in full",
+    "pendingAmount": "Pending: {amount}"
   },
   "paymentHold": {
     "hold": "Put on hold: client has not paid",

@@ -73,7 +73,7 @@ export function paymentVariant(status: PaymentStatus): BadgeVariant {
   return status === "paid" ? "ok" : status === "deposit_paid" ? "warn" : "mute";
 }
 
-// Badge plus, for a paid deposit, what is still owed.
+// Badge; for a paid deposit it also shows what is still owed (when the price is known).
 export function PaymentBadge({
   status,
   priceCents,
@@ -84,18 +84,11 @@ export function PaymentBadge({
   depositCents: number | null;
 }) {
   const t = useTranslations("paymentStatus");
-  const tc = useTranslations("common");
   const locale = useLocale();
+  const owed = status === "deposit_paid" ? remainingCents(priceCents, depositCents) : null;
   return (
-    <span className="inline-flex flex-wrap items-center gap-2">
-      <StatusBadge variant={paymentVariant(status)}>{t(status)}</StatusBadge>
-      {status === "deposit_paid" && (
-        <span className="text-[13px] text-ink-2">
-          {tc("remaining", {
-            amount: formatEuros(remainingCents(priceCents, depositCents), locale),
-          })}
-        </span>
-      )}
-    </span>
+    <StatusBadge variant={paymentVariant(status)}>
+      {owed === null ? t(status) : t("pendingAmount", { amount: formatEuros(owed, locale) })}
+    </StatusBadge>
   );
 }
