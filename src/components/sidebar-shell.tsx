@@ -19,10 +19,12 @@ export function SidebarShell({
 }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
-  // The menu is open for the page it was opened on, so going to another page
-  // (a link, back, forward) closes it without any effect.
+  // The page the menu was opened on, or null while it is closed. Going to another
+  // page (a link, back, forward) closes it: the stored path is dropped right away,
+  // not just ignored, so coming back to the same page does not reopen it.
   const [openOn, setOpenOn] = useState<string | null>(null);
-  const open = openOn === pathname;
+  if (openOn !== null && openOn !== pathname) setOpenOn(null);
+  const open = openOn !== null;
 
   return (
     <aside
