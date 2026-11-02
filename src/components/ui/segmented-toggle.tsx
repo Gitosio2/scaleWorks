@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { Spinner } from "./spinner";
 import { variantSwatches, type BadgeVariant } from "./status-badge";
 
 type Option = { value: string; label: string; variant: BadgeVariant };
@@ -69,31 +70,34 @@ export function SegmentedToggle({
 
   return (
     <div className="flex flex-col gap-1">
-      <div
-        role="radiogroup"
-        aria-label={label}
-        aria-busy={pending}
-        className={`relative h-7 rounded-full border border-input-border bg-line ${TRACK_WIDTH[stops]}`}
-      >
-        <span
-          aria-hidden
-          className={`pointer-events-none absolute top-[3px] left-[3px] size-5 rounded-full shadow transition-all duration-150 ${THUMB_OFFSET[index]} ${variantSwatches[options[index].variant].solid}`}
-        />
-        <div className={`absolute inset-0 grid ${GRID_COLUMNS[stops]}`}>
-          {options.map((o, i) => (
-            <button
-              key={o.value}
-              type="button"
-              role="radio"
-              aria-checked={i === index}
-              aria-label={o.label}
-              onClick={() => choose(o.value)}
-              className="flex cursor-pointer items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-            >
-              {i !== index && <span aria-hidden className="size-1.5 rounded-full bg-muted/40" />}
-            </button>
-          ))}
+      <div className="flex items-center gap-2">
+        <div
+          role="radiogroup"
+          aria-label={label}
+          aria-busy={pending}
+          className={`relative h-7 shrink-0 rounded-full border border-input-border bg-line ${TRACK_WIDTH[stops]}`}
+        >
+          <span
+            aria-hidden
+            className={`pointer-events-none absolute top-[3px] left-[3px] size-5 rounded-full shadow transition-all duration-150 ${THUMB_OFFSET[index]} ${variantSwatches[options[index].variant].solid}`}
+          />
+          <div className={`absolute inset-0 grid ${GRID_COLUMNS[stops]}`}>
+            {options.map((o, i) => (
+              <button
+                key={o.value}
+                type="button"
+                role="radio"
+                aria-checked={i === index}
+                aria-label={o.label}
+                onClick={() => choose(o.value)}
+                className="flex cursor-pointer items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+              >
+                {i !== index && <span aria-hidden className="size-1.5 rounded-full bg-muted/40" />}
+              </button>
+            ))}
+          </div>
         </div>
+        {pending && <Spinner className="size-4 text-muted" />}
       </div>
       {error && (
         <p role="alert" className="text-sm text-danger">

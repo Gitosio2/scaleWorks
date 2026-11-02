@@ -2,6 +2,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { supplyStatus } from "@/db/schema";
 import type { parts } from "@/db/schema";
 import { formatEuros } from "@/lib/labels";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { CollapsibleCard } from "@/components/ui/card";
 import { StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
 import { DeleteIconButton, PaidCheckButton } from "@/components/ui/icon-actions";
@@ -103,9 +104,7 @@ export function PartsSection({
             ))}
           </select>
         </label>
-        <button type="submit" className={`${primaryButtonClass} self-start`}>
-          {t("add")}
-        </button>
+        <SubmitButton className={`${primaryButtonClass} self-start`}>{t("add")}</SubmitButton>
       </form>
 
       <ul className="flex flex-col">
