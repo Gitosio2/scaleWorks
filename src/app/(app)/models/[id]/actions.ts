@@ -35,6 +35,24 @@ export async function addTimeEntry(modelId: string, formData: FormData) {
   revalidatePath(`/models/${modelId}`);
 }
 
+const MAX_NOTES_LENGTH = 5000;
+
+export async function updateModelNotes(modelId: string, formData: FormData) {
+  const user = await requireUser();
+  const t = await getTranslations("actionErrors");
+
+  const notes = String(formData.get("notes") ?? "").trim();
+  if (notes.length > MAX_NOTES_LENGTH) throw new Error(t("notesTooLong"));
+
+  const updated = await db
+    .update(models)
+    .set({ notes: notes || null })
+    .where(and(eq(models.id, modelId), eq(models.userId, user.id)))
+    .returning({ id: models.id });
+  if (updated.length === 0) throw new Error(t("modelNotFound"));
+  revalidatePath(`/models/${modelId}`);
+}
+
 export async function deleteTimeEntry(modelId: string, entryId: string) {
   const user = await requireUser();
   await db

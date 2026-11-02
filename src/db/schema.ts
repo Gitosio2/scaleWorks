@@ -97,6 +97,8 @@ export const models = pgTable(
     // Shown on the public gallery once finished. Off by default: nothing about a
     // model is public until the owner opts in.
     published: boolean("published").notNull().default(false),
+    // Free-text private notes about the build. Never shown on the public gallery.
+    notes: text("notes"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
   (t) => [

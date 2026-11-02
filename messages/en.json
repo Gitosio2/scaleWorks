@@ -307,6 +307,11 @@
       "requested": "Requested date",
       "estimated": "Estimated date"
     },
+    "notes": {
+      "title": "Notes",
+      "label": "Notes",
+      "placeholder": "Anything worth remembering about this build…"
+    },
     "time": {
       "title": "Time: {total}",
       "date": "Date",
@@ -375,6 +380,7 @@
     "invalidDate": "Invalid date",
     "clientNotFound": "Client not found",
     "modelNotFound": "Model not found",
+    "notesTooLong": "Notes are too long (max 5000 characters)",
     "imageInvalid": "The file is not a valid image",
     "imageTooLarge": "The image is too large",
     "imageLimit": "A model can have up to 20 photos",
