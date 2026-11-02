@@ -197,6 +197,33 @@ export const consumables = pgTable("consumables", {
   active: boolean("active").notNull().default(true),
 });
 
+// Parts kept in the warehouse, counted by unit. Separate from `parts` (which
+// has no quantity and ties a purchase to a model or quote).
+export const stockComponents = pgTable(
+  "stock_components",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    brand: text("brand"),
+    reference: text("reference"),
+    description: text("description").notNull(),
+    store: text("store"),
+    url: text("url"),
+    // Price of one unit, in cents.
+    priceCents: integer("price_cents"),
+    quantity: integer("quantity").notNull().default(0),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [
+    index("stock_components_user_idx").on(t.userId),
+    check("stock_components_quantity_non_negative", sql`${t.quantity} >= 0`),
+  ],
+);
+
 // Many-to-many: which consumables were used on which model.
 export const modelConsumables = pgTable(
   "model_consumables",

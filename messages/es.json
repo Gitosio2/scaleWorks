@@ -10,7 +10,9 @@
     "models": "Maquetas",
     "quotes": "Presupuestos",
     "clients": "Clientes",
+    "warehouse": "Almacén",
     "consumables": "Consumibles",
+    "components": "Componentes",
     "expenses": "Gastos pendientes",
     "gallery": "Galería pública",
     "signedInAs": "Sesión iniciada como",
@@ -171,6 +173,8 @@
     "quoteAge": "{days, plural, =0 {Hoy} one {Hace # día} other {Hace # días}}",
     "staleTitle": "Maquetas paradas",
     "staleHint": "Sin empezar desde hace más de 7 meses",
+    "componentsTitle": "Componentes en stock",
+    "componentsHint": "{count, plural, one {# unidad en stock} other {# unidades en stock}}",
     "staleAge": "{months, plural, one {# mes} other {# meses}}",
     "andMore": "y {count} más",
     "activeToCollect": "Pendiente de cobro de los trabajos en activo",
@@ -215,6 +219,41 @@
       "oldest": "Más antiguos primero",
       "name": "Nombre (A–Z)",
       "company": "Empresa (A–Z)"
+    }
+  },
+  "components": {
+    "subtitle": "Piezas que tienes en stock, con las unidades que te quedan.",
+    "add": "Añadir componente",
+    "editTitle": "Editar componente",
+    "referencePlaceholder": "Referencia (opcional)",
+    "urlPlaceholder": "https://…",
+    "url": "Enlace",
+    "unitPrice": "Precio unidad (€)",
+    "quantity": "Cantidad",
+    "inStock": "{count} en stock",
+    "outOfStock": "Sin stock",
+    "unitPriceValue": "{amount} cada uno",
+    "increase": "Añadir una unidad",
+    "decrease": "Quitar una unidad",
+    "openLink": "Abrir enlace",
+    "deleteTitle": "Eliminar componente",
+    "deleteMessage": "¿Eliminar \"{name}\"? No se puede deshacer.",
+    "stock": {
+      "label": "Stock",
+      "available": "Con stock",
+      "empty": "Sin stock"
+    },
+    "searchPlaceholder": "Marca, referencia, descripción o tienda",
+    "empty": "Aún no hay componentes.",
+    "emptyFiltered": "Ningún componente coincide con estos filtros.",
+    "sort": {
+      "description": "Descripción (A–Z)",
+      "brand": "Marca (A–Z)",
+      "store": "Tienda (A–Z)",
+      "price_desc": "Precio (de mayor a menor)",
+      "price_asc": "Precio (de menor a mayor)",
+      "quantity_asc": "Cantidad (de menor a mayor)",
+      "quantity_desc": "Cantidad (de mayor a menor)"
     }
   },
   "consumables": {
@@ -382,6 +421,7 @@
   "actionErrors": {
     "invalidPrice": "Precio no válido",
     "invalidQuantity": "Cantidad no válida",
+    "invalidStockQuantity": "La cantidad debe ser un número entero de 0 o más",
     "nameRequired": "El nombre es obligatorio",
     "clientHasRecords": "El cliente tiene maquetas o presupuestos y no se puede eliminar",
     "titleRequired": "El título es obligatorio",
@@ -393,6 +433,8 @@
     "invalidType": "Tipo no válido",
     "invalidPaymentStatus": "Estado de pago no válido",
     "invalidLink": "Enlace no válido",
+    "invalidId": "Identificador no válido",
+    "textTooLong": "El texto es demasiado largo",
     "invalidDuration": "La duración debe tener el formato hh:mm, hasta 24:00",
     "invalidDate": "Fecha no válida",
     "clientNotFound": "Cliente no encontrado",
@@ -426,7 +468,8 @@
       "parts": "Piezas y gastos sueltos",
       "consumables": "Consumibles",
       "modelConsumables": "Consumibles usados en maquetas",
-      "timeEntries": "Registros de tiempo"
+      "timeEntries": "Registros de tiempo",
+      "stockComponents": "Componentes del almacén"
     },
     "noteTitle": "Conviene saber",
     "noteSensitive": "Los archivos contienen los datos de tus clientes y tus precios. Guárdalos en un sitio privado.",

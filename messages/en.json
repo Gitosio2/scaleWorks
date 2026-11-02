@@ -10,7 +10,9 @@
     "models": "Models",
     "quotes": "Quotes",
     "clients": "Clients",
+    "warehouse": "Warehouse",
     "consumables": "Consumables",
+    "components": "Components",
     "expenses": "Pending expenses",
     "gallery": "Public gallery",
     "signedInAs": "Signed in as",
@@ -171,6 +173,8 @@
     "quoteAge": "{days, plural, =0 {Today} one {# day old} other {# days old}}",
     "staleTitle": "Stalled models",
     "staleHint": "Not started for over 7 months",
+    "componentsTitle": "Components in stock",
+    "componentsHint": "{count, plural, one {# unit in stock} other {# units in stock}}",
     "staleAge": "{months, plural, one {# month} other {# months}}",
     "andMore": "and {count} more",
     "activeToCollect": "Still to collect on active work",
@@ -215,6 +219,41 @@
       "oldest": "Oldest first",
       "name": "Name (A–Z)",
       "company": "Company (A–Z)"
+    }
+  },
+  "components": {
+    "subtitle": "Parts you keep in stock, with how many you have left.",
+    "add": "Add component",
+    "editTitle": "Edit component",
+    "referencePlaceholder": "Reference (optional)",
+    "urlPlaceholder": "https://…",
+    "url": "Link",
+    "unitPrice": "Unit price (€)",
+    "quantity": "Quantity",
+    "inStock": "{count} in stock",
+    "outOfStock": "Out of stock",
+    "unitPriceValue": "{amount} each",
+    "increase": "Add one unit",
+    "decrease": "Remove one unit",
+    "openLink": "Open link",
+    "deleteTitle": "Delete component",
+    "deleteMessage": "Delete \"{name}\"? This cannot be undone.",
+    "stock": {
+      "label": "Stock",
+      "available": "In stock",
+      "empty": "Out of stock"
+    },
+    "searchPlaceholder": "Brand, reference, description or store",
+    "empty": "No components yet.",
+    "emptyFiltered": "No components match these filters.",
+    "sort": {
+      "description": "Description (A–Z)",
+      "brand": "Brand (A–Z)",
+      "store": "Store (A–Z)",
+      "price_desc": "Price (high to low)",
+      "price_asc": "Price (low to high)",
+      "quantity_asc": "Quantity (low to high)",
+      "quantity_desc": "Quantity (high to low)"
     }
   },
   "consumables": {
@@ -382,6 +421,7 @@
   "actionErrors": {
     "invalidPrice": "Invalid price",
     "invalidQuantity": "Invalid quantity",
+    "invalidStockQuantity": "Quantity must be a whole number of 0 or more",
     "nameRequired": "Name is required",
     "clientHasRecords": "This client has models or quotes and cannot be deleted",
     "titleRequired": "Title is required",
@@ -393,6 +433,8 @@
     "invalidType": "Invalid type",
     "invalidPaymentStatus": "Invalid payment status",
     "invalidLink": "Invalid link",
+    "invalidId": "Invalid id",
+    "textTooLong": "Text is too long",
     "invalidDuration": "Duration must be hh:mm, up to 24:00",
     "invalidDate": "Invalid date",
     "clientNotFound": "Client not found",
@@ -426,7 +468,8 @@
       "parts": "Parts and loose purchases",
       "consumables": "Consumables",
       "modelConsumables": "Consumables used on models",
-      "timeEntries": "Time entries"
+      "timeEntries": "Time entries",
+      "stockComponents": "Warehouse components"
     },
     "noteTitle": "Good to know",
     "noteSensitive": "The files contain your clients' data and your prices. Keep them somewhere private.",
