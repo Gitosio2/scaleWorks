@@ -51,7 +51,7 @@ export async function generateMetadata({
     .where(eq(modelImages.modelId, model.id))
     .orderBy(asc(modelImages.position), asc(modelImages.createdAt))
     .limit(1);
-  const details = [model.type ? ttype(model.type) : null, model.company].filter(Boolean).join(" · ");
+  const details = [model.type ? ttype(model.type) : null, model.company].filter(Boolean).join(" Â· ");
   return shareMetadata({
     title: modelTitle(model.brand, model.name),
     description: details || t("subtitle"),
