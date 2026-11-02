@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   and,
   asc,
+  count,
   desc,
   eq,
   ilike,
@@ -37,11 +38,13 @@ import {
   uuidParam,
   type SearchParams,
 } from "@/lib/list-filters";
+import { pageWindow, parsePage } from "@/lib/pagination";
 import { requireUser } from "@/lib/session";
 import { stalledCutoff } from "@/lib/stalled";
 import { Card } from "@/components/ui/card";
 import { CreateModal } from "@/components/ui/create-modal";
 import { FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filters";
+import { Pagination } from "@/components/ui/pagination";
 import { PageHeader } from "@/components/ui/page-header";
 import { PhaseProgress } from "@/components/ui/phase-progress";
 import { PaymentBadge, PhaseBadge } from "@/components/ui/status-badge";
@@ -133,6 +136,14 @@ export default async function ModelsPage({
   const activeCount = [q, client, company, type, phase, payment, scope === "open"].filter(Boolean).length;
   const hasUserFilters = [q, client, company, type, phase, payment].some(Boolean);
 
+  // Total matches, so the requested page can be clamped to the last one.
+  const [{ total }] = await db
+    .select({ total: count() })
+    .from(models)
+    .leftJoin(clients, eq(models.clientId, clients.id))
+    .where(and(...conditions));
+  const win = pageWindow(parsePage(sp), total);
+
   const [rows, clientRows, companyRows] = await Promise.all([
     db
       .select({
@@ -153,7 +164,9 @@ export default async function ModelsPage({
       .from(models)
       .leftJoin(clients, eq(models.clientId, clients.id))
       .where(and(...conditions))
-      .orderBy(...sorts[sort].order, asc(models.id)),
+      .orderBy(...sorts[sort].order, asc(models.id))
+      .limit(win.limit)
+      .offset(win.offset),
     db
       .select({ id: clients.id, name: clients.name })
       .from(clients)
@@ -309,6 +322,8 @@ export default async function ModelsPage({
           })}
         </ul>
       </Card>
+
+      <Pagination pathname="/models" searchParams={sp} pageInfo={win} total={total} />
     </>
   );
 }
