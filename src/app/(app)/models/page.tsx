@@ -267,20 +267,6 @@ export default async function ModelsPage({
                     {m.company ? `${m.company} · ` : ""}
                     {formatEuros(m.priceCents, locale)}
                   </p>
-                  {profitCents !== null && (
-                    <p className="text-[13px] text-muted">
-                      {t("profit")}{" "}
-                      <span className={`font-semibold ${profitCents < 0 ? "text-danger" : "text-ok"}`}>
-                        {profitCents > 0 ? "+" : ""}
-                        {formatEuros(profitCents, locale)}
-                      </span>
-                      {" · "}
-                      {t("profitBreakdown", {
-                        income: formatEuros(m.priceCents, locale),
-                        cost: formatEuros(costCents, locale),
-                      })}
-                    </p>
-                  )}
                   {!done && (
                     <p className="text-[13px] text-muted">
                       {t("dates", {
@@ -303,6 +289,21 @@ export default async function ModelsPage({
                   </div>
                 </div>
               </div>
+              {/* Full width under the columns: beside the badges it ran under them on a phone. */}
+              {profitCents !== null && (
+                <p className="text-[13px] text-muted">
+                  {t("profit")}{" "}
+                  <span className={`font-semibold ${profitCents < 0 ? "text-danger" : "text-ok"}`}>
+                    {profitCents > 0 ? "+" : ""}
+                    {formatEuros(profitCents, locale)}
+                  </span>
+                  {" · "}
+                  {t("profitBreakdown", {
+                    income: formatEuros(m.priceCents, locale),
+                    cost: formatEuros(costCents, locale),
+                  })}
+                </p>
+              )}
             </li>
             );
           })}
