@@ -144,6 +144,11 @@
     "deposit_paid": "Pendiente",
     "paid": "Pagado por completo"
   },
+  "paymentHold": {
+    "hold": "Pausar: el cliente no ha pagado",
+    "resume": "Reanudar: quitar la pausa por impago",
+    "badge": "En pausa: sin pagar"
+  },
   "home": {
     "subtitle": "Gestiona tus maquetas, presupuestos, piezas y horas."
   },
@@ -327,6 +332,7 @@
       "viewPublic": "Ver página pública"
     },
     "paymentPending": "Pendiente de cobro (con precio)",
+    "paymentOnHold": "En pausa (el cliente no ha pagado)",
     "phaseActive": "En curso (empezadas, sin terminar)",
     "phaseStalled": "Paradas (sin empezar desde hace más de 7 meses)",
     "deposit": "Anticipo (€)",

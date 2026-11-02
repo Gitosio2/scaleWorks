@@ -63,6 +63,12 @@ export function PhaseBadge({ phase }: { phase: ModelPhase }) {
   return <StatusBadge variant={phaseVariant(phase)}>{t(phase)}</StatusBadge>;
 }
 
+// Shown next to the phase when the owner paused the model because it is unpaid.
+export function HoldBadge() {
+  const t = useTranslations("paymentHold");
+  return <StatusBadge variant="bad">{t("badge")}</StatusBadge>;
+}
+
 export function paymentVariant(status: PaymentStatus): BadgeVariant {
   return status === "paid" ? "ok" : status === "deposit_paid" ? "warn" : "mute";
 }

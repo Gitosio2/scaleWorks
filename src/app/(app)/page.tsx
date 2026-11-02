@@ -147,6 +147,8 @@ export default async function Home() {
           eq(models.userId, user.id),
           eq(models.phase, "not_started"),
           lt(models.createdAt, staleCutoff),
+          // Paused on purpose because the client has not paid: not forgotten.
+          isNull(models.paymentHoldAt),
         ),
       )
       .orderBy(asc(models.createdAt), asc(models.id)),

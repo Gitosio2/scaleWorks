@@ -39,6 +39,7 @@ import {
   type SearchParams,
 } from "@/lib/list-filters";
 import { pageWindow, parsePage } from "@/lib/pagination";
+import { canHold } from "@/lib/payment-hold";
 import { requireUser } from "@/lib/session";
 import { stalledCutoff } from "@/lib/stalled";
 import { Card } from "@/components/ui/card";
@@ -47,12 +48,12 @@ import { FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filt
 import { Pagination } from "@/components/ui/pagination";
 import { PageHeader } from "@/components/ui/page-header";
 import { PhaseProgress } from "@/components/ui/phase-progress";
-import { PaymentBadge, PhaseBadge } from "@/components/ui/status-badge";
-import { DeleteIconButton, EditIconLink } from "@/components/ui/icon-actions";
+import { HoldBadge, PaymentBadge, PhaseBadge } from "@/components/ui/status-badge";
+import { DeleteIconButton, EditIconLink, HoldIconButton } from "@/components/ui/icon-actions";
 import {
   listItemClass,
 } from "@/components/ui/styles";
-import { createModel, deleteModel } from "./actions";
+import { createModel, deleteModel, setPaymentHold } from "./actions";
 import { ModelFields } from "./model-fields";
 
 // "brand name" as shown on screen, for searching and sorting by what the user sees.
@@ -75,8 +76,9 @@ const sortKeys = Object.keys(sorts) as SortKey[];
 const phaseFilters = [...modelPhase.enumValues, "active", "stalled"] as const;
 
 // Payment filter: a payment status, or "pending" = still owed (not paid, with a
-// price), which is what the dashboard's pending-payment card counts.
-const paymentFilters = [...paymentStatus.enumValues, "pending"] as const;
+// price), which is what the dashboard's pending-payment card counts, or "on_hold"
+// = paused by hand because the client has not paid.
+const paymentFilters = [...paymentStatus.enumValues, "pending", "on_hold"] as const;
 
 // "open" (the default) hides models that are both finished and paid in full.
 const scopes = ["open", "all"] as const;
@@ -94,6 +96,7 @@ export default async function ModelsPage({
   const tp = await getTranslations("phase");
   const tpay = await getTranslations("paymentStatus");
   const ttype = await getTranslations("modelType");
+  const th = await getTranslations("paymentHold");
   const locale = await getLocale();
 
   const q = textParam(sp, "q");
@@ -120,15 +123,21 @@ export default async function ModelsPage({
     phase === "active"
       ? notInArray(models.phase, ["not_started", "finished"])
       : phase === "stalled"
-        ? and(eq(models.phase, "not_started"), lt(models.createdAt, stalledCutoff(new Date())))
+        ? and(
+            eq(models.phase, "not_started"),
+            lt(models.createdAt, stalledCutoff(new Date())),
+            isNull(models.paymentHoldAt),
+          )
         : phase
           ? eq(models.phase, phase)
           : undefined,
     payment === "pending"
       ? and(ne(models.paymentStatus, "paid"), isNotNull(models.priceCents))
-      : payment
-        ? eq(models.paymentStatus, payment)
-        : undefined,
+      : payment === "on_hold"
+        ? isNotNull(models.paymentHoldAt)
+        : payment
+          ? eq(models.paymentStatus, payment)
+          : undefined,
     scope === "open"
       ? or(ne(models.phase, "finished"), ne(models.paymentStatus, "paid"))
       : undefined,
@@ -234,6 +243,7 @@ export default async function ModelsPage({
           options={[
             ...paymentStatus.enumValues.map((p) => ({ value: p as string, label: tpay(p) })),
             { value: "pending", label: t("paymentPending") },
+            { value: "on_hold", label: t("paymentOnHold") },
           ]}
         />
         <FilterSelect
@@ -265,6 +275,7 @@ export default async function ModelsPage({
               <div className="flex flex-wrap items-center gap-2">
                 <PhaseBadge phase={m.phase} />
                 <PaymentBadge status={m.paymentStatus} priceCents={m.priceCents} depositCents={m.depositCents} />
+                {m.paymentHoldAt && <HoldBadge />}
               </div>
             );
             return (
@@ -291,6 +302,14 @@ export default async function ModelsPage({
                 </div>
                 <div className="-mt-1 flex min-w-0 flex-col items-end gap-1">
                   <div className="flex shrink-0 items-center">
+                    {(m.paymentHoldAt || canHold(m.paymentStatus)) && (
+                      <form action={setPaymentHold.bind(null, m.id, !m.paymentHoldAt)}>
+                        <HoldIconButton
+                          held={!!m.paymentHoldAt}
+                          label={m.paymentHoldAt ? th("resume") : th("hold")}
+                        />
+                      </form>
+                    )}
                     <EditIconLink href={`/models/${m.id}/edit`} label={tc("edit")} />
                     <form action={deleteModel.bind(null, m.id)}>
                       <DeleteIconButton label={tc("delete")} />
