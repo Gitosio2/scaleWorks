@@ -34,6 +34,7 @@ import { addPart, deletePart, updatePart, updatePartStatus } from "./part-action
 import { setPartPaid } from "../../expenses/actions";
 import { setPaymentHold } from "../actions";
 import { profitability } from "@/lib/profitability";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Card, CardTitle, CollapsibleCard } from "@/components/ui/card";
 import { BackLink, PageHeader } from "@/components/ui/page-header";
 import { PhaseProgress } from "@/components/ui/phase-progress";
@@ -267,9 +268,7 @@ export default async function ModelDetailPage({
               className={`${inputClass} w-28`}
             />
           </label>
-          <button type="submit" className={primaryButtonClass}>
-            {tc("add")}
-          </button>
+          <SubmitButton className={primaryButtonClass}>{tc("add")}</SubmitButton>
         </form>
 
         <ul className="flex flex-col">
@@ -326,9 +325,7 @@ export default async function ModelDetailPage({
               ))}
             </select>
             <QuantityFields />
-            <button type="submit" className={primaryButtonClass}>
-              {tc("add")}
-            </button>
+            <SubmitButton className={primaryButtonClass}>{tc("add")}</SubmitButton>
           </form>
         )}
 
@@ -393,9 +390,7 @@ export default async function ModelDetailPage({
             placeholder={t("notes.placeholder")}
             className={`${inputClass} py-2`}
           />
-          <button type="submit" className={`${primaryButtonClass} self-start`}>
-            {tc("save")}
-          </button>
+          <SubmitButton className={`${primaryButtonClass} self-start`}>{tc("save")}</SubmitButton>
         </form>
       </CollapsibleCard>
     </>

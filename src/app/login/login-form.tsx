@@ -7,6 +7,7 @@ import { authClient } from "@/lib/auth-client";
 import { SITE_INITIAL, SITE_NAME } from "@/lib/site";
 import { Card } from "@/components/ui/card";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { Spinner } from "@/components/ui/spinner";
 import {
   cx,
   inputClass,
@@ -105,8 +106,10 @@ export function LoginForm({ signupEnabled }: { signupEnabled: boolean }) {
           <button
             type="submit"
             disabled={pending}
-            className={cx(primaryButtonClass, "w-full")}
+            aria-busy={pending}
+            className={cx(primaryButtonClass, "w-full gap-2", pending && "cursor-wait")}
           >
+            {pending && <Spinner />}
             {mode === "signin" ? t("signIn") : t("signUp")}
           </button>
           {signupEnabled && (

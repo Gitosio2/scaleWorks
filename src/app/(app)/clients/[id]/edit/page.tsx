@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { clients } from "@/db/schema";
 import { requireUser } from "@/lib/session";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Card } from "@/components/ui/card";
 import { BackLink, PageHeader } from "@/components/ui/page-header";
 import { primaryButtonClass } from "@/components/ui/styles";
@@ -32,9 +33,7 @@ export default async function EditClientPage({
       <Card>
         <form action={updateClient.bind(null, id)} className="flex flex-col gap-3">
           <ClientFields defaults={client} />
-          <button type="submit" className={`${primaryButtonClass} self-start`}>
-            {tc("save")}
-          </button>
+          <SubmitButton className={`${primaryButtonClass} self-start`}>{tc("save")}</SubmitButton>
         </form>
       </Card>
     </>

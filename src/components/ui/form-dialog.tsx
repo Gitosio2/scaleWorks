@@ -3,7 +3,8 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { useTranslations } from "next-intl";
-import { dangerButtonClass, primaryButtonClass, secondaryButtonClass } from "./styles";
+import { Spinner } from "./spinner";
+import { cx, dangerButtonClass, primaryButtonClass, secondaryButtonClass } from "./styles";
 
 function SubmitButton({
   children,
@@ -18,8 +19,10 @@ function SubmitButton({
     <button
       type="submit"
       disabled={pending}
-      className={destructive ? dangerButtonClass : primaryButtonClass}
+      aria-busy={pending}
+      className={cx(destructive ? dangerButtonClass : primaryButtonClass, "gap-2", pending && "cursor-wait")}
     >
+      {pending && <Spinner />}
       {pending ? t("saving") : children}
     </button>
   );

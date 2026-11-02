@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { modelImages } from "@/db/schema";
 import { storageConfigured } from "@/lib/storage";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { CollapsibleCard } from "@/components/ui/card";
 import { ConfirmDelete } from "@/components/ui/confirm-delete";
 import { Photo } from "@/components/ui/photo";
@@ -55,9 +56,9 @@ export async function PhotosSection({
                   <StatusBadge variant="info">{t("cover")}</StatusBadge>
                 ) : (
                   <form action={setCoverImage.bind(null, modelId, image.id)}>
-                    <button type="submit" className={`${linkActionClass} min-h-9 text-[13px]`}>
+                    <SubmitButton className={`${linkActionClass} min-h-9 text-[13px]`}>
                       {t("makeCover")}
-                    </button>
+                    </SubmitButton>
                   </form>
                 )}
                 <ConfirmDelete
@@ -80,9 +81,9 @@ export async function PhotosSection({
             {published ? t("publicOn") : t("publicOff")}
           </StatusBadge>
           <form action={setModelPublished.bind(null, modelId, !published)}>
-            <button type="submit" className={`${secondaryButtonClass} min-h-9 text-sm`}>
+            <SubmitButton className={`${secondaryButtonClass} min-h-9 text-sm`}>
               {published ? t("unpublish") : t("publish")}
-            </button>
+            </SubmitButton>
           </form>
           {published && finished && (
             <Link href={`/portfolio/${modelId}`} className={`${linkActionClass} text-sm`}>

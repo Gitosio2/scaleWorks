@@ -6,6 +6,7 @@ import { db } from "@/db";
 import { clients, parts, quotes } from "@/db/schema";
 import { formatEuros } from "@/lib/labels";
 import { requireUser } from "@/lib/session";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { BackLink, PageHeader } from "@/components/ui/page-header";
 import { StatusBadge, quoteStatusVariant } from "@/components/ui/status-badge";
 import { primaryButtonClass, secondaryButtonClass } from "@/components/ui/styles";
@@ -62,9 +63,7 @@ export default async function QuoteDetailPage({
               {t("editQuote")}
             </Link>
             <form action={convertQuoteToModel.bind(null, id)}>
-              <button type="submit" className={primaryButtonClass}>
-                {t("acceptConvert")}
-              </button>
+              <SubmitButton className={primaryButtonClass}>{t("acceptConvert")}</SubmitButton>
             </form>
           </div>
         }
