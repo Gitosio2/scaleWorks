@@ -18,6 +18,8 @@ import {
   formatQuantity,
   remainingCents,
 } from "@/lib/labels";
+import { consumableCost } from "@/lib/consumable-cost";
+import { todayInMadrid } from "@/lib/dates";
 import { modelTitle } from "@/lib/model-title";
 import { requireUser } from "@/lib/session";
 import { addTimeEntry, deleteTimeEntry, updateModelNotes } from "./actions";
@@ -100,21 +102,12 @@ export default async function ModelDetailPage({
       .where(and(eq(consumables.userId, user.id), eq(consumables.active, true)))
       .orderBy(consumables.description),
   ]);
-  // Cost of a consumable on this model = unit price x fraction used. The product is
-  // trimmed to 9 decimals before rounding so a float artefact (25 x 0.58 = 14.4999...)
-  // rounds like the exact decimal the models list computes in SQL (14.5 -> 15).
-  const consumableCost = (priceCents: number | null, quantity: string | null) =>
-    priceCents !== null && quantity !== null
-      ? Math.round(Number((priceCents * Number(quantity)).toFixed(9)))
-      : null;
   const consumablesTotalCents = linkedRows.reduce(
     (acc, r) => acc + (consumableCost(r.consumable.priceCents, r.quantity) ?? 0),
     0,
   );
 
-  const today = new Date().toLocaleDateString("sv-SE", {
-    timeZone: "Europe/Madrid",
-  });
+  const today = todayInMadrid();
   const done = m.phase === "finished" && m.paymentStatus === "paid";
   const badges = (
     <div className="flex flex-wrap items-center justify-end gap-2">
