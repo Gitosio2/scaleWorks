@@ -54,8 +54,23 @@ describe("restoreFilters", () => {
     expect(restoreFilters(req)).toBeNull();
   });
 
+  it("does not restore a cookie that holds only a page", () => {
+    const req = request("/models", { cookie: "filters_models=page%3D4" });
+    expect(restoreFilters(req)).toBeNull();
+  });
+
   it("treats the Next RSC param as no filter", () => {
     const req = request("/models?_rsc=abc", { cookie: "filters_models=q%3Dfiat" });
+    expect(location(restoreFilters(req))?.search).toBe("?q=fiat");
+  });
+
+  it("does not bring a page back from the cookie", () => {
+    const req = request("/models", { cookie: "filters_models=q%3Dfiat%26page%3D4" });
+    expect(location(restoreFilters(req))?.search).toBe("?q=fiat");
+  });
+
+  it("restores the saved filters when only a page is requested", () => {
+    const req = request("/models?page=2", { cookie: "filters_models=q%3Dfiat" });
     expect(location(restoreFilters(req))?.search).toBe("?q=fiat");
   });
 
@@ -87,6 +102,11 @@ describe("saveFilters", () => {
   it("does not store the RSC param", () => {
     expect(save(request("/models?_rsc=abc&q=fiat"))?.value).toBe("q=fiat");
     expect(save(request("/models?_rsc=abc"))).toBeUndefined();
+  });
+
+  it("does not store the page", () => {
+    expect(save(request("/models?q=fiat&page=3"))?.value).toBe("q=fiat");
+    expect(save(request("/models?page=3"))).toBeUndefined();
   });
 
   it("does not store an empty query", () => {

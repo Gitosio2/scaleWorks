@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { RESET_PARAM } from "./filter-reset";
+import { PAGE_PARAM } from "./pagination";
 
 // The list pages keep their filters in the URL. These helpers (run from the
 // proxy) also remember them in a cookie, so opening the list again without
@@ -9,17 +10,22 @@ const FILTER_PAGES = ["/models", "/clients", "/quotes", "/expenses", "/consumabl
 const MAX_LENGTH = 500;
 const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
 
-// Next adds this to its own navigation requests; it is not a filter. (It is
-// normally hidden from the proxy already; this is a safeguard.)
+// Next adds _rsc to its own navigation requests; it is not a filter. (It is
+// normally hidden from the proxy already; this is a safeguard.) "page" is the
+// pagination position: it is not saved, so a stale page is never restored.
 const FRAMEWORK_PARAMS = ["_rsc"];
+const NON_FILTER_PARAMS = [...FRAMEWORK_PARAMS, PAGE_PARAM];
 
 const filtersCookieName = (pathname: string) => `filters_${pathname.slice(1)}`;
 
-function filterParams(request: NextRequest) {
-  const params = new URLSearchParams(request.nextUrl.search);
-  for (const key of FRAMEWORK_PARAMS) params.delete(key);
+// Parses a query string and drops the params that are not filters.
+function filtersOnly(query: string) {
+  const params = new URLSearchParams(query);
+  for (const key of NON_FILTER_PARAMS) params.delete(key);
   return params;
 }
+
+const filterParams = (request: NextRequest) => filtersOnly(request.nextUrl.search);
 
 function isListNavigation(request: NextRequest) {
   // Server actions are POSTs to the page URL; they must reach the page untouched.
@@ -46,7 +52,8 @@ export function restoreFilters(request: NextRequest) {
   const saved = request.cookies.get(name)?.value;
   if (!saved || saved.length > MAX_LENGTH) return null;
   // Re-serialised, so only well-formed key=value pairs can come back out.
-  const query = new URLSearchParams(saved).toString();
+  // A page saved by an older cookie is dropped too.
+  const query = filtersOnly(saved).toString();
   if (!query) return null;
   const url = request.nextUrl.clone();
   url.search = `?${query}`;

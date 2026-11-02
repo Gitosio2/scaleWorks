@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { and, asc, desc, eq, ilike, isNull, ne, or, sql, type SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, isNull, ne, or, sql, type SQL } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { models, parts } from "@/db/schema";
 import { formatEuros } from "@/lib/labels";
 import { modelTitle } from "@/lib/model-title";
 import { containsPattern, descNullsLast, enumParam, textParam, type SearchParams } from "@/lib/list-filters";
+import { pageWindow, parsePage } from "@/lib/pagination";
 import { requireUser } from "@/lib/session";
 import { Card } from "@/components/ui/card";
 import { ConfirmDelete } from "@/components/ui/confirm-delete";
@@ -14,6 +15,7 @@ import { EditModal } from "@/components/ui/edit-modal";
 import { PaidCheckButton } from "@/components/ui/icon-actions";
 import { FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filters";
 import { PageHeader } from "@/components/ui/page-header";
+import { Pagination } from "@/components/ui/pagination";
 import { StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
 import { listItemClass } from "@/components/ui/styles";
 import { createLoosePart, deleteLoosePart, setPartPaid, updateLoosePart } from "./actions";
@@ -68,13 +70,23 @@ export default async function ExpensesPage({
   ];
   const activeCount = [q, status !== "pending"].filter(Boolean).length;
 
+  // Total matches, so the requested page can be clamped to the last one.
+  const [{ total }] = await db
+    .select({ total: count() })
+    .from(parts)
+    .leftJoin(models, eq(models.id, parts.modelId))
+    .where(and(...conditions));
+  const win = pageWindow(parsePage(sp), total);
+
   const [rows, [owed]] = await Promise.all([
     db
       .select({ part: parts, modelId: models.id, modelBrand: models.brand, modelName: models.name })
       .from(parts)
       .leftJoin(models, eq(models.id, parts.modelId))
       .where(and(...conditions))
-      .orderBy(...sorts[sort].order, desc(parts.priceCents), asc(parts.id)),
+      .orderBy(...sorts[sort].order, desc(parts.priceCents), asc(parts.id))
+      .limit(win.limit)
+      .offset(win.offset),
     // What is still owed across every unpaid bought part, whatever the list is filtered by.
     db
       .select({
@@ -168,6 +180,8 @@ export default async function ExpensesPage({
           ))}
         </ul>
       </Card>
+
+      <Pagination pathname="/expenses" searchParams={sp} pageInfo={win} total={total} />
     </>
   );
 }

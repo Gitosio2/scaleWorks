@@ -1,4 +1,4 @@
-import { and, asc, eq, gt, ilike, isNotNull, or, type SQL } from "drizzle-orm";
+import { and, asc, count, eq, gt, ilike, isNotNull, or, type SQL } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { stockComponents } from "@/db/schema";
@@ -11,6 +11,7 @@ import {
   textParam,
   type SearchParams,
 } from "@/lib/list-filters";
+import { pageWindow, parsePage } from "@/lib/pagination";
 import { requireUser } from "@/lib/session";
 import { Card } from "@/components/ui/card";
 import { ConfirmDelete } from "@/components/ui/confirm-delete";
@@ -18,6 +19,7 @@ import { CreateModal } from "@/components/ui/create-modal";
 import { EditModal } from "@/components/ui/edit-modal";
 import { FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filters";
 import { PageHeader } from "@/components/ui/page-header";
+import { Pagination } from "@/components/ui/pagination";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { listItemClass } from "@/components/ui/styles";
 import {
@@ -78,12 +80,18 @@ export default async function ComponentsPage({
   ];
   const activeCount = [q, store, brand, stock].filter(Boolean).length;
 
+  // Total matches, so the requested page can be clamped to the last one.
+  const [{ total }] = await db.select({ total: count() }).from(c).where(and(...conditions));
+  const win = pageWindow(parsePage(sp), total);
+
   const [rows, storeRows, brandRows] = await Promise.all([
     db
       .select()
       .from(c)
       .where(and(...conditions))
-      .orderBy(...sorts[sort].order, asc(c.id)),
+      .orderBy(...sorts[sort].order, asc(c.id))
+      .limit(win.limit)
+      .offset(win.offset),
     db
       .selectDistinct({ store: c.store })
       .from(c)
@@ -187,6 +195,8 @@ export default async function ComponentsPage({
           ))}
         </ul>
       </Card>
+
+      <Pagination pathname="/components" searchParams={sp} pageInfo={win} total={total} />
     </>
   );
 }

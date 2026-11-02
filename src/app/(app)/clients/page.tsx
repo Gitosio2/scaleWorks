@@ -1,6 +1,7 @@
 import {
   and,
   asc,
+  count,
   desc,
   eq,
   getTableColumns,
@@ -23,11 +24,13 @@ import {
   textParam,
   type SearchParams,
 } from "@/lib/list-filters";
+import { pageWindow, parsePage } from "@/lib/pagination";
 import { requireUser } from "@/lib/session";
 import { Card } from "@/components/ui/card";
 import { CreateModal } from "@/components/ui/create-modal";
 import { FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filters";
 import { PageHeader } from "@/components/ui/page-header";
+import { Pagination } from "@/components/ui/pagination";
 import { ConfirmDelete } from "@/components/ui/confirm-delete";
 import { EditIconLink } from "@/components/ui/icon-actions";
 import { PhaseBadge, StatusBadge } from "@/components/ui/status-badge";
@@ -75,6 +78,10 @@ export default async function ClientsPage({
   ];
   const activeCount = [q, company].filter(Boolean).length;
 
+  // Total matches, so the requested page can be clamped to the last one.
+  const [{ total }] = await db.select({ total: count() }).from(clients).where(and(...conditions));
+  const win = pageWindow(parsePage(sp), total);
+
   const [rows, companyRows] = await Promise.all([
     db
       .select({
@@ -100,7 +107,9 @@ export default async function ClientsPage({
       })
       .from(clients)
       .where(and(...conditions))
-      .orderBy(...sorts[sort].order, asc(clients.id)),
+      .orderBy(...sorts[sort].order, asc(clients.id))
+      .limit(win.limit)
+      .offset(win.offset),
     db
       .selectDistinct({ company: clients.company })
       .from(clients)
@@ -212,6 +221,8 @@ export default async function ClientsPage({
           ))}
         </ul>
       </Card>
+
+      <Pagination pathname="/clients" searchParams={sp} pageInfo={win} total={total} />
     </>
   );
 }

@@ -54,7 +54,12 @@
     "name": "Name",
     "price": "Price (€)",
     "moneyPlaceholder": "0.00",
-    "noValue": "—"
+    "noValue": "—",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {totalPages}",
+    "showing": "Showing {from}–{to} of {total}",
+    "pagination": "Pagination"
   },
   "login": {
     "signIn": "Sign in",

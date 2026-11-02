@@ -1,4 +1,4 @@
-import { and, asc, eq, ilike, isNotNull, or, type SQL } from "drizzle-orm";
+import { and, asc, count, eq, ilike, isNotNull, or, type SQL } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { consumableCategory, consumables, supplyStatus } from "@/db/schema";
@@ -11,11 +11,13 @@ import {
   textParam,
   type SearchParams,
 } from "@/lib/list-filters";
+import { pageWindow, parsePage } from "@/lib/pagination";
 import { requireUser } from "@/lib/session";
 import { Card } from "@/components/ui/card";
 import { CreateModal } from "@/components/ui/create-modal";
 import { FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filters";
 import { PageHeader } from "@/components/ui/page-header";
+import { Pagination } from "@/components/ui/pagination";
 import { StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
 import { SegmentedToggle } from "@/components/ui/segmented-toggle";
 import { DeleteIconButton } from "@/components/ui/icon-actions";
@@ -92,12 +94,18 @@ export default async function ConsumablesPage({
   ];
   const activeCount = [q, store, status, category, activity !== "active"].filter(Boolean).length;
 
+  // Total matches, so the requested page can be clamped to the last one.
+  const [{ total }] = await db.select({ total: count() }).from(consumables).where(and(...conditions));
+  const win = pageWindow(parsePage(sp), total);
+
   const [rows, storeRows] = await Promise.all([
     db
       .select()
       .from(consumables)
       .where(and(...conditions))
-      .orderBy(...sorts[sort].order, asc(consumables.id)),
+      .orderBy(...sorts[sort].order, asc(consumables.id))
+      .limit(win.limit)
+      .offset(win.offset),
     db
       .selectDistinct({ store: consumables.store })
       .from(consumables)
@@ -205,6 +213,8 @@ export default async function ConsumablesPage({
           ))}
         </ul>
       </Card>
+
+      <Pagination pathname="/consumables" searchParams={sp} pageInfo={win} total={total} />
     </>
   );
 }
