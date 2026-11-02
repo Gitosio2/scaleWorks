@@ -37,6 +37,7 @@ export default async function PortfolioLayout({ children }: { children: React.Re
   return (
     <div className="flex flex-1 flex-col md:flex-row">
       <SidebarShell
+        wide
         brand={
           <Link href="/portfolio" aria-label={tp("title")}>
             <Brand />

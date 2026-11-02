@@ -9,7 +9,7 @@ type NavModel = { id: string; name: string; company: string | null };
 export function PortfolioNav({ models, label }: { models: NavModel[]; label: string }) {
   const pathname = usePathname();
   return (
-    <nav aria-label={label} className="flex flex-wrap gap-1 md:flex-col">
+    <nav aria-label={label} className="flex flex-wrap gap-1 md:flex-col md:flex-nowrap">
       {models.map((m) => {
         const href = `/portfolio/${m.id}`;
         const active = pathname === href;
