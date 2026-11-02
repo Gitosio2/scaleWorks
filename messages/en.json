@@ -4,6 +4,8 @@
   },
   "nav": {
     "main": "Main",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
     "home": "Home",
     "models": "Models",
     "quotes": "Quotes",
