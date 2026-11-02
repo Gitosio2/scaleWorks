@@ -19,9 +19,12 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
+// Brand, model and company on one line, like the card caption.
+const label = (m: { brand: string | null; name: string; company: string | null }) =>
+  [modelTitle(m.brand, m.name), m.company].filter(Boolean).join(" · ");
+
 export default async function PortfolioPage() {
   const t = await getTranslations("portfolio");
-  const ttype = await getTranslations("modelType");
   const rows = await getPublicModels();
 
   return (
@@ -68,12 +71,9 @@ export default async function PortfolioPage() {
                     />
                   )}
                 </div>
-                <span className="font-bold group-hover:text-brand">{modelTitle(m.brand, m.name)}</span>
-                {(m.type || m.company) && (
-                  <span className="-mt-1.5 text-[13px] text-muted">
-                    {[m.type ? ttype(m.type) : null, m.company].filter(Boolean).join(" · ")}
-                  </span>
-                )}
+                <span title={label(m)} className="truncate px-3 text-sm font-bold group-hover:text-brand">
+                  {label(m)}
+                </span>
               </Link>
             </li>
           ))}
