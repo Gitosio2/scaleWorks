@@ -33,15 +33,14 @@ export function SidebarShell({
       }}
       className="sticky top-0 z-30 flex shrink-0 flex-col border-b border-line bg-sidebar p-4 md:h-dvh md:w-[232px] md:gap-6 md:self-start md:overflow-y-auto md:border-r md:border-b-0 md:py-6"
     >
-      <div className="flex items-center justify-between gap-3">
-        {brand}
+      <div className="flex items-center gap-3">
         <button
           type="button"
           onClick={() => setOpenOn(open ? null : pathname)}
           aria-expanded={open}
           aria-controls="site-menu"
           aria-label={open ? t("closeMenu") : t("openMenu")}
-          className="-my-1 -mr-2 flex size-11 cursor-pointer items-center justify-center rounded-[10px] text-ink hover:bg-line md:hidden"
+          className="-my-1 -ml-2 flex size-11 cursor-pointer items-center justify-center rounded-[10px] text-ink hover:bg-line md:hidden"
         >
           <svg
             aria-hidden
@@ -56,6 +55,7 @@ export function SidebarShell({
             {open ? <path d="M6 6l12 12M18 6 6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
           </svg>
         </button>
+        {brand}
       </div>
       {/* A dropdown below the bar on a phone; from md on `contents` makes the items part of the sidebar itself. */}
       <div
