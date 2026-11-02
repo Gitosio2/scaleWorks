@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { contactHref, siteOrigin } from "./share";
+import { siteOrigin, socialLinks } from "./share";
 
 describe("siteOrigin", () => {
   it("prefers the configured URL and keeps only its origin", () => {
@@ -28,24 +28,32 @@ describe("siteOrigin", () => {
   });
 });
 
-describe("contactHref", () => {
-  it("builds a mailto link from an email", () => {
-    expect(contactHref("me@example.com")).toBe("mailto:me@example.com");
+describe("socialLinks", () => {
+  it("returns the configured links in a fixed order", () => {
+    expect(
+      socialLinks({
+        facebook: "https://facebook.com/marcos",
+        tiktok: "https://www.tiktok.com/@marcos",
+      }),
+    ).toEqual([
+      { key: "tiktok", href: "https://www.tiktok.com/@marcos" },
+      { key: "facebook", href: "https://facebook.com/marcos" },
+    ]);
   });
 
-  it("builds a WhatsApp link from a phone number", () => {
-    expect(contactHref("+34 600 123 456")).toBe("https://wa.me/34600123456");
+  it("trims values and skips empty ones", () => {
+    expect(socialLinks({ instagram: "  https://instagram.com/marcos  ", tiktok: " ", facebook: undefined })).toEqual([
+      { key: "instagram", href: "https://instagram.com/marcos" },
+    ]);
   });
 
-  it("keeps http(s) URLs", () => {
-    expect(contactHref("https://wa.me/34600123456")).toBe("https://wa.me/34600123456");
-  });
-
-  it("hides the button for empty or unsupported values", () => {
-    expect(contactHref(undefined)).toBeNull();
-    expect(contactHref("  ")).toBeNull();
-    expect(contactHref("javascript:alert(1)")).toBeNull();
-    expect(contactHref("12345")).toBeNull();
-    expect(contactHref("just words")).toBeNull();
+  it("rejects anything that is not an https URL", () => {
+    expect(
+      socialLinks({
+        tiktok: "javascript:alert(1)",
+        instagram: "http://instagram.com/marcos",
+        facebook: "facebook.com/marcos",
+      }),
+    ).toEqual([]);
   });
 });

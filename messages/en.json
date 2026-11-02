@@ -147,9 +147,8 @@
     "back": "← All models",
     "noPhotos": "No photos yet.",
     "alt": "Photo {n} of {name}",
-    "contactTitle": "Get in touch",
-    "contactText": "Want to commission a model or have a question? Send me a message.",
-    "contactButton": "Contact me"
+    "followTitle": "Follow me",
+    "followText": "See more work and updates on my social media."
   },
   "dashboard": {
     "activeTitle": "Active work",

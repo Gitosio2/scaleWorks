@@ -147,9 +147,8 @@
     "back": "← Todas las maquetas",
     "noPhotos": "Aún no hay fotos.",
     "alt": "Foto {n} de {name}",
-    "contactTitle": "Contacto",
-    "contactText": "¿Quieres encargar una maqueta o tienes alguna pregunta? Escríbeme.",
-    "contactButton": "Contactar"
+    "followTitle": "Sígueme",
+    "followText": "Mira más trabajos y novedades en mis redes."
   },
   "dashboard": {
     "activeTitle": "Trabajos en activo",

@@ -33,27 +33,28 @@ export function siteOrigin(input: {
   }
 }
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export type SocialKey = "tiktok" | "instagram" | "facebook";
+
+export type SocialLink = { key: SocialKey; href: string };
+
+const SOCIAL_KEYS: SocialKey[] = ["tiktok", "instagram", "facebook"];
 
 /**
- * Turns the PORTFOLIO_CONTACT setting into a link: an email becomes a mailto:,
- * a phone number a wa.me (WhatsApp) link, and an http(s) URL is used as is.
- * Anything else returns null, which hides the button.
+ * Picks the configured social profile links, in a fixed order. Only https URLs
+ * are accepted; empty or invalid values are skipped, so a typo hides the link
+ * instead of rendering a broken or unsafe one.
  */
-export function contactHref(raw: string | null | undefined): string | null {
-  const value = raw?.trim();
-  if (!value) return null;
-  if (/^https?:\/\//i.test(value)) {
+export function socialLinks(values: Partial<Record<SocialKey, string | null | undefined>>): SocialLink[] {
+  const links: SocialLink[] = [];
+  for (const key of SOCIAL_KEYS) {
+    const raw = values[key]?.trim();
+    if (!raw) continue;
     try {
-      return new URL(value).href;
+      const url = new URL(raw);
+      if (url.protocol === "https:") links.push({ key, href: url.href });
     } catch {
-      return null;
+      // Invalid URL: leave this link out.
     }
   }
-  if (EMAIL_PATTERN.test(value)) return `mailto:${value}`;
-  if (/^\+?[\d\s().-]+$/.test(value)) {
-    const digits = value.replace(/\D/g, "");
-    if (digits.length >= 7 && digits.length <= 15) return `https://wa.me/${digits}`;
-  }
-  return null;
+  return links;
 }
