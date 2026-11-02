@@ -92,3 +92,9 @@ Planned once the project is scaffolded: prerequisites, install, environment vari
 2. Quotes and quote-to-model conversion, with links to similar past models.
 3. Purchase overview: everything still `To order` across models.
 4. Polish for mobile (PWA install, quick hour logging).
+
+## Account recovery and sign-up
+
+- **Lost password**: run `npx tsx scripts/reset-password.ts <email>` from the project root. It reads `DATABASE_URL` from `.env.local`, asks for the new password (hidden) and signs the user out everywhere.
+- **Close public sign-up**: set `DISABLE_SIGNUP=true` in the environment. The sign-up endpoint is rejected and the login page hides the "Create one" link. It is off by default.
+- **Login rate limit**: at most 5 sign-in attempts per minute per client. Counters are kept in memory, so on serverless hosting each instance counts separately.
