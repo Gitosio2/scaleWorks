@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -108,17 +108,23 @@ export async function setPaymentHold(id: string, hold: boolean) {
     .from(models)
     .where(and(eq(models.id, id), eq(models.userId, user.id)));
   if (!current) return;
+  const paymentHoldAt = nextHold({
+    current: current.paymentHoldAt,
+    requested: hold,
+    status: current.paymentStatus,
+    now: new Date(),
+  });
   await db
     .update(models)
-    .set({
-      paymentHoldAt: nextHold({
-        current: current.paymentHoldAt,
-        requested: hold,
-        status: current.paymentStatus,
-        now: new Date(),
-      }),
-    })
-    .where(and(eq(models.id, id), eq(models.userId, user.id)));
+    .set({ paymentHoldAt })
+    .where(
+      and(
+        eq(models.id, id),
+        eq(models.userId, user.id),
+        // Setting a hold must not race a payment saved in between: only still-unpaid models.
+        paymentHoldAt ? ne(models.paymentStatus, "paid") : undefined,
+      ),
+    );
   revalidatePath("/models");
   revalidatePath(`/models/${id}`);
   revalidatePath("/");
