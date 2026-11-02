@@ -81,7 +81,6 @@ export default async function PortfolioLayout({ children }: { children: React.Re
           {socials.length > 0 && (
             <section className={cx(cardClass, "items-start")}>
               <h2 className="text-lg font-bold">{tp("followTitle")}</h2>
-              <p className="font-bold">{tp("followText")}</p>
               <ul className="flex flex-wrap gap-3">
                 {socials.map(({ key, href }) => (
                   <li key={key}>
