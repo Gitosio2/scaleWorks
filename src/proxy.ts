@@ -36,7 +36,9 @@ export function proxy(request: NextRequest) {
   // re-checked on the server wherever data is read or written.
   // Reachable without a session: the login page, the public gallery, the
   // photo route (which decides per image whether it may be seen) and the site
-  // icons (browsers and link-preview crawlers fetch them anonymously).
+  // icons (browsers and link-preview crawlers fetch them anonymously). Anything
+  // else sends a visitor without a session to the public gallery; the owner
+  // signs in from /login.
   const { pathname } = request.nextUrl;
   const isOpen =
     pathname === "/login" ||
@@ -48,7 +50,7 @@ export function proxy(request: NextRequest) {
     pathname === "/manifest.webmanifest" ||
     pathname.startsWith("/pwa-icon/");
   if (!isOpen && !getSessionCookie(request)) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(new URL("/portfolio", request.url));
   }
 
   const restored = restoreFilters(request);
