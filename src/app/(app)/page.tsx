@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { consumables, models, parts, quotes } from "@/db/schema";
 import { formatDate, formatEuros } from "@/lib/labels";
 import { modelTitle } from "@/lib/model-title";
+import { todayInMadrid } from "@/lib/dates";
 import { stalledCutoff } from "@/lib/stalled";
 import { requireUser } from "@/lib/session";
 import { Card, CardTitle } from "@/components/ui/card";
@@ -67,8 +68,7 @@ export default async function Home() {
   const locale = await getLocale();
 
   const now = new Date();
-  // Calendar "today" in the app's time zone, as YYYY-MM-DD like the date columns.
-  const today = now.toLocaleDateString("sv-SE", { timeZone: "Europe/Madrid" });
+  const today = todayInMadrid(now);
   const horizon = new Date(`${today}T00:00:00Z`);
   horizon.setUTCMonth(horizon.getUTCMonth() + 2);
   const deadlineCutoff = horizon.toISOString().slice(0, 10);
