@@ -173,7 +173,11 @@
     "staleAge": "{months, plural, one {# month} other {# months}}",
     "andMore": "and {count} more",
     "activeToCollect": "Still to collect on active work",
-    "notStartedToCollect": "Still to collect on models not started yet"
+    "notStartedToCollect": "Still to collect on models not started yet",
+    "profitabilityTitle": "Profitability of finished models",
+    "profitabilityProfit": "{count, plural, one {Average profit per model (# finished priced model)} other {Average profit per model (# finished priced models)}}",
+    "profitabilityPerHour": "Average profit per hour (only models with logged time)",
+    "profitabilityNoTime": "No time logged"
   },
   "parts": {
     "title": "Parts: {total}",
@@ -295,6 +299,17 @@
     "emptyOpen": "No unfinished or unpaid models. Finished and fully paid ones are hidden.",
     "profit": "Profit",
     "profitBreakdown": "{income} price − {cost} cost",
+    "profitability": {
+      "title": "Profitability",
+      "price": "Price",
+      "parts": "Parts",
+      "consumables": "Consumables",
+      "profit": "Profit",
+      "time": "Time",
+      "perHour": "Profit per hour",
+      "perHourUnit": "{amount}/h",
+      "noTime": "Log time to see the profit per hour."
+    },
     "dates": "Requested: {requested} · Estimated: {estimated}",
     "depositSummary": "Deposit: {deposit} · Remaining: {remaining}",
     "createQuote": "Create quote from this model",
