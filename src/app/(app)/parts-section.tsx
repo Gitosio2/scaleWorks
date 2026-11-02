@@ -5,6 +5,7 @@ import { formatEuros } from "@/lib/labels";
 import { CollapsibleCard } from "@/components/ui/card";
 import { StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
 import { DeleteIconButton, PaidCheckButton } from "@/components/ui/icon-actions";
+import { EditModal } from "@/components/ui/edit-modal";
 import { SegmentedToggle } from "@/components/ui/segmented-toggle";
 import {
   inputClass,
@@ -15,17 +16,64 @@ import {
 
 type Part = typeof parts.$inferSelect;
 
+// Status is edited through the toggle, so it is not part of these fields.
+function PartFields({ defaults }: { defaults?: Part }) {
+  const t = useTranslations("parts");
+  const tc = useTranslations("common");
+  const pair = `${labelClass} min-w-40 flex-1`;
+  return (
+    <>
+      <label className={labelClass}>
+        {tc("description")}
+        <input name="description" placeholder={tc("description")} required defaultValue={defaults?.description} className={inputClass} />
+      </label>
+      <div className="flex flex-wrap gap-3">
+        <label className={pair}>
+          {tc("brand")}
+          <input name="brand" placeholder={tc("brand")} defaultValue={defaults?.brand ?? ""} className={inputClass} />
+        </label>
+        <label className={pair}>
+          {tc("reference")}
+          <input name="reference" placeholder={tc("reference")} defaultValue={defaults?.reference ?? ""} className={inputClass} />
+        </label>
+      </div>
+      <div className="flex flex-wrap gap-3">
+        <label className={pair}>
+          {tc("price")}
+          <input
+            name="price"
+            inputMode="decimal"
+            placeholder={tc("price")}
+            defaultValue={defaults?.priceCents != null ? (defaults.priceCents / 100).toFixed(2) : ""}
+            className={inputClass}
+          />
+        </label>
+        <label className={pair}>
+          {tc("store")}
+          <input name="store" placeholder={tc("store")} defaultValue={defaults?.store ?? ""} className={inputClass} />
+        </label>
+      </div>
+      <label className={labelClass}>
+        {t("storeLink")}
+        <input name="url" type="url" placeholder={t("storeLinkPlaceholder")} defaultValue={defaults?.url ?? ""} className={inputClass} />
+      </label>
+    </>
+  );
+}
+
 // Shared by models and quotes. The owner-specific server actions come in as
 // props, already bound to the owning model or quote.
 export function PartsSection({
   parts: rows,
   add,
+  update,
   updateStatus,
   remove,
   setPaid,
 }: {
   parts: Part[];
   add: (formData: FormData) => Promise<void>;
+  update: (partId: string, formData: FormData) => Promise<void>;
   updateStatus: (partId: string, status: string) => Promise<void>;
   remove: (partId: string) => Promise<void>;
   // Only models track payment; quotes leave this out and show no paid check.
@@ -36,7 +84,6 @@ export function PartsSection({
   const ts = useTranslations("supplyStatus");
   const locale = useLocale();
   const totalCents = rows.reduce((acc, p) => acc + (p.priceCents ?? 0), 0);
-  const pair = `${labelClass} min-w-40 flex-1`;
   const statusOptions = supplyStatus.enumValues.map((s) => ({
     value: s as string,
     label: ts(s),
@@ -47,34 +94,7 @@ export function PartsSection({
     <CollapsibleCard title={t("title", { total: formatEuros(totalCents, locale) })}>
 
       <form action={add} className="flex flex-col gap-3">
-        <label className={labelClass}>
-          {tc("description")}
-          <input name="description" placeholder={tc("description")} required className={inputClass} />
-        </label>
-        <div className="flex flex-wrap gap-3">
-          <label className={pair}>
-            {tc("brand")}
-            <input name="brand" placeholder={tc("brand")} className={inputClass} />
-          </label>
-          <label className={pair}>
-            {tc("reference")}
-            <input name="reference" placeholder={tc("reference")} className={inputClass} />
-          </label>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <label className={pair}>
-            {tc("price")}
-            <input name="price" inputMode="decimal" placeholder={tc("price")} className={inputClass} />
-          </label>
-          <label className={pair}>
-            {tc("store")}
-            <input name="store" placeholder={tc("store")} className={inputClass} />
-          </label>
-        </div>
-        <label className={labelClass}>
-          {t("storeLink")}
-          <input name="url" type="url" placeholder={t("storeLinkPlaceholder")} className={inputClass} />
-        </label>
+        <PartFields />
         <label className={labelClass}>
           {tc("status")}
           <select name="status" defaultValue="to_order" className={inputClass}>
@@ -125,6 +145,14 @@ export function PartsSection({
                     </form>
                   </>
                 )}
+                <EditModal
+                  label={tc("edit")}
+                  title={t("editTitle")}
+                  submitLabel={tc("save")}
+                  action={update.bind(null, p.id)}
+                >
+                  <PartFields defaults={p} />
+                </EditModal>
                 <form action={remove.bind(null, p.id)}>
                   <DeleteIconButton label={tc("delete")} />
                 </form>
