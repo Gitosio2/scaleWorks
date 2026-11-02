@@ -127,6 +127,7 @@ export function FilterSelect({
   defaultValue,
   options,
   allLabel,
+  hideLabel = false,
 }: {
   name: string;
   label: string;
@@ -134,6 +135,8 @@ export function FilterSelect({
   options: ReadonlyArray<{ value: string; label: string }>;
   // Label of the empty option (default: "All"); pass null when a value must always be chosen.
   allLabel?: string | null;
+  // Drop the visible label (the empty option should then say what the field is); it stays as the accessible name.
+  hideLabel?: boolean;
 }) {
   const t = useTranslations("common");
   const ref = useSyncedField<HTMLSelectElement>(defaultValue);
@@ -144,8 +147,14 @@ export function FilterSelect({
       : options;
   return (
     <label className={labelClass}>
-      {label}
-      <select ref={ref} name={name} defaultValue={defaultValue} className={inputClass}>
+      {!hideLabel && label}
+      <select
+        ref={ref}
+        name={name}
+        defaultValue={defaultValue}
+        aria-label={hideLabel ? label : undefined}
+        className={inputClass}
+      >
         {allLabel !== null && <option value="">{allLabel ?? t("all")}</option>}
         {shown.map((o) => (
           <option key={o.value} value={o.value}>

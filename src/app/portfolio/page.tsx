@@ -102,6 +102,8 @@ export default async function PortfolioPage({
               key={key}
               name={key}
               label={t(`filters.${key}`)}
+              allLabel={t(`filters.${key}`)}
+              hideLabel
               defaultValue={selected[key]}
               options={options[key]}
             />
