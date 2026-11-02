@@ -13,6 +13,8 @@ import { hashPassword } from "better-auth/crypto";
 import { account, session, user } from "../src/db/auth-schema";
 
 const MIN_PASSWORD_LENGTH = 8;
+// better-auth rejects longer passwords at sign-in (its default maxPasswordLength).
+const MAX_PASSWORD_LENGTH = 128;
 
 config({ path: ".env.local" });
 
@@ -57,6 +59,9 @@ async function main() {
   const password = await askHidden("New password: ");
   if (password.length < MIN_PASSWORD_LENGTH) {
     throw new Error(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
+  }
+  if (password.length > MAX_PASSWORD_LENGTH) {
+    throw new Error(`Password must be at most ${MAX_PASSWORD_LENGTH} characters.`);
   }
   if (password !== (await askHidden("Repeat password: "))) {
     throw new Error("Passwords do not match.");

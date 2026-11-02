@@ -15,7 +15,7 @@ What happens:
 
 1. Loads `DATABASE_URL` from `.env.local`.
 2. Looks up the user by email (case-insensitive). Fails if it does not exist.
-3. Asks for the new password twice. Input is hidden and never lands in the shell history. Minimum 8 characters.
+3. Asks for the new password twice. Input is hidden and never lands in the shell history. Between 8 and 128 characters (better-auth rejects longer passwords at sign-in).
 4. Hashes it with better-auth's own hasher (`better-auth/crypto`), so the normal login accepts it.
 5. Updates the user's credential account and **deletes all their sessions**, so every device is signed out.
 
