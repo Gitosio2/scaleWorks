@@ -43,14 +43,27 @@ export function SidebarShell({
     const bottom = el.scrollTop + el.clientHeight < el.scrollHeight - 2;
     setFade((f) => (f.top === top && f.bottom === bottom ? f : { top, bottom }));
   }, []);
-  // The observer reports once when it starts, then whenever the box or its content is resized.
+  // The resize observer reports once when it starts, then whenever the box or its
+  // direct children change size. The menu wrapper has no box of its own
+  // (`contents`), so a group that expands inside it is only seen by watching the
+  // subtree for the attributes and nodes that change its height.
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    const observer = new ResizeObserver(updateFade);
-    observer.observe(el);
-    for (const child of el.children) observer.observe(child);
-    return () => observer.disconnect();
+    const resize = new ResizeObserver(updateFade);
+    resize.observe(el);
+    for (const child of el.children) resize.observe(child);
+    const mutation = new MutationObserver(updateFade);
+    mutation.observe(el, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["hidden", "class", "open"],
+    });
+    return () => {
+      resize.disconnect();
+      mutation.disconnect();
+    };
   }, [pathname, updateFade]);
 
   return (
