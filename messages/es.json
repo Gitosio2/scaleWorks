@@ -173,7 +173,11 @@
     "staleAge": "{months, plural, one {# mes} other {# meses}}",
     "andMore": "y {count} más",
     "activeToCollect": "Pendiente de cobro de los trabajos en activo",
-    "notStartedToCollect": "Pendiente de cobro de maquetas sin empezar"
+    "notStartedToCollect": "Pendiente de cobro de maquetas sin empezar",
+    "profitabilityTitle": "Rentabilidad de las maquetas terminadas",
+    "profitabilityProfit": "{count, plural, one {Ganancia media por maqueta (# terminada con precio)} other {Ganancia media por maqueta (# terminadas con precio)}}",
+    "profitabilityPerHour": "Ganancia media por hora (solo maquetas con tiempo registrado)",
+    "profitabilityNoTime": "Sin tiempo registrado"
   },
   "parts": {
     "title": "Piezas: {total}",
@@ -295,6 +299,17 @@
     "emptyOpen": "No hay maquetas sin terminar ni sin pagar. Las terminadas y pagadas por completo están ocultas.",
     "profit": "Rentabilidad",
     "profitBreakdown": "{income} de precio − {cost} de gasto",
+    "profitability": {
+      "title": "Rentabilidad",
+      "price": "Precio",
+      "parts": "Piezas",
+      "consumables": "Consumibles",
+      "profit": "Ganancia",
+      "time": "Tiempo",
+      "perHour": "Ganancia por hora",
+      "perHourUnit": "{amount}/h",
+      "noTime": "Registra tiempo para ver la ganancia por hora."
+    },
     "dates": "Solicitada: {requested} · Estimada: {estimated}",
     "depositSummary": "Anticipo: {deposit} · Restante: {remaining}",
     "createQuote": "Crear presupuesto a partir de esta maqueta",

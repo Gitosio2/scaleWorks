@@ -31,7 +31,8 @@ import {
 } from "./consumable-actions";
 import { addPart, deletePart, updatePartStatus } from "./part-actions";
 import { setPartPaid } from "../../expenses/actions";
-import { CollapsibleCard } from "@/components/ui/card";
+import { profitability } from "@/lib/profitability";
+import { Card, CardTitle, CollapsibleCard } from "@/components/ui/card";
 import { BackLink, PageHeader } from "@/components/ui/page-header";
 import { PhaseProgress } from "@/components/ui/phase-progress";
 import { PaymentBadge, PhaseBadge, StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
@@ -50,6 +51,23 @@ import {
 import { PartsSection } from "@/app/(app)/parts-section";
 import { PhotosSection } from "./photos-section";
 import { QuantityFields } from "./quantity-fields";
+
+function ProfitStat({
+  label,
+  value,
+  valueClass = "",
+}: {
+  label: string;
+  value: string;
+  valueClass?: string;
+}) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className={`text-xl font-bold tracking-tight ${valueClass}`}>{value}</span>
+      <span className="text-[13px] text-muted">{label}</span>
+    </div>
+  );
+}
 
 export default async function ModelDetailPage({
   params,
@@ -106,6 +124,15 @@ export default async function ModelDetailPage({
     (acc, r) => acc + (consumableCost(r.consumable.priceCents, r.quantity) ?? 0),
     0,
   );
+
+  const partsTotalCents = partRows.reduce((acc, p) => acc + (p.priceCents ?? 0), 0);
+  const totalMinutes = Number(total ?? 0);
+  const costCents = partsTotalCents + consumablesTotalCents;
+  const { profitCents, centsPerHour } = profitability({
+    priceCents: m.priceCents,
+    costCents,
+    minutes: totalMinutes,
+  });
 
   const today = todayInMadrid();
   const done = m.phase === "finished" && m.paymentStatus === "paid";
@@ -176,7 +203,34 @@ export default async function ModelDetailPage({
         finished={m.phase === "finished"}
       />
 
-      <CollapsibleCard title={t("time.title", { total: formatDuration(Number(total ?? 0)) })}>
+      {profitCents !== null && (
+        <Card>
+          <CardTitle>{t("profitability.title")}</CardTitle>
+          <div className="flex flex-wrap gap-x-10 gap-y-3">
+            <ProfitStat label={t("profitability.price")} value={formatEuros(m.priceCents, locale)} />
+            <ProfitStat label={t("profitability.parts")} value={formatEuros(partsTotalCents, locale)} />
+            <ProfitStat label={t("profitability.consumables")} value={formatEuros(consumablesTotalCents, locale)} />
+            <ProfitStat
+              label={t("profitability.profit")}
+              value={formatEuros(profitCents, locale)}
+              valueClass={profitCents < 0 ? "text-danger" : "text-ok"}
+            />
+            <ProfitStat label={t("profitability.time")} value={formatDuration(totalMinutes)} />
+            {centsPerHour !== null && (
+              <ProfitStat
+                label={t("profitability.perHour")}
+                value={t("profitability.perHourUnit", { amount: formatEuros(centsPerHour, locale) })}
+                valueClass={centsPerHour < 0 ? "text-danger" : "text-ok"}
+              />
+            )}
+          </div>
+          {centsPerHour === null && (
+            <p className="text-[13px] text-muted">{t("profitability.noTime")}</p>
+          )}
+        </Card>
+      )}
+
+      <CollapsibleCard title={t("time.title", { total: formatDuration(totalMinutes) })}>
 
         <form action={addTimeEntry.bind(null, id)} className="flex flex-wrap items-end gap-3">
           <label className={labelClass}>

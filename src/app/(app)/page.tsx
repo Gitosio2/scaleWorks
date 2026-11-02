@@ -2,10 +2,18 @@ import Link from "next/link";
 import { and, asc, eq, isNotNull, isNull, lt, lte, ne, notInArray, sql } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
-import { consumables, models, parts, quotes } from "@/db/schema";
+import {
+  consumables,
+  modelConsumables,
+  models,
+  parts,
+  quotes,
+  timeEntries,
+} from "@/db/schema";
 import { formatDate, formatEuros } from "@/lib/labels";
 import { modelTitle } from "@/lib/model-title";
 import { todayInMadrid } from "@/lib/dates";
+import { aggregateProfitability } from "@/lib/profitability";
 import { stalledCutoff } from "@/lib/stalled";
 import { requireUser } from "@/lib/session";
 import { Card, CardTitle } from "@/components/ui/card";
@@ -82,6 +90,7 @@ export default async function Home() {
     [partsSpent],
     [consumablesSpent],
     [unpaidExpenses],
+    finishedRows,
   ] = await Promise.all([
     db
       .select({
@@ -166,8 +175,27 @@ export default async function Home() {
           eq(parts.paid, false),
         ),
       ),
+    // Price, cost (parts + consumables used) and tracked time of each finished model,
+    // the same figures its detail page shows.
+    db
+      .select({
+        priceCents: models.priceCents,
+        costCents: sql<number>`(
+          coalesce((select sum(${parts.priceCents}) from ${parts} where ${parts.modelId} = ${models.id}), 0)
+          + coalesce((
+              select sum(round(${consumables.priceCents} * ${modelConsumables.quantity}))
+              from ${modelConsumables}
+              inner join ${consumables} on ${consumables.id} = ${modelConsumables.consumableId}
+              where ${modelConsumables.modelId} = ${models.id}
+            ), 0)
+        )::int`,
+        minutes: sql<number>`coalesce((select sum(${timeEntries.minutes}) from ${timeEntries} where ${timeEntries.modelId} = ${models.id}), 0)::int`,
+      })
+      .from(models)
+      .where(and(eq(models.userId, user.id), eq(models.phase, "finished"))),
   ]);
   const expensesCents = partsSpent.cents + consumablesSpent.cents;
+  const profit = aggregateProfitability(finishedRows);
   const balanceCents = stats.incomeCents - expensesCents;
 
   const daysUntil = (date: string) =>
@@ -292,6 +320,34 @@ export default async function Home() {
             </div>
           )}
         </Card>
+
+        {profit.avgProfitCents !== null && (
+          <Card className="md:col-span-2">
+            <CardTitle>{t("profitabilityTitle")}</CardTitle>
+            <div className="flex flex-wrap gap-x-10 gap-y-3">
+              <Stat
+                value={formatEuros(profit.avgProfitCents, locale)}
+                valueClass={profit.avgProfitCents < 0 ? "text-bad" : "text-ok"}
+                label={t("profitabilityProfit", { count: profit.count })}
+              />
+              <Stat
+                value={
+                  profit.centsPerHour !== null
+                    ? `${formatEuros(profit.centsPerHour, locale)}/h`
+                    : "—"
+                }
+                valueClass={
+                  profit.centsPerHour === null ? "" : profit.centsPerHour < 0 ? "text-bad" : "text-ok"
+                }
+                label={
+                  profit.centsPerHour !== null
+                    ? t("profitabilityPerHour")
+                    : t("profitabilityNoTime")
+                }
+              />
+            </div>
+          </Card>
+        )}
 
         <Card className="md:col-span-2">
           <CardTitle>{t("financesTitle")}</CardTitle>
