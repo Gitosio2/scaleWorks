@@ -110,40 +110,44 @@ export function PartsSection({
 
       <ul className="flex flex-col">
         {rows.length === 0 && <li className="py-4 text-muted">{t("empty")}</li>}
+        {/* A grid so that on a phone the status slider sits under the text, in the space the taller block at the right leaves empty. */}
         {rows.map((p) => (
-          <li key={p.id} className={`${listItemClass} flex flex-col gap-2`}>
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="font-bold">{p.description}</p>
-                <p className="text-[13px] text-muted">
-                  {[p.brand, p.reference].filter(Boolean).join(" · ") || tc("noValue")}
-                  {" · "}
-                  {formatEuros(p.priceCents, locale)}
-                </p>
-                <p className="text-[13px] text-muted">
-                  {p.url ? (
-                    <a href={p.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-brand hover:underline">
-                      {p.store ?? t("storeLink")}
-                    </a>
-                  ) : (
-                    (p.store ?? t("noStore"))
-                  )}
-                </p>
-              </div>
-              <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+          <li key={p.id} className={`${listItemClass} grid grid-cols-[minmax(0,1fr)_auto] grid-rows-[auto_1fr] gap-x-3 gap-y-2 sm:grid-rows-none`}>
+            <div className="min-w-0 self-start">
+              <p className="font-bold">{p.description}</p>
+              <p className="text-[13px] text-muted">
+                {[p.brand, p.reference].filter(Boolean).join(" · ") || tc("noValue")}
+                {" · "}
+                {formatEuros(p.priceCents, locale)}
+              </p>
+              <p className="text-[13px] text-muted">
+                {p.url ? (
+                  <a href={p.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-brand hover:underline">
+                    {p.store ?? t("storeLink")}
+                  </a>
+                ) : (
+                  (p.store ?? t("noStore"))
+                )}
+              </p>
+            </div>
+            {/* On a phone this block is a narrow column at the right (icons, then the badges stacked) so the text keeps its room; from sm on it is one row, badges first. */}
+            <div className="row-span-2 flex flex-col items-end gap-2 self-start sm:row-span-1 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+              <div className="flex flex-col items-end gap-2 max-sm:order-2 sm:flex-row sm:items-center">
                 <StatusBadge variant={supplyStatusVariant(p.status)}>
                   {ts(p.status)}
                 </StatusBadge>
                 {/* A part still "to order" is not owed yet, so only bought parts show or change their payment. */}
                 {setPaid && p.status !== "to_order" && (
-                  <>
-                    <StatusBadge variant={p.paid ? "ok" : "warn"}>
-                      {p.paid ? t("paid") : t("unpaid")}
-                    </StatusBadge>
-                    <form action={setPaid.bind(null, p.id, !p.paid)}>
-                      <PaidCheckButton paid={p.paid} label={p.paid ? t("markUnpaid") : t("markPaid")} />
-                    </form>
-                  </>
+                  <StatusBadge variant={p.paid ? "ok" : "warn"}>
+                    {p.paid ? t("paid") : t("unpaid")}
+                  </StatusBadge>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                {setPaid && p.status !== "to_order" && (
+                  <form action={setPaid.bind(null, p.id, !p.paid)}>
+                    <PaidCheckButton paid={p.paid} label={p.paid ? t("markUnpaid") : t("markPaid")} />
+                  </form>
                 )}
                 <EditModal
                   label={tc("edit")}
@@ -158,12 +162,14 @@ export function PartsSection({
                 </form>
               </div>
             </div>
-            <SegmentedToggle
-              value={p.status}
-              options={statusOptions}
-              action={updateStatus.bind(null, p.id)}
-              label={tc("status")}
-            />
+            <div className="sm:col-span-2">
+              <SegmentedToggle
+                value={p.status}
+                options={statusOptions}
+                action={updateStatus.bind(null, p.id)}
+                label={tc("status")}
+              />
+            </div>
           </li>
         ))}
       </ul>
