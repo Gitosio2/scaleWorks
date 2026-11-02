@@ -127,6 +127,13 @@
       "when": 1793570182563,
       "tag": "0017_parts_paid_and_loose",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1793614789469,
+      "tag": "0018_model_notes",
+      "breakpoints": true
     }
   ]
 }

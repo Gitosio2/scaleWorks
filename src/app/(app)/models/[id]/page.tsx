@@ -20,7 +20,7 @@ import {
 } from "@/lib/labels";
 import { modelTitle } from "@/lib/model-title";
 import { requireUser } from "@/lib/session";
-import { addTimeEntry, deleteTimeEntry } from "./actions";
+import { addTimeEntry, deleteTimeEntry, updateModelNotes } from "./actions";
 import { createQuoteFromModel } from "./create-quote-action";
 import {
   removeModelConsumable,
@@ -314,6 +314,23 @@ export default async function ModelDetailPage({
             );
           })}
         </ul>
+      </CollapsibleCard>
+
+      <CollapsibleCard title={t("notes.title")} defaultOpen={!!m.notes}>
+        <form action={updateModelNotes.bind(null, id)} className="flex flex-col gap-3">
+          <textarea
+            name="notes"
+            rows={3}
+            maxLength={5000}
+            defaultValue={m.notes ?? ""}
+            aria-label={t("notes.label")}
+            placeholder={t("notes.placeholder")}
+            className={`${inputClass} py-2`}
+          />
+          <button type="submit" className={`${primaryButtonClass} self-start`}>
+            {tc("save")}
+          </button>
+        </form>
       </CollapsibleCard>
     </>
   );

@@ -307,6 +307,11 @@
       "requested": "Fecha solicitada",
       "estimated": "Fecha estimada"
     },
+    "notes": {
+      "title": "Observaciones",
+      "label": "Observaciones",
+      "placeholder": "Cualquier cosa que convenga recordar de esta maqueta…"
+    },
     "time": {
       "title": "Tiempo: {total}",
       "date": "Fecha",
@@ -375,6 +380,7 @@
     "invalidDate": "Fecha no válida",
     "clientNotFound": "Cliente no encontrado",
     "modelNotFound": "Maqueta no encontrada",
+    "notesTooLong": "Las observaciones son demasiado largas (máx. 5000 caracteres)",
     "imageInvalid": "El archivo no es una imagen válida",
     "imageTooLarge": "La imagen es demasiado grande",
     "imageLimit": "Una maqueta puede tener hasta 20 fotos",
