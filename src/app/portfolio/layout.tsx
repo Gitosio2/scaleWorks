@@ -11,6 +11,7 @@ import { LogoutButton } from "@/components/logout-button";
 import { PortfolioNav } from "@/components/portfolio-nav";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { SidebarShell } from "@/components/sidebar-shell";
+import { SocialIcon } from "@/components/ui/social-icon";
 import { cardClass, cx, linkActionClass, secondaryButtonClass } from "@/components/ui/styles";
 
 const SOCIAL_NAMES = { tiktok: "TikTok", instagram: "Instagram", facebook: "Facebook" } as const;
@@ -84,8 +85,15 @@ export default async function PortfolioLayout({ children }: { children: React.Re
               <ul className="flex flex-wrap gap-3">
                 {socials.map(({ key, href }) => (
                   <li key={key}>
-                    <a href={href} target="_blank" rel="noopener noreferrer" className={secondaryButtonClass}>
-                      {SOCIAL_NAMES[key]}
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={SOCIAL_NAMES[key]}
+                      title={SOCIAL_NAMES[key]}
+                      className={cx(secondaryButtonClass, "w-11 px-0")}
+                    >
+                      <SocialIcon name={key} />
                     </a>
                   </li>
                 ))}
