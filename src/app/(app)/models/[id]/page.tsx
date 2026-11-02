@@ -315,7 +315,12 @@ export default async function ModelDetailPage({
           </p>
         ) : (
           <form action={setModelConsumable.bind(null, id)} className="flex flex-wrap gap-3">
-            <select name="consumableId" required aria-label={t("consumables.select")} className={inputClass}>
+            <select
+              name="consumableId"
+              required
+              aria-label={t("consumables.select")}
+              className={`${inputClass} max-w-full min-w-0`}
+            >
               {consumableOptions.map((c) => (
                 <option key={c.id} value={c.id}>{c.description}</option>
               ))}
