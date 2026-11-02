@@ -99,6 +99,9 @@ export const models = pgTable(
     published: boolean("published").notNull().default(false),
     // Free-text private notes about the build. Never shown on the public gallery.
     notes: text("notes"),
+    // Set by hand when the client has not paid and work is paused; null otherwise.
+    // Independent of the phase, which keeps showing how far the build got.
+    paymentHoldAt: timestamp("payment_hold_at"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
   (t) => [

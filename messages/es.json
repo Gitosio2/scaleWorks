@@ -33,7 +33,6 @@
     "close": "Cerrar",
     "saving": "Guardando…",
     "saveFailed": "No se pudo guardar. Revisa los campos e inténtalo de nuevo.",
-    "remaining": "Restante {amount}",
     "progress": "Progreso: {done} de {total} pasos",
     "edit": "Editar",
     "delete": "Eliminar",
@@ -142,7 +141,13 @@
   "paymentStatus": {
     "none": "Sin pago",
     "deposit_paid": "Pendiente",
-    "paid": "Pagado por completo"
+    "paid": "Pagado por completo",
+    "pendingAmount": "Pendiente: {amount}"
+  },
+  "paymentHold": {
+    "hold": "Pausar: el cliente no ha pagado",
+    "resume": "Reanudar: quitar la pausa por impago",
+    "badge": "En pausa: sin pagar"
   },
   "home": {
     "subtitle": "Gestiona tus maquetas, presupuestos, piezas y horas."
@@ -327,6 +332,7 @@
       "viewPublic": "Ver página pública"
     },
     "paymentPending": "Pendiente de cobro (con precio)",
+    "paymentOnHold": "En pausa (el cliente no ha pagado)",
     "phaseActive": "En curso (empezadas, sin terminar)",
     "phaseStalled": "Paradas (sin empezar desde hace más de 7 meses)",
     "deposit": "Anticipo (€)",

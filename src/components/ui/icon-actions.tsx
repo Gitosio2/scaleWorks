@@ -148,6 +148,27 @@ export function PaidCheckButton({ paid, label }: { paid: boolean; label: string 
   );
 }
 
+/**
+ * Pause icon that toggles the "on hold, unpaid" flag: filled when on hold.
+ * `label` says what pressing it does (put on hold / resume).
+ */
+export function HoldIconButton({ held, label }: { held: boolean; label: string }) {
+  return (
+    <button
+      type="submit"
+      aria-label={label}
+      aria-pressed={held}
+      title={label}
+      className={cx(baseClass, held ? "text-bad" : "text-muted hover:text-bad")}
+    >
+      <svg {...iconProps}>
+        <circle cx="12" cy="12" r="9" fill={held ? "currentColor" : "none"} fillOpacity={held ? 0.15 : 0} />
+        <path d="M10 9v6M14 9v6" />
+      </svg>
+    </button>
+  );
+}
+
 export function ConfirmIconButton({ label }: { label: string }) {
   return (
     <button type="submit" aria-label={label} title={label} className={cx(baseClass, "text-brand")}>

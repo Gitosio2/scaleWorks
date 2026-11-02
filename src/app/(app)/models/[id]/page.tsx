@@ -21,6 +21,7 @@ import {
 import { consumableCost } from "@/lib/consumable-cost";
 import { todayInMadrid } from "@/lib/dates";
 import { modelTitle } from "@/lib/model-title";
+import { canHold } from "@/lib/payment-hold";
 import { requireUser } from "@/lib/session";
 import { addTimeEntry, deleteTimeEntry, updateModelNotes } from "./actions";
 import { createQuoteFromModel } from "./create-quote-action";
@@ -31,15 +32,17 @@ import {
 } from "./consumable-actions";
 import { addPart, deletePart, updatePart, updatePartStatus } from "./part-actions";
 import { setPartPaid } from "../../expenses/actions";
+import { setPaymentHold } from "../actions";
 import { profitability } from "@/lib/profitability";
 import { Card, CardTitle, CollapsibleCard } from "@/components/ui/card";
 import { BackLink, PageHeader } from "@/components/ui/page-header";
 import { PhaseProgress } from "@/components/ui/phase-progress";
-import { PaymentBadge, PhaseBadge, StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
+import { HoldBadge, PaymentBadge, PhaseBadge, StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
 import {
   ConfirmIconButton,
   DeleteIconButton,
   EditIconLink,
+  HoldIconButton,
   QuoteIconButton,
 } from "@/components/ui/icon-actions";
 import {
@@ -80,6 +83,7 @@ export default async function ModelDetailPage({
   const tc = await getTranslations("common");
   const ts = await getTranslations("supplyStatus");
   const ttype = await getTranslations("modelType");
+  const th = await getTranslations("paymentHold");
   const locale = await getLocale();
 
   const [row] = await db
@@ -140,10 +144,19 @@ export default async function ModelDetailPage({
     <div className="flex flex-wrap items-center justify-end gap-2">
       <PhaseBadge phase={m.phase} />
       <PaymentBadge status={m.paymentStatus} priceCents={m.priceCents} depositCents={m.depositCents} />
+      {m.paymentHoldAt && <HoldBadge />}
     </div>
   );
   const actions = (
     <div className="flex items-center gap-2">
+      {(m.paymentHoldAt || canHold(m.paymentStatus)) && (
+        <form action={setPaymentHold.bind(null, id, !m.paymentHoldAt)}>
+          <HoldIconButton
+            held={!!m.paymentHoldAt}
+            label={m.paymentHoldAt ? th("resume") : th("hold")}
+          />
+        </form>
+      )}
       <form action={createQuoteFromModel.bind(null, id)}>
         <QuoteIconButton label={t("createQuote")} />
       </form>

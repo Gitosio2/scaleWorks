@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -15,6 +15,7 @@ import {
 } from "@/db/schema";
 import { parseEuros } from "@/lib/labels";
 import { derivePayment } from "@/lib/payments";
+import { nextHold } from "@/lib/payment-hold";
 import { requireUser } from "@/lib/session";
 import { deleteObjects } from "@/lib/storage";
 
@@ -84,12 +85,49 @@ export async function createModel(formData: FormData) {
 
 export async function updateModel(id: string, formData: FormData) {
   const user = await requireUser();
+  const values = await parseModel(formData, user.id);
   await db
     .update(models)
-    .set(await parseModel(formData, user.id))
+    .set({
+      ...values,
+      // Editing a model never sets a hold, but settling it in full lifts one.
+      ...(values.paymentStatus === "paid" && { paymentHoldAt: null }),
+    })
     .where(and(eq(models.id, id), eq(models.userId, user.id)));
   revalidatePath("/models");
+  revalidatePath(`/models/${id}`);
+  revalidatePath("/");
   redirect("/models");
+}
+
+// Marks a model as paused because the client has not paid, or lifts the pause.
+export async function setPaymentHold(id: string, hold: boolean) {
+  const user = await requireUser();
+  const [current] = await db
+    .select({ paymentStatus: models.paymentStatus, paymentHoldAt: models.paymentHoldAt })
+    .from(models)
+    .where(and(eq(models.id, id), eq(models.userId, user.id)));
+  if (!current) return;
+  const paymentHoldAt = nextHold({
+    current: current.paymentHoldAt,
+    requested: hold,
+    status: current.paymentStatus,
+    now: new Date(),
+  });
+  await db
+    .update(models)
+    .set({ paymentHoldAt })
+    .where(
+      and(
+        eq(models.id, id),
+        eq(models.userId, user.id),
+        // Setting a hold must not race a payment saved in between: only still-unpaid models.
+        paymentHoldAt ? ne(models.paymentStatus, "paid") : undefined,
+      ),
+    );
+  revalidatePath("/models");
+  revalidatePath(`/models/${id}`);
+  revalidatePath("/");
 }
 
 export async function deleteModel(id: string) {

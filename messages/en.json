@@ -33,7 +33,6 @@
     "close": "Close",
     "saving": "Saving…",
     "saveFailed": "Could not save. Check the fields and try again.",
-    "remaining": "Remaining {amount}",
     "progress": "Progress: {done} of {total} steps",
     "edit": "Edit",
     "delete": "Delete",
@@ -142,7 +141,13 @@
   "paymentStatus": {
     "none": "No payment",
     "deposit_paid": "Pending",
-    "paid": "Paid in full"
+    "paid": "Paid in full",
+    "pendingAmount": "Pending: {amount}"
+  },
+  "paymentHold": {
+    "hold": "Put on hold: client has not paid",
+    "resume": "Resume: lift the unpaid hold",
+    "badge": "On hold: unpaid"
   },
   "home": {
     "subtitle": "Manage your scale models, quotes, parts and hours."
@@ -327,6 +332,7 @@
       "viewPublic": "View public page"
     },
     "paymentPending": "Pending payment (with a price)",
+    "paymentOnHold": "On hold (client has not paid)",
     "phaseActive": "In progress (started, not finished)",
     "phaseStalled": "Stalled (not started for over 7 months)",
     "deposit": "Deposit (€)",
