@@ -95,7 +95,7 @@ export function SidebarNav() {
   const t = useTranslations("nav");
   const pathname = usePathname();
   return (
-    <nav aria-label={t("main")} className="flex flex-wrap gap-1 md:flex-col">
+    <nav aria-label={t("main")} className="flex flex-col gap-1">
       {items.map((item) => {
         const active =
           item.href === "/"

@@ -4,6 +4,8 @@
   },
   "nav": {
     "main": "Principal",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
     "home": "Inicio",
     "models": "Maquetas",
     "quotes": "Presupuestos",
