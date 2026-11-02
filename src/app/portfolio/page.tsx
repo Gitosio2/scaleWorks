@@ -94,7 +94,8 @@ export default async function PortfolioPage({
           )
         }
       />
-      {offered.length > 0 && (
+      {/* Kept while a filter is active even if no selector is offered any more, so the clear link never disappears. */}
+      {(offered.length > 0 || activeCount > 0) && (
         <GalleryFilters action="/portfolio" clearLabel={t("clearFilters")} showClear={activeCount > 0}>
           {offered.map((key) => (
             <FilterSelect
