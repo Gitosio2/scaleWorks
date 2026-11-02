@@ -291,6 +291,8 @@
     "empty": "Aún no hay maquetas.",
     "emptyFiltered": "Ninguna maqueta coincide con estos filtros.",
     "emptyOpen": "No hay maquetas sin terminar ni sin pagar. Las terminadas y pagadas por completo están ocultas.",
+    "profit": "Rentabilidad",
+    "profitBreakdown": "{income} de precio − {cost} de gasto",
     "dates": "Solicitada: {requested} · Estimada: {estimated}",
     "depositSummary": "Anticipo: {deposit} · Restante: {remaining}",
     "createQuote": "Crear presupuesto a partir de esta maqueta",
