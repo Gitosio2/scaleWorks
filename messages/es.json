@@ -158,7 +158,17 @@
     "empty": "Todavía no hay nada que mostrar.",
     "back": "← Todas las maquetas",
     "noPhotos": "Aún no hay fotos.",
+    "viewAllPhotos": "Ver todas las fotos",
+    "allPhotos": "Todas las fotos",
+    "allPhotosSubtitle": "{count, plural, one {# foto} other {# fotos}} de todas las maquetas.",
     "alt": "Foto {n} de {name}",
+    "viewer": {
+      "label": "Visor de fotos",
+      "close": "Cerrar",
+      "previous": "Foto anterior",
+      "next": "Foto siguiente",
+      "counter": "{n} / {total}"
+    },
     "followTitle": "Sígueme, maquinaria real y maquetas en mis redes"
   },
   "dashboard": {

@@ -158,7 +158,17 @@
     "empty": "Nothing to show yet.",
     "back": "← All models",
     "noPhotos": "No photos yet.",
+    "viewAllPhotos": "View all photos",
+    "allPhotos": "All photos",
+    "allPhotosSubtitle": "{count, plural, one {# photo} other {# photos}} from all the models.",
     "alt": "Photo {n} of {name}",
+    "viewer": {
+      "label": "Photo viewer",
+      "close": "Close",
+      "previous": "Previous photo",
+      "next": "Next photo",
+      "counter": "{n} / {total}"
+    },
     "followTitle": "Follow me, real machinery and scale models on my social media"
   },
   "dashboard": {
