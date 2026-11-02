@@ -9,7 +9,7 @@ const PATHS: Record<SocialKey, string> = {
 
 export function SocialIcon({ name }: { name: SocialKey }) {
   return (
-    <svg aria-hidden viewBox="0 0 24 24" fill="currentColor" className="size-16">
+    <svg aria-hidden viewBox="0 0 24 24" fill="currentColor" className="size-[45px]">
       <path d={PATHS[name]} />
     </svg>
   );

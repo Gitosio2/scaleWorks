@@ -91,7 +91,7 @@ export default async function PortfolioLayout({ children }: { children: React.Re
                       rel="noopener noreferrer"
                       aria-label={SOCIAL_NAMES[key]}
                       title={SOCIAL_NAMES[key]}
-                      className={cx(secondaryButtonClass, "size-24 px-0")}
+                      className={cx(secondaryButtonClass, "size-16 px-0")}
                     >
                       <SocialIcon name={key} />
                     </a>
