@@ -86,6 +86,7 @@ export default async function Home() {
   const [
     [stats],
     deadlines,
+    draftQuotes,
     openQuotes,
     stalled,
     [partsSpent],
@@ -133,6 +134,12 @@ export default async function Home() {
         ),
       )
       .orderBy(asc(models.estimatedDate), asc(models.id)),
+    // Drafts are quotes still to be prepared, oldest first.
+    db
+      .select({ id: quotes.id, title: quotes.title, createdAt: quotes.createdAt })
+      .from(quotes)
+      .where(and(eq(quotes.userId, user.id), eq(quotes.status, "draft")))
+      .orderBy(asc(quotes.createdAt), asc(quotes.id)),
     // Rejecting a quote is the existing "rejected" status, so open = awaiting a decision.
     db
       .select({ id: quotes.id, title: quotes.title, createdAt: quotes.createdAt })
@@ -289,6 +296,28 @@ export default async function Home() {
             label={t("pendingCount", { count: stats.pendingCount })}
           />
         </Card>
+
+        {draftQuotes.length > 0 && (
+          <Card>
+            <CardLinkTitle title={t("draftQuotesTitle")} href="/quotes?status=draft" />
+            <Stat value={draftQuotes.length} label={t("draftQuotesHint")} valueClass="text-warn" />
+            <div>
+              <RowList>
+                {draftQuotes.slice(0, MAX_ROWS).map((q) => (
+                  <Row key={q.id}>
+                    <Link href={`/quotes/${q.id}`} className={rowLinkClass}>
+                      {q.title}
+                    </Link>
+                    <span className="shrink-0 text-[13px] text-muted">
+                      {t("quoteAge", { days: daysSince(q.createdAt) })}
+                    </span>
+                  </Row>
+                ))}
+              </RowList>
+              {more(draftQuotes.length)}
+            </div>
+          </Card>
+        )}
 
         <Card>
           <CardLinkTitle title={t("quotesTitle")} href="/quotes?status=open" />

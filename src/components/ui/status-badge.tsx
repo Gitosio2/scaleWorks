@@ -42,7 +42,8 @@ export function StatusBadge({
   );
 }
 
-export function quoteStatusVariant(status: "open" | "rejected"): BadgeVariant {
+export function quoteStatusVariant(status: "draft" | "open" | "rejected"): BadgeVariant {
+  if (status === "draft") return "warn";
   return status === "open" ? "info" : "bad";
 }
 

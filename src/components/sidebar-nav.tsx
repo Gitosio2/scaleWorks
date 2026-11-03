@@ -124,7 +124,19 @@ const linkClass = (active: boolean) =>
     active ? "bg-brand font-semibold text-brand-fg" : "text-ink-2 hover:bg-line"
   }`;
 
-function NavItemLink({ item, pathname, nested }: { item: NavLink; pathname: string; nested?: boolean }) {
+type NavBadges = Partial<Record<NavLink["label"], number>>;
+
+function NavItemLink({
+  item,
+  pathname,
+  nested,
+  badge,
+}: {
+  item: NavLink;
+  pathname: string;
+  nested?: boolean;
+  badge?: number;
+}) {
   const t = useTranslations("nav");
   const active = isPathActive(pathname, item.href);
   return (
@@ -134,7 +146,16 @@ function NavItemLink({ item, pathname, nested }: { item: NavLink; pathname: stri
       className={`${linkClass(active)}${nested ? " ml-3" : ""}`}
     >
       {item.icon}
-      {t(item.label)}
+      <span className="flex-1">{t(item.label)}</span>
+      {badge ? (
+        <span
+          title={t("pendingBadge", { count: badge })}
+          className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-warn px-1.5 text-xs font-bold text-brand-fg"
+        >
+          <span aria-hidden>{badge}</span>
+          <span className="sr-only">{t("pendingBadge", { count: badge })}</span>
+        </span>
+      ) : null}
     </Link>
   );
 }
@@ -176,7 +197,7 @@ function NavGroupItem({ group, pathname }: { group: NavGroup; pathname: string }
   );
 }
 
-export function SidebarNav() {
+export function SidebarNav({ badges = {} }: { badges?: NavBadges }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   return (
@@ -185,7 +206,7 @@ export function SidebarNav() {
         "children" in item ? (
           <NavGroupItem key={item.label} group={item} pathname={pathname} />
         ) : (
-          <NavItemLink key={item.href} item={item} pathname={pathname} />
+          <NavItemLink key={item.href} item={item} pathname={pathname} badge={badges[item.label]} />
         ),
       )}
     </nav>
