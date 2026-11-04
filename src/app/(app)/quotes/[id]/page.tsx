@@ -9,8 +9,10 @@ import { requireUser } from "@/lib/session";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { BackLink, PageHeader } from "@/components/ui/page-header";
 import { StatusBadge, quoteStatusVariant } from "@/components/ui/status-badge";
-import { primaryButtonClass, secondaryButtonClass } from "@/components/ui/styles";
+import { CollapsibleCard } from "@/components/ui/card";
+import { inputClass, primaryButtonClass, secondaryButtonClass } from "@/components/ui/styles";
 import Link from "next/link";
+import { updateQuoteNotes } from "../actions";
 import { convertQuoteToModel } from "./convert-action";
 import {
   addQuotePart,
@@ -28,6 +30,7 @@ export default async function QuoteDetailPage({
   const user = await requireUser();
   const t = await getTranslations("quotes");
   const tq = await getTranslations("quoteStatus");
+  const tc = await getTranslations("common");
   const locale = await getLocale();
 
   const [row] = await db
@@ -76,6 +79,21 @@ export default async function QuoteDetailPage({
         updateStatus={updateQuotePartStatus.bind(null, id)}
         remove={deleteQuotePart.bind(null, id)}
       />
+
+      <CollapsibleCard title={t("notes.title")} defaultOpen={!!q.notes}>
+        <form action={updateQuoteNotes.bind(null, id)} className="flex flex-col gap-3">
+          <textarea
+            name="notes"
+            rows={3}
+            maxLength={5000}
+            defaultValue={q.notes ?? ""}
+            aria-label={t("notes.label")}
+            placeholder={t("notes.placeholder")}
+            className={`${inputClass} py-2`}
+          />
+          <SubmitButton className={`${primaryButtonClass} self-start`}>{tc("save")}</SubmitButton>
+        </form>
+      </CollapsibleCard>
     </>
   );
 }

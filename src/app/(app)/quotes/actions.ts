@@ -62,3 +62,21 @@ export async function deleteQuote(id: string) {
     .where(and(eq(quotes.id, id), eq(quotes.userId, user.id)));
   revalidatePath("/quotes");
 }
+
+const MAX_NOTES_LENGTH = 5000;
+
+export async function updateQuoteNotes(quoteId: string, formData: FormData) {
+  const user = await requireUser();
+  const t = await getTranslations("actionErrors");
+
+  const notes = String(formData.get("notes") ?? "").trim();
+  if (notes.length > MAX_NOTES_LENGTH) throw new Error(t("notesTooLong"));
+
+  const updated = await db
+    .update(quotes)
+    .set({ notes: notes || null })
+    .where(and(eq(quotes.id, quoteId), eq(quotes.userId, user.id)))
+    .returning({ id: quotes.id });
+  if (updated.length === 0) throw new Error(t("quoteNotFound"));
+  revalidatePath(`/quotes/${quoteId}`);
+}

@@ -144,6 +144,7 @@ export const quotes = pgTable(
     title: text("title").notNull(),
     priceCents: integer("price_cents"),
     status: quoteStatus("status").notNull().default("open"),
+    notes: text("notes"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
   (t) => [index("quotes_user_idx").on(t.userId)],
