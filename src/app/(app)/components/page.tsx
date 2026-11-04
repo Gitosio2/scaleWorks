@@ -20,7 +20,7 @@ import { EditModal } from "@/components/ui/edit-modal";
 import { FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filters";
 import { PageHeader } from "@/components/ui/page-header";
 import { Pagination } from "@/components/ui/pagination";
-import { StatusBadge } from "@/components/ui/status-badge";
+import { StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
 import { listItemClass } from "@/components/ui/styles";
 import {
   adjustComponentQuantity,
@@ -55,6 +55,7 @@ export default async function ComponentsPage({
   const t = await getTranslations("components");
   const tc = await getTranslations("common");
   const tn = await getTranslations("nav");
+  const ts = await getTranslations("supplyStatus");
   const locale = await getLocale();
 
   const q = textParam(sp, "q");
@@ -169,7 +170,12 @@ export default async function ComponentsPage({
                 )}
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                {row.quantity === 0 && <StatusBadge variant="mute">{t("outOfStock")}</StatusBadge>}
+                {row.status !== "in_hand" && (
+                  <StatusBadge variant={supplyStatusVariant(row.status)}>{ts(row.status)}</StatusBadge>
+                )}
+                {row.status === "in_hand" && row.quantity === 0 && (
+                  <StatusBadge variant="mute">{t("outOfStock")}</StatusBadge>
+                )}
                 <QuantityStepper
                   quantity={row.quantity}
                   action={adjustComponentQuantity.bind(null, row.id)}

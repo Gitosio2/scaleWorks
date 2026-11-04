@@ -5,32 +5,9 @@ import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { stockComponents } from "@/db/schema";
-import { capText, isUuid, parseHttpUrl } from "@/lib/input";
-import { parseEuros, type ActionT } from "@/lib/labels";
+import { isUuid } from "@/lib/input";
 import { requireUser } from "@/lib/session";
-import { parseStockQuantity } from "@/lib/stock";
-
-const MAX_TEXT = 500;
-const MAX_URL = 2000;
-
-function text(formData: FormData, key: string, max: number, t: ActionT) {
-  return capText(String(formData.get(key) ?? "").trim() || null, max, t);
-}
-
-async function parseComponent(formData: FormData) {
-  const t = await getTranslations("actionErrors");
-  const description = text(formData, "description", MAX_TEXT, t);
-  if (!description) throw new Error(t("descriptionRequired"));
-  return {
-    description,
-    brand: text(formData, "brand", MAX_TEXT, t),
-    reference: text(formData, "reference", MAX_TEXT, t),
-    store: text(formData, "store", MAX_TEXT, t),
-    url: parseHttpUrl(text(formData, "url", MAX_URL, t), t),
-    priceCents: parseEuros(String(formData.get("price") ?? ""), t),
-    quantity: parseStockQuantity(String(formData.get("quantity") ?? ""), t),
-  };
-}
+import { parseComponent } from "./parse";
 
 export async function createComponent(formData: FormData) {
   const user = await requireUser();

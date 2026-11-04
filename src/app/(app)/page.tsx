@@ -205,7 +205,8 @@ export default async function Home() {
         units: sql<number>`coalesce(sum(${stockComponents.quantity}), 0)::float8`,
       })
       .from(stockComponents)
-      .where(eq(stockComponents.userId, user.id)),
+      // Components still on their way are not stock yet.
+      .where(and(eq(stockComponents.userId, user.id), eq(stockComponents.status, "in_hand"))),
   ]);
   const expensesCents = partsSpent.cents + consumablesSpent.cents;
   const profit = aggregateProfitability(finishedRows);
