@@ -433,6 +433,11 @@
     "noClientOption": "— Sin cliente —",
     "searchPlaceholder": "Título o cliente",
     "empty": "Aún no hay presupuestos.",
+    "notes": {
+      "title": "Observaciones",
+      "label": "Observaciones",
+      "placeholder": "Cualquier cosa que convenga recordar de este presupuesto…"
+    },
     "emptyFiltered": "Ningún presupuesto coincide con estos filtros.",
     "sort": {
       "newest": "Más recientes primero",

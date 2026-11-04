@@ -30,6 +30,7 @@ export async function convertQuoteToModel(quoteId: string) {
       clientId: quote.clientId,
       name: quote.title,
       priceCents: quote.priceCents,
+      notes: quote.notes,
       phase: "not_started",
     }),
     db
