@@ -76,8 +76,9 @@ export default async function ComponentsPage({
       : undefined,
     store ? eq(c.store, store) : undefined,
     brand ? eq(c.brand, brand) : undefined,
-    stock === "available" ? gt(c.quantity, 0) : undefined,
-    stock === "empty" ? eq(c.quantity, 0) : undefined,
+    // Components still on their way (ordered / to order) are not stock yet.
+    stock === "available" ? and(gt(c.quantity, 0), eq(c.status, "in_hand")) : undefined,
+    stock === "empty" ? and(eq(c.quantity, 0), eq(c.status, "in_hand")) : undefined,
   ];
   const activeCount = [q, store, brand, stock].filter(Boolean).length;
 
