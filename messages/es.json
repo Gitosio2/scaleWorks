@@ -255,6 +255,7 @@
     "unitPrice": "Precio unidad (€)",
     "quantity": "Cantidad",
     "inStock": "{count} en stock",
+    "markInHand": "Marcar en mano",
     "outOfStock": "Sin stock",
     "unitPriceValue": "{amount} cada uno",
     "increase": "Añadir una unidad",

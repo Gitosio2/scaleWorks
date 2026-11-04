@@ -17,7 +17,8 @@ function parseStatus(value: string, t: ActionT): LooseStatus {
   return value as LooseStatus;
 }
 
-export async function parseLoosePart(formData: FormData) {
+// Everything but the status, for forms whose status is edited elsewhere.
+export async function parseLooseFields(formData: FormData) {
   const t = await getTranslations("actionErrors");
   const description = text(formData, "description");
   if (!description) throw new Error(t("descriptionRequired"));
@@ -25,8 +26,15 @@ export async function parseLoosePart(formData: FormData) {
     description,
     store: text(formData, "store"),
     priceCents: parseEuros(String(formData.get("price") ?? ""), t),
-    status: parseStatus(String(formData.get("status")), t),
     // An unchecked checkbox is simply absent from the form data.
     paid: formData.get("paid") === "on",
+  };
+}
+
+export async function parseLoosePart(formData: FormData) {
+  const t = await getTranslations("actionErrors");
+  return {
+    ...(await parseLooseFields(formData)),
+    status: parseStatus(String(formData.get("status")), t),
   };
 }

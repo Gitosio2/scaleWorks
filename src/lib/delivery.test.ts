@@ -26,3 +26,17 @@ describe("newLineStatus", () => {
     expect(newLineStatus("pending", "to_order")).toBe("to_order");
   });
 });
+
+describe("deliveryState with mixed and single lines", () => {
+  it("handles a note with a single line", () => {
+    expect(deliveryState(["ordered"])).toBe("pending");
+    expect(deliveryState(["in_hand"])).toBe("delivered");
+  });
+  it("counts to_order together with in_hand as partial", () => {
+    expect(deliveryState(["to_order", "in_hand"])).toBe("partial");
+    expect(deliveryState(["to_order", "ordered", "in_hand"])).toBe("partial");
+  });
+  it("never forces a status on a to_order line unless delivered", () => {
+    expect(newLineStatus("partial", "to_order")).toBe("to_order");
+  });
+});

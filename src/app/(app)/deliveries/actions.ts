@@ -12,15 +12,25 @@ import type { ActionT } from "@/lib/labels";
 import { requireUser } from "@/lib/session";
 import { parseComponent } from "../components/parse";
 import { parseConsumable, parseStatus } from "../consumables/parse";
-import { parseLoosePart } from "../expenses/parse";
+import { parseLooseFields, parseLoosePart } from "../expenses/parse";
 
 const MAX_TEXT = 500;
 const MAX_URL = 2000;
 
-export type LineKind = "part" | "consumable" | "component";
+// Not exported: a "use server" file may only export async functions.
+const LINE_KINDS = ["part", "consumable", "component"] as const;
 
 function text(formData: FormData, key: string, max: number, t: ActionT) {
   return capText(String(formData.get(key) ?? "").trim() || null, max, t);
+}
+
+// A client chooses the kind and the id of a line: both are checked before any query.
+async function requireLine(kind: string, id: string) {
+  const t = await tErrors();
+  if (!(LINE_KINDS as readonly string[]).includes(kind) || !isUuid(id)) {
+    throw new Error(t("invalidId"));
+  }
+  return kind as (typeof LINE_KINDS)[number];
 }
 
 function tErrors() {
@@ -104,7 +114,8 @@ export async function markDelivered(id: string) {
   const inHand = { status: "in_hand" as const };
   await db.batch([
     db.update(parts).set(inHand).where(and(eq(parts.deliveryId, id), eq(parts.userId, user.id))),
-    db.update(consumables).set(inHand).where(and(eq(consumables.deliveryId, id), eq(consumables.userId, user.id))),
+    // A depleted consumable that arrives again is usable again.
+    db.update(consumables).set({ ...inHand, active: true }).where(and(eq(consumables.deliveryId, id), eq(consumables.userId, user.id))),
     db.update(stockComponents).set(inHand).where(and(eq(stockComponents.deliveryId, id), eq(stockComponents.userId, user.id))),
   ]);
   refresh(id);
@@ -156,9 +167,12 @@ export async function addDeliveryComponent(deliveryId: string, formData: FormDat
 export async function updateDeliveryPart(deliveryId: string, id: string, formData: FormData) {
   const user = await requireUser();
   await requireDelivery(deliveryId, user.id);
+  await requireLine("part", id);
+  // The status has its own toggle: the form only offers ordered / in hand, so
+  // saving it here would turn a "to order" line into "ordered".
   await db
     .update(parts)
-    .set(await parseLoosePart(formData))
+    .set(await parseLooseFields(formData))
     .where(and(eq(parts.id, id), eq(parts.deliveryId, deliveryId), eq(parts.userId, user.id)));
   refresh(deliveryId);
 }
@@ -166,6 +180,7 @@ export async function updateDeliveryPart(deliveryId: string, id: string, formDat
 export async function updateDeliveryConsumable(deliveryId: string, id: string, formData: FormData) {
   const user = await requireUser();
   await requireDelivery(deliveryId, user.id);
+  await requireLine("consumable", id);
   await db
     .update(consumables)
     .set(await parseConsumable(formData))
@@ -176,6 +191,7 @@ export async function updateDeliveryConsumable(deliveryId: string, id: string, f
 export async function updateDeliveryComponent(deliveryId: string, id: string, formData: FormData) {
   const user = await requireUser();
   await requireDelivery(deliveryId, user.id);
+  await requireLine("component", id);
   await db
     .update(stockComponents)
     .set(await parseComponent(formData))
@@ -186,12 +202,13 @@ export async function updateDeliveryComponent(deliveryId: string, id: string, fo
 // Per-line status, for partial deliveries.
 export async function setLineStatus(
   deliveryId: string,
-  kind: LineKind,
+  kindInput: string,
   id: string,
   status: string,
 ) {
   const user = await requireUser();
   await requireDelivery(deliveryId, user.id);
+  const kind = await requireLine(kindInput, id);
   const next = parseStatus(status, await tErrors());
   if (kind === "part") {
     await db
@@ -214,9 +231,10 @@ export async function setLineStatus(
 }
 
 // Deletes the line itself, not just its link to the delivery.
-export async function deleteLine(deliveryId: string, kind: LineKind, id: string) {
+export async function deleteLine(deliveryId: string, kindInput: string, id: string) {
   const user = await requireUser();
   await requireDelivery(deliveryId, user.id);
+  const kind = await requireLine(kindInput, id);
   const table = kind === "part" ? parts : kind === "consumable" ? consumables : stockComponents;
   await db
     .delete(table)

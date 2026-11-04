@@ -15,6 +15,7 @@ export async function createComponent(formData: FormData) {
     .insert(stockComponents)
     .values({ ...(await parseComponent(formData)), userId: user.id });
   revalidatePath("/components");
+  revalidatePath("/deliveries", "layout");
 }
 
 async function requireId(id: string) {
@@ -29,6 +30,7 @@ export async function updateComponent(id: string, formData: FormData) {
     .set(await parseComponent(formData))
     .where(and(eq(stockComponents.id, id), eq(stockComponents.userId, user.id)));
   revalidatePath("/components");
+  revalidatePath("/deliveries", "layout");
 }
 
 // Quick +/- step. Done in SQL so concurrent clicks stay consistent and the
@@ -45,6 +47,21 @@ export async function adjustComponentQuantity(id: string, delta: number) {
     .set({ quantity: sql`GREATEST(${stockComponents.quantity} + ${delta}, 0)` })
     .where(and(eq(stockComponents.id, id), eq(stockComponents.userId, user.id)));
   revalidatePath("/components");
+  revalidatePath("/deliveries", "layout");
+}
+
+// A component that came on a delivery note and arrived (or whose note was deleted
+// before it was received) is marked in hand here, so it is never stuck as ordered.
+export async function receiveComponent(id: string) {
+  const user = await requireUser();
+  await requireId(id);
+  await db
+    .update(stockComponents)
+    .set({ status: "in_hand" })
+    .where(and(eq(stockComponents.id, id), eq(stockComponents.userId, user.id)));
+  revalidatePath("/components");
+  revalidatePath("/deliveries", "layout");
+  revalidatePath("/");
 }
 
 export async function deleteComponent(id: string) {
@@ -54,4 +71,5 @@ export async function deleteComponent(id: string) {
     .delete(stockComponents)
     .where(and(eq(stockComponents.id, id), eq(stockComponents.userId, user.id)));
   revalidatePath("/components");
+  revalidatePath("/deliveries", "layout");
 }

@@ -10,6 +10,7 @@ import { parseLoosePart } from "./parse";
 function refresh(modelId?: string | null) {
   if (modelId) revalidatePath(`/models/${modelId}`);
   revalidatePath("/expenses");
+  revalidatePath("/deliveries", "layout");
   revalidatePath("/");
 }
 

@@ -33,7 +33,6 @@ import {
   updateDeliveryComponent,
   updateDeliveryConsumable,
   updateDeliveryPart,
-  type LineKind,
 } from "../actions";
 
 export default async function DeliveryPage({ params }: { params: Promise<{ id: string }> }) {
@@ -59,7 +58,7 @@ export default async function DeliveryPage({ params }: { params: Promise<{ id: s
   ]);
 
   type Line = {
-    kind: LineKind;
+    kind: "part" | "consumable" | "component";
     id: string;
     description: string;
     detail: string;
@@ -75,7 +74,7 @@ export default async function DeliveryPage({ params }: { params: Promise<{ id: s
       description: p.description,
       detail: [p.store, money(p.priceCents)].filter(Boolean).join(" · "),
       status: p.status,
-      edit: <ExpenseFields defaults={p} />,
+      edit: <ExpenseFields defaults={p} hideStatus />,
       editAction: updateDeliveryPart.bind(null, id, p.id),
     })),
     ...consumableRows.map((c) => ({

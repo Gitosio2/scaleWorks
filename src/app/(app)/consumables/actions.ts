@@ -15,6 +15,7 @@ export async function createConsumable(formData: FormData) {
     .insert(consumables)
     .values({ ...(await parseConsumable(formData)), userId: user.id });
   revalidatePath("/consumables");
+  revalidatePath("/deliveries", "layout");
 }
 
 export async function updateConsumable(id: string, formData: FormData) {
@@ -24,6 +25,7 @@ export async function updateConsumable(id: string, formData: FormData) {
     .set(await parseConsumable(formData))
     .where(and(eq(consumables.id, id), eq(consumables.userId, user.id)));
   revalidatePath("/consumables");
+  revalidatePath("/deliveries", "layout");
 }
 
 export async function updateConsumableStatus(id: string, status: string) {
@@ -38,6 +40,7 @@ export async function updateConsumableStatus(id: string, status: string) {
     .set(change)
     .where(and(eq(consumables.id, id), eq(consumables.userId, user.id)));
   revalidatePath("/consumables");
+  revalidatePath("/deliveries", "layout");
   revalidatePath("/models");
 }
 
@@ -47,4 +50,5 @@ export async function deleteConsumable(id: string) {
     .delete(consumables)
     .where(and(eq(consumables.id, id), eq(consumables.userId, user.id)));
   revalidatePath("/consumables");
+  revalidatePath("/deliveries", "layout");
 }

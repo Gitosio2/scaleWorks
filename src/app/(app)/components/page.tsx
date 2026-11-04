@@ -21,9 +21,11 @@ import { FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filt
 import { PageHeader } from "@/components/ui/page-header";
 import { Pagination } from "@/components/ui/pagination";
 import { StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
-import { listItemClass } from "@/components/ui/styles";
+import { SubmitButton } from "@/components/ui/submit-button";
+import { listItemClass, secondaryButtonClass } from "@/components/ui/styles";
 import {
   adjustComponentQuantity,
+  receiveComponent,
   createComponent,
   deleteComponent,
   updateComponent,
@@ -172,7 +174,12 @@ export default async function ComponentsPage({
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 {row.status !== "in_hand" && (
-                  <StatusBadge variant={supplyStatusVariant(row.status)}>{ts(row.status)}</StatusBadge>
+                  <>
+                    <StatusBadge variant={supplyStatusVariant(row.status)}>{ts(row.status)}</StatusBadge>
+                    <form action={receiveComponent.bind(null, row.id)}>
+                      <SubmitButton className={secondaryButtonClass}>{t("markInHand")}</SubmitButton>
+                    </form>
+                  </>
                 )}
                 {row.status === "in_hand" && row.quantity === 0 && (
                   <StatusBadge variant="mute">{t("outOfStock")}</StatusBadge>
