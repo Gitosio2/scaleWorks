@@ -465,6 +465,11 @@
     "searchPlaceholder": "Title or client",
     "empty": "No quotes yet.",
     "emptyFiltered": "No quotes match these filters.",
+    "notes": {
+      "title": "Notes",
+      "label": "Notes",
+      "placeholder": "Anything worth remembering about this quote…"
+    },
     "sort": {
       "newest": "Newest first",
       "oldest": "Oldest first",

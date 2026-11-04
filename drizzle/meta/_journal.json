@@ -152,8 +152,15 @@
     {
       "idx": 21,
       "version": "7",
-      "when": 1793778409169,
-      "tag": "0021_deliveries",
+      "when": 1793814724953,
+      "tag": "0021_quote_notes",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1793819812308,
+      "tag": "0022_deliveries",
       "breakpoints": true
     }
   ]
