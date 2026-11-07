@@ -5,6 +5,7 @@
   "nav": {
     "main": "Main",
     "openMenu": "Open menu",
+    "pendingBadge": "{count, plural, one {# quote to prepare} other {# quotes to prepare}}",
     "closeMenu": "Close menu",
     "home": "Home",
     "models": "Models",
@@ -91,6 +92,7 @@
     "finished": "Finished"
   },
   "quoteStatus": {
+    "draft": "Draft",
     "open": "Open",
     "rejected": "Rejected"
   },
@@ -192,6 +194,8 @@
     "expensesLabel": "Expenses (parts and consumables ordered or in hand)",
     "balanceLabel": "Balance",
     "unpaidExpensesLabel": "{count, plural, =0 {Nothing left to pay} one {# expense left to pay} other {# expenses left to pay}}",
+    "draftQuotesTitle": "Quotes to prepare",
+    "draftQuotesHint": "Draft quotes still to be prepared, oldest first",
     "quotesTitle": "Quotes to decide",
     "quotesHint": "Open quotes, oldest first",
     "quoteAge": "{days, plural, =0 {Today} one {# day old} other {# days old}}",

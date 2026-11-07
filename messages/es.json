@@ -5,6 +5,7 @@
   "nav": {
     "main": "Principal",
     "openMenu": "Abrir menú",
+    "pendingBadge": "{count, plural, one {# presupuesto por preparar} other {# presupuestos por preparar}}",
     "closeMenu": "Cerrar menú",
     "home": "Inicio",
     "models": "Maquetas",
@@ -91,6 +92,7 @@
     "finished": "Terminada"
   },
   "quoteStatus": {
+    "draft": "Borrador",
     "open": "Abierto",
     "rejected": "Rechazado"
   },
@@ -192,6 +194,8 @@
     "expensesLabel": "Gastos (piezas y consumibles pedidos o en mano)",
     "balanceLabel": "Balance",
     "unpaidExpensesLabel": "{count, plural, =0 {Nada pendiente de pago} one {# gasto pendiente de pago} other {# gastos pendientes de pago}}",
+    "draftQuotesTitle": "Presupuestos por hacer",
+    "draftQuotesHint": "Borradores pendientes de preparar, los más antiguos primero",
     "quotesTitle": "Presupuestos por decidir",
     "quotesHint": "Presupuestos abiertos, los más antiguos primero",
     "quoteAge": "{days, plural, =0 {Hoy} one {Hace # día} other {Hace # días}}",

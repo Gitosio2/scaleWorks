@@ -11,7 +11,8 @@ import { modelTitle } from "@/lib/model-title";
 import { requireUser } from "@/lib/session";
 
 // Starts a new quote from a finished model: copies its client, price and
-// parts so the quote can be adjusted instead of written from scratch.
+// parts so the quote can be adjusted instead of written from scratch. It starts as
+// a draft because it still has to be prepared before it is sent.
 // Parts are copied (not moved) and restart as "to order".
 export async function createQuoteFromModel(modelId: string) {
   const user = await requireUser();
@@ -35,7 +36,7 @@ export async function createQuoteFromModel(modelId: string) {
     clientId: model.clientId,
     title: modelTitle(model.brand, model.name),
     priceCents: model.priceCents,
-    status: "open",
+    status: "draft",
   });
 
   if (modelParts.length === 0) {

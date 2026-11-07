@@ -52,9 +52,10 @@ export const paymentStatus = pgEnum("payment_status", [
   "paid",
 ]);
 
-// An accepted quote is converted into a model and deleted, so there is no
+// "draft" = still to be prepared; "open" = sent, awaiting a decision. An accepted
+// quote is converted into a model and deleted, so there is no
 // "accepted" state.
-export const quoteStatus = pgEnum("quote_status", ["open", "rejected"]);
+export const quoteStatus = pgEnum("quote_status", ["draft", "open", "rejected"]);
 
 // Prices are stored as integer cents to avoid floating-point rounding errors.
 
