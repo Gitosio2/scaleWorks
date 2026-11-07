@@ -11,7 +11,14 @@ type Defaults = {
 
 // Fields of a loose expense (a part with no model). "To order" is left out: it
 // would not count as owed until it is bought.
-export function ExpenseFields({ defaults = {} }: { defaults?: Defaults }) {
+export function ExpenseFields({
+  defaults = {},
+  hideStatus = false,
+}: {
+  defaults?: Defaults;
+  // For edit forms whose status is changed elsewhere.
+  hideStatus?: boolean;
+}) {
   const tc = useTranslations("common");
   const t = useTranslations("expenses");
   const ts = useTranslations("supplyStatus");
@@ -37,17 +44,19 @@ export function ExpenseFields({ defaults = {} }: { defaults?: Defaults }) {
           />
         </label>
       </div>
-      <label className={labelClass}>
-        {tc("status")}
-        <select
-          name="status"
-          defaultValue={defaults.status === "in_hand" ? "in_hand" : "ordered"}
-          className={inputClass}
-        >
-          <option value="ordered">{ts("ordered")}</option>
-          <option value="in_hand">{ts("in_hand")}</option>
-        </select>
-      </label>
+      {!hideStatus && (
+        <label className={labelClass}>
+          {tc("status")}
+          <select
+            name="status"
+            defaultValue={defaults.status === "in_hand" ? "in_hand" : "ordered"}
+            className={inputClass}
+          >
+            <option value="ordered">{ts("ordered")}</option>
+            <option value="in_hand">{ts("in_hand")}</option>
+          </select>
+        </label>
+      )}
       <label className="flex min-h-11 items-center gap-2 text-sm font-semibold text-ink-2">
         <input type="checkbox" name="paid" defaultChecked={defaults.paid ?? false} className="size-4 accent-brand" />
         {t("paid")}

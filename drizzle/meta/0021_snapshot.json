@@ -1,5 +1,5 @@
 {
-  "id": "fe8cf2c5-88f1-4d2d-829a-fbc6e30d60f1",
+  "id": "71ba1e5b-6245-49d8-9cea-c75a8202677f",
   "prevId": "c9a780df-b6a0-4a3c-b638-cfcfb87151d6",
   "version": "7",
   "dialect": "postgresql",
@@ -616,6 +616,12 @@
           "notNull": true,
           "default": "'open'"
         },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -1226,7 +1232,6 @@
       "name": "quote_status",
       "schema": "public",
       "values": [
-        "draft",
         "open",
         "rejected"
       ]

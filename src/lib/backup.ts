@@ -3,6 +3,7 @@ import { db } from "@/db";
 import {
   clients,
   consumables,
+  deliveries,
   modelConsumables,
   modelImages,
   models,
@@ -25,6 +26,7 @@ export const BACKUP_TABLES = [
   "modelConsumables",
   "timeEntries",
   "stockComponents",
+  "deliveries",
 ] as const;
 export type BackupTable = (typeof BACKUP_TABLES)[number];
 
@@ -46,6 +48,7 @@ const COLUMNS: Record<BackupTable, string[]> = {
   modelConsumables: Object.keys(getTableColumns(modelConsumables)),
   timeEntries: Object.keys(getTableColumns(timeEntries)),
   stockComponents: Object.keys(getTableColumns(stockComponents)),
+  deliveries: Object.keys(getTableColumns(deliveries)),
 };
 
 export function columnsOf(table: BackupTable) {
@@ -83,6 +86,8 @@ export async function loadTable(table: BackupTable, userId: string): Promise<Row
       return withoutOwner(
         await db.select().from(stockComponents).where(eq(stockComponents.userId, userId)),
       );
+    case "deliveries":
+      return withoutOwner(await db.select().from(deliveries).where(eq(deliveries.userId, userId)));
     case "modelConsumables":
       // The link table has no owner column: it belongs to the account through its model.
       return db

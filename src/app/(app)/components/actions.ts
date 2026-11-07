@@ -5,32 +5,9 @@ import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { stockComponents } from "@/db/schema";
-import { capText, isUuid, parseHttpUrl } from "@/lib/input";
-import { parseEuros, type ActionT } from "@/lib/labels";
+import { isUuid } from "@/lib/input";
 import { requireUser } from "@/lib/session";
-import { parseStockQuantity } from "@/lib/stock";
-
-const MAX_TEXT = 500;
-const MAX_URL = 2000;
-
-function text(formData: FormData, key: string, max: number, t: ActionT) {
-  return capText(String(formData.get(key) ?? "").trim() || null, max, t);
-}
-
-async function parseComponent(formData: FormData) {
-  const t = await getTranslations("actionErrors");
-  const description = text(formData, "description", MAX_TEXT, t);
-  if (!description) throw new Error(t("descriptionRequired"));
-  return {
-    description,
-    brand: text(formData, "brand", MAX_TEXT, t),
-    reference: text(formData, "reference", MAX_TEXT, t),
-    store: text(formData, "store", MAX_TEXT, t),
-    url: parseHttpUrl(text(formData, "url", MAX_URL, t), t),
-    priceCents: parseEuros(String(formData.get("price") ?? ""), t),
-    quantity: parseStockQuantity(String(formData.get("quantity") ?? ""), t),
-  };
-}
+import { parseComponent } from "./parse";
 
 export async function createComponent(formData: FormData) {
   const user = await requireUser();
@@ -38,6 +15,7 @@ export async function createComponent(formData: FormData) {
     .insert(stockComponents)
     .values({ ...(await parseComponent(formData)), userId: user.id });
   revalidatePath("/components");
+  revalidatePath("/deliveries", "layout");
 }
 
 async function requireId(id: string) {
@@ -52,6 +30,7 @@ export async function updateComponent(id: string, formData: FormData) {
     .set(await parseComponent(formData))
     .where(and(eq(stockComponents.id, id), eq(stockComponents.userId, user.id)));
   revalidatePath("/components");
+  revalidatePath("/deliveries", "layout");
 }
 
 // Quick +/- step. Done in SQL so concurrent clicks stay consistent and the
@@ -68,6 +47,21 @@ export async function adjustComponentQuantity(id: string, delta: number) {
     .set({ quantity: sql`GREATEST(${stockComponents.quantity} + ${delta}, 0)` })
     .where(and(eq(stockComponents.id, id), eq(stockComponents.userId, user.id)));
   revalidatePath("/components");
+  revalidatePath("/deliveries", "layout");
+}
+
+// A component that came on a delivery note and arrived (or whose note was deleted
+// before it was received) is marked in hand here, so it is never stuck as ordered.
+export async function receiveComponent(id: string) {
+  const user = await requireUser();
+  await requireId(id);
+  await db
+    .update(stockComponents)
+    .set({ status: "in_hand" })
+    .where(and(eq(stockComponents.id, id), eq(stockComponents.userId, user.id)));
+  revalidatePath("/components");
+  revalidatePath("/deliveries", "layout");
+  revalidatePath("/");
 }
 
 export async function deleteComponent(id: string) {
@@ -77,4 +71,5 @@ export async function deleteComponent(id: string) {
     .delete(stockComponents)
     .where(and(eq(stockComponents.id, id), eq(stockComponents.userId, user.id)));
   revalidatePath("/components");
+  revalidatePath("/deliveries", "layout");
 }
