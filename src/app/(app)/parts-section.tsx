@@ -16,8 +16,12 @@ import {
   primaryButtonClass,
 } from "@/components/ui/styles";
 
-// A part, plus the unit price of its stock component when it was taken from stock.
-type Part = typeof parts.$inferSelect & { stockUnitPriceCents?: number | null };
+// A part, plus the unit price and the units still on hand of its stock component
+// when it was taken from stock.
+type Part = typeof parts.$inferSelect & {
+  stockUnitPriceCents?: number | null;
+  stockAvailable?: number | null;
+};
 
 // Status is edited through the toggle, so it is not part of these fields.
 function PartFields({ defaults }: { defaults?: Part }) {
@@ -184,6 +188,8 @@ export function PartsSection({
                           type="number"
                           inputMode="numeric"
                           min={1}
+                          // The part can use at most what it already holds plus what is left in stock.
+                          max={(p.quantity ?? 0) + (p.stockAvailable ?? 0)}
                           step={1}
                           required
                           defaultValue={p.quantity ?? 1}

@@ -111,7 +111,11 @@ export default async function ModelDetailPage({
       .from(timeEntries)
       .where(and(eq(timeEntries.modelId, id), eq(timeEntries.userId, user.id))),
     db
-      .select({ part: parts, stockUnitPriceCents: stockComponents.priceCents })
+      .select({
+        part: parts,
+        stockUnitPriceCents: stockComponents.priceCents,
+        stockAvailable: stockComponents.quantity,
+      })
       .from(parts)
       .leftJoin(stockComponents, eq(stockComponents.id, parts.stockComponentId))
       .where(and(eq(parts.modelId, id), eq(parts.userId, user.id)))
@@ -141,9 +145,10 @@ export default async function ModelDetailPage({
       .where(eq(stockComponents.userId, user.id))
       .orderBy(stockComponents.description),
   ]);
-  const partRowsWithCost = partRows.map(({ part, stockUnitPriceCents }) => ({
+  const partRowsWithCost = partRows.map(({ part, stockUnitPriceCents, stockAvailable }) => ({
     ...part,
     stockUnitPriceCents,
+    stockAvailable,
   }));
   const costOfPart = (p: (typeof partRowsWithCost)[number]) =>
     partCostCents({
