@@ -140,22 +140,31 @@ export async function deleteModel(id: string) {
     .from(modelImages)
     .where(and(eq(modelImages.modelId, id), eq(modelImages.userId, user.id)));
   // Parts taken from stock go back to the warehouse with the model, in the same
-  // statement as the delete (no interactive transactions on neon-http).
+  // statement as the delete (no interactive transactions on neon-http). The refund
+  // is read from the rows this very statement deletes (RETURNING), so a part removed
+  // concurrently by deletePart is refunded once, by whichever statement deleted it.
   if (isUuid(id)) {
     await db.execute(sql`
-      WITH back AS (
+      WITH owned AS (
+        SELECT id FROM models WHERE id = ${id}::uuid AND user_id = ${user.id}
+      ),
+      removed AS (
+        DELETE FROM parts
+        WHERE model_id IN (SELECT id FROM owned) AND stock_component_id IS NOT NULL
+        RETURNING stock_component_id, quantity
+      ),
+      back AS (
         SELECT stock_component_id, sum(quantity)::int AS units
-        FROM parts
-        WHERE model_id = ${id}::uuid AND user_id = ${user.id} AND stock_component_id IS NOT NULL
+        FROM removed
         GROUP BY stock_component_id
       ),
       gone AS (
-        DELETE FROM models WHERE id = ${id}::uuid AND user_id = ${user.id} RETURNING id
+        DELETE FROM models WHERE id IN (SELECT id FROM owned) RETURNING id
       )
       UPDATE stock_components s
       SET quantity = s.quantity + back.units, updated_at = now()
       FROM back
-      WHERE s.id = back.stock_component_id AND EXISTS (SELECT 1 FROM gone)
+      WHERE s.id = back.stock_component_id
     `);
   }
   // The model is already gone, so a storage failure must not fail the action or
