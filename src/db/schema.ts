@@ -150,57 +150,6 @@ export const quotes = pgTable(
   (t) => [index("quotes_user_idx").on(t.userId)],
 );
 
-// A part belongs to one model OR one quote, or to neither (a loose purchase added
-// from Pending expenses). Converting a quote moves its parts to the new model.
-export const parts = pgTable(
-  "parts",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    userId: text("user_id").notNull(),
-    modelId: uuid("model_id").references(() => models.id, {
-      onDelete: "cascade",
-    }),
-    quoteId: uuid("quote_id").references(() => quotes.id, {
-      onDelete: "cascade",
-    }),
-    brand: text("brand"),
-    reference: text("reference"),
-    description: text("description").notNull(),
-    priceCents: integer("price_cents"),
-    store: text("store"),
-    url: text("url"),
-    status: supplyStatus("status").notNull().default("to_order"),
-    // Payment is separate from supply: a part can be ordered or in hand and still
-    // unpaid. Unpaid parts of models that were bought feed "Pending expenses".
-    paid: boolean("paid").notNull().default(false),
-  },
-  (t) => [
-    // At most one owner. A part with neither is a "loose" purchase added from
-    // Pending expenses, not tied to any model or quote.
-    check(
-      "parts_at_most_one_owner",
-      sql`NOT (${t.modelId} IS NOT NULL AND ${t.quoteId} IS NOT NULL)`,
-    ),
-  ],
-);
-
-// General supplies (thinner, primer, some paints) reused across models.
-export const consumables = pgTable("consumables", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id").notNull(),
-  store: text("store"),
-  description: text("description").notNull(),
-  priceCents: integer("price_cents"),
-  reference: text("reference"),
-  status: supplyStatus("status").notNull().default("to_order"),
-  category: consumableCategory("category").notNull().default("other"),
-  // Manual color as "#rrggbb"; when null the swatch falls back to a RAL code in `reference`.
-  colorHex: text("color_hex"),
-  // Inactive = used up or broken. The row is kept so price and store stay
-  // consultable, and it can still be linked from models it was used on.
-  active: boolean("active").notNull().default(true),
-});
-
 // Parts kept in the warehouse, counted by unit. Separate from `parts` (which
 // has no quantity and ties a purchase to a model or quote).
 export const stockComponents = pgTable(
@@ -227,6 +176,72 @@ export const stockComponents = pgTable(
     check("stock_components_quantity_non_negative", sql`${t.quantity} >= 0`),
   ],
 );
+
+// A part belongs to one model OR one quote, or to neither (a loose purchase added
+// from Pending expenses). Converting a quote moves its parts to the new model.
+export const parts = pgTable(
+  "parts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    modelId: uuid("model_id").references(() => models.id, {
+      onDelete: "cascade",
+    }),
+    quoteId: uuid("quote_id").references(() => quotes.id, {
+      onDelete: "cascade",
+    }),
+    brand: text("brand"),
+    reference: text("reference"),
+    description: text("description").notNull(),
+    priceCents: integer("price_cents"),
+    store: text("store"),
+    url: text("url"),
+    status: supplyStatus("status").notNull().default("to_order"),
+    // Payment is separate from supply: a part can be ordered or in hand and still
+    // unpaid. Unpaid parts of models that were bought feed "Pending expenses".
+    paid: boolean("paid").notNull().default(false),
+    // Set when the part was taken from the warehouse. Its cost is then derived
+    // live (component unit price x quantity), never stored in priceCents.
+    // RESTRICT: a component used by a part cannot be deleted.
+    stockComponentId: uuid("stock_component_id").references(
+      () => stockComponents.id,
+      { onDelete: "restrict" },
+    ),
+    // Units taken from stock; set exactly when stockComponentId is.
+    quantity: integer("quantity"),
+  },
+  (t) => [
+    // At most one owner. A part with neither is a "loose" purchase added from
+    // Pending expenses, not tied to any model or quote.
+    check(
+      "parts_at_most_one_owner",
+      sql`NOT (${t.modelId} IS NOT NULL AND ${t.quoteId} IS NOT NULL)`,
+    ),
+    // Stock parts only exist on models (never on quotes or loose), with a
+    // positive quantity; plain parts carry no quantity.
+    check(
+      "parts_stock_link_consistent",
+      sql`(${t.stockComponentId} IS NULL AND ${t.quantity} IS NULL) OR (${t.stockComponentId} IS NOT NULL AND ${t.quantity} > 0 AND ${t.modelId} IS NOT NULL)`,
+    ),
+  ],
+);
+
+// General supplies (thinner, primer, some paints) reused across models.
+export const consumables = pgTable("consumables", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").notNull(),
+  store: text("store"),
+  description: text("description").notNull(),
+  priceCents: integer("price_cents"),
+  reference: text("reference"),
+  status: supplyStatus("status").notNull().default("to_order"),
+  category: consumableCategory("category").notNull().default("other"),
+  // Manual color as "#rrggbb"; when null the swatch falls back to a RAL code in `reference`.
+  colorHex: text("color_hex"),
+  // Inactive = used up or broken. The row is kept so price and store stay
+  // consultable, and it can still be linked from models it was used on.
+  active: boolean("active").notNull().default(true),
+});
 
 // Many-to-many: which consumables were used on which model.
 export const modelConsumables = pgTable(

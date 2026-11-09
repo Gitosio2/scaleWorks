@@ -218,7 +218,11 @@
     "paid": "Pagada",
     "unpaid": "Sin pagar",
     "markPaid": "Marcar como pagada",
-    "markUnpaid": "Marcar como no pagada"
+    "markUnpaid": "Marcar como no pagada",
+    "fromStock": "Del almacén",
+    "stockSummary": "{quantity} × {unit} = {total}",
+    "stockEditTitle": "Editar cantidad",
+    "quantity": "Cantidad"
   },
   "clients": {
     "subtitle": "Personas y empresas para las que trabajas.",
@@ -400,6 +404,17 @@
       "durationHint": "Formato hh:mm, por ejemplo 01:30",
       "empty": "Aún no se ha registrado tiempo."
     },
+    "stockParts": {
+      "title": "Componentes del almacén: {total}",
+      "addFirst": "Primero añade componentes a tu almacén en <link>Componentes</link>.",
+      "select": "Componente",
+      "quantity": "Cantidad",
+      "option": "{name} · {unit} cada uno · {available} en stock",
+      "optionEmpty": "{name} · {unit} cada uno · sin stock",
+      "total": "Total: {total}",
+      "add": "Añadir del almacén",
+      "help": "Al añadirlo se descuentan estas unidades de tu almacén. Si quitas la pieza, se devuelven."
+    },
     "consumables": {
       "title": "Consumibles: {total}",
       "addFirst": "Primero añade consumibles en <link>Consumibles</link>.",
@@ -451,6 +466,11 @@
     "invalidPrice": "Precio no válido",
     "invalidQuantity": "Cantidad no válida",
     "invalidStockQuantity": "La cantidad debe ser un número entero de 0 o más",
+    "invalidUsedQuantity": "La cantidad debe ser un número entero de 1 o más",
+    "componentNotFound": "Componente no encontrado",
+    "insufficientStock": "No hay existencias suficientes de este componente",
+    "componentInUse": "Este componente se usa en una pieza de un modelo. Quítalo primero del modelo",
+    "partNotFound": "Pieza no encontrada",
     "nameRequired": "El nombre es obligatorio",
     "clientHasRecords": "El cliente tiene maquetas o presupuestos y no se puede eliminar",
     "titleRequired": "El título es obligatorio",

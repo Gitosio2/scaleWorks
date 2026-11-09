@@ -155,6 +155,13 @@
       "when": 1793814724953,
       "tag": "0021_quote_notes",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1794173107322,
+      "tag": "0022_parts_stock_link",
+      "breakpoints": true
     }
   ]
 }

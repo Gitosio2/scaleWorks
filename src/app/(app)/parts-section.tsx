@@ -2,6 +2,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { supplyStatus } from "@/db/schema";
 import type { parts } from "@/db/schema";
 import { formatEuros } from "@/lib/labels";
+import { partCostCents } from "@/lib/part-cost";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { CollapsibleCard } from "@/components/ui/card";
 import { StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
@@ -15,7 +16,8 @@ import {
   primaryButtonClass,
 } from "@/components/ui/styles";
 
-type Part = typeof parts.$inferSelect;
+// A part, plus the unit price of its stock component when it was taken from stock.
+type Part = typeof parts.$inferSelect & { stockUnitPriceCents?: number | null };
 
 // Status is edited through the toggle, so it is not part of these fields.
 function PartFields({ defaults }: { defaults?: Part }) {
@@ -71,6 +73,7 @@ export function PartsSection({
   updateStatus,
   remove,
   setPaid,
+  updateStockQuantity,
 }: {
   parts: Part[];
   add: (formData: FormData) => Promise<void>;
@@ -79,12 +82,20 @@ export function PartsSection({
   remove: (partId: string) => Promise<void>;
   // Only models track payment; quotes leave this out and show no paid check.
   setPaid?: (partId: string, paid: boolean) => Promise<void>;
+  // Parts taken from stock only let their quantity change; quotes have none.
+  updateStockQuantity?: (partId: string, formData: FormData) => Promise<void>;
 }) {
   const t = useTranslations("parts");
   const tc = useTranslations("common");
   const ts = useTranslations("supplyStatus");
   const locale = useLocale();
-  const totalCents = rows.reduce((acc, p) => acc + (p.priceCents ?? 0), 0);
+  const costOf = (p: Part) =>
+    partCostCents({
+      priceCents: p.priceCents,
+      stockUnitPriceCents: p.stockUnitPriceCents ?? null,
+      quantity: p.quantity,
+    });
+  const totalCents = rows.reduce((acc, p) => acc + costOf(p), 0);
   const statusOptions = supplyStatus.enumValues.map((s) => ({
     value: s as string,
     label: ts(s),
@@ -117,7 +128,13 @@ export function PartsSection({
               <p className="text-[13px] text-muted">
                 {[p.brand, p.reference].filter(Boolean).join(" · ") || tc("noValue")}
                 {" · "}
-                {formatEuros(p.priceCents, locale)}
+                {p.stockComponentId !== null && p.quantity !== null
+                  ? t("stockSummary", {
+                      quantity: p.quantity,
+                      unit: formatEuros(p.stockUnitPriceCents ?? 0, locale),
+                      total: formatEuros(costOf(p), locale),
+                    })
+                  : formatEuros(p.priceCents, locale)}
               </p>
               <p className="text-[13px] text-muted">
                 {p.url ? (
@@ -132,43 +149,74 @@ export function PartsSection({
             {/* On a phone this block is a narrow column at the right (icons, then the badges stacked) so the text keeps its room; from sm on it is one row, badges first. */}
             <div className="row-span-2 flex flex-col items-end gap-2 self-start sm:row-span-1 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
               <div className="flex flex-col items-end gap-2 max-sm:order-2 sm:flex-row sm:items-center">
-                <StatusBadge variant={supplyStatusVariant(p.status)}>
-                  {ts(p.status)}
-                </StatusBadge>
-                {/* A part still "to order" is not owed yet, so only bought parts show or change their payment. */}
-                {setPaid && p.status !== "to_order" && (
+                {p.stockComponentId !== null ? (
+                  <StatusBadge variant="ok">{t("fromStock")}</StatusBadge>
+                ) : (
+                  <StatusBadge variant={supplyStatusVariant(p.status)}>
+                    {ts(p.status)}
+                  </StatusBadge>
+                )}
+                {/* A part still "to order" is not owed yet, so only bought parts show or change their payment. Stock parts are already bought and paid. */}
+                {setPaid && p.stockComponentId === null && p.status !== "to_order" && (
                   <StatusBadge variant={p.paid ? "ok" : "warn"}>
                     {p.paid ? t("paid") : t("unpaid")}
                   </StatusBadge>
                 )}
               </div>
               <div className="flex items-center gap-2">
-                {setPaid && p.status !== "to_order" && (
+                {setPaid && p.stockComponentId === null && p.status !== "to_order" && (
                   <form action={setPaid.bind(null, p.id, !p.paid)}>
                     <PaidCheckButton paid={p.paid} label={p.paid ? t("markUnpaid") : t("markPaid")} />
                   </form>
                 )}
-                <EditModal
-                  label={tc("edit")}
-                  title={t("editTitle")}
-                  submitLabel={tc("save")}
-                  action={update.bind(null, p.id)}
-                >
-                  <PartFields defaults={p} />
-                </EditModal>
+                {p.stockComponentId !== null ? (
+                  updateStockQuantity && (
+                    <EditModal
+                      label={tc("edit")}
+                      title={t("stockEditTitle")}
+                      submitLabel={tc("save")}
+                      action={updateStockQuantity.bind(null, p.id)}
+                    >
+                      <label className={labelClass}>
+                        {t("quantity")}
+                        <input
+                          name="quantity"
+                          type="number"
+                          inputMode="numeric"
+                          min={1}
+                          step={1}
+                          required
+                          defaultValue={p.quantity ?? 1}
+                          className={inputClass}
+                        />
+                      </label>
+                    </EditModal>
+                  )
+                ) : (
+                  <EditModal
+                    label={tc("edit")}
+                    title={t("editTitle")}
+                    submitLabel={tc("save")}
+                    action={update.bind(null, p.id)}
+                  >
+                    <PartFields defaults={p} />
+                  </EditModal>
+                )}
                 <form action={remove.bind(null, p.id)}>
                   <DeleteIconButton label={tc("delete")} />
                 </form>
               </div>
             </div>
-            <div className="sm:col-span-2">
-              <SegmentedToggle
-                value={p.status}
-                options={statusOptions}
-                action={updateStatus.bind(null, p.id)}
-                label={tc("status")}
-              />
-            </div>
+            {p.stockComponentId === null && (
+              <div className="sm:col-span-2">
+                <SegmentedToggle
+                  value={p.status}
+                  options={statusOptions}
+                  action={updateStatus.bind(null, p.id)}
+                  label={tc("status")}
+                />
+              </div>
+            )}
           </li>
         ))}
       </ul>

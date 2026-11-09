@@ -9,6 +9,7 @@ import {
   modelConsumables,
   models,
   parts,
+  stockComponents,
   timeEntries,
 } from "@/db/schema";
 import {
@@ -19,6 +20,7 @@ import {
   remainingCents,
 } from "@/lib/labels";
 import { consumableCost } from "@/lib/consumable-cost";
+import { partCostCents } from "@/lib/part-cost";
 import { todayInMadrid } from "@/lib/dates";
 import { modelTitle } from "@/lib/model-title";
 import { canHold } from "@/lib/payment-hold";
@@ -55,6 +57,8 @@ import {
 import { PartsSection } from "@/app/(app)/parts-section";
 import { PhotosSection } from "./photos-section";
 import { QuantityFields } from "./quantity-fields";
+import { addStockPart, updateStockPartQuantity } from "./stock-part-actions";
+import { StockPartForm } from "./stock-part-form";
 
 function ProfitStat({
   label,
@@ -95,7 +99,7 @@ export default async function ModelDetailPage({
   if (!row) notFound();
   const { model: m, clientName } = row;
 
-  const [entries, [{ total }], partRows, linkedRows, consumableOptions] =
+  const [entries, [{ total }], partRows, linkedRows, consumableOptions, stockOptions] =
     await Promise.all([
     db
       .select()
@@ -107,8 +111,9 @@ export default async function ModelDetailPage({
       .from(timeEntries)
       .where(and(eq(timeEntries.modelId, id), eq(timeEntries.userId, user.id))),
     db
-      .select()
+      .select({ part: parts, stockUnitPriceCents: stockComponents.priceCents })
       .from(parts)
+      .leftJoin(stockComponents, eq(stockComponents.id, parts.stockComponentId))
       .where(and(eq(parts.modelId, id), eq(parts.userId, user.id)))
       .orderBy(parts.description),
     db
@@ -124,13 +129,37 @@ export default async function ModelDetailPage({
       .from(consumables)
       .where(and(eq(consumables.userId, user.id), eq(consumables.active, true)))
       .orderBy(consumables.description),
+    db
+      .select({
+        id: stockComponents.id,
+        brand: stockComponents.brand,
+        description: stockComponents.description,
+        priceCents: stockComponents.priceCents,
+        quantity: stockComponents.quantity,
+      })
+      .from(stockComponents)
+      .where(eq(stockComponents.userId, user.id))
+      .orderBy(stockComponents.description),
   ]);
+  const partRowsWithCost = partRows.map(({ part, stockUnitPriceCents }) => ({
+    ...part,
+    stockUnitPriceCents,
+  }));
+  const costOfPart = (p: (typeof partRowsWithCost)[number]) =>
+    partCostCents({
+      priceCents: p.priceCents,
+      stockUnitPriceCents: p.stockUnitPriceCents,
+      quantity: p.quantity,
+    });
+  const stockPartsTotalCents = partRowsWithCost
+    .filter((p) => p.quantity !== null)
+    .reduce((acc, p) => acc + costOfPart(p), 0);
   const consumablesTotalCents = linkedRows.reduce(
     (acc, r) => acc + (consumableCost(r.consumable.priceCents, r.quantity) ?? 0),
     0,
   );
 
-  const partsTotalCents = partRows.reduce((acc, p) => acc + (p.priceCents ?? 0), 0);
+  const partsTotalCents = partRowsWithCost.reduce((acc, p) => acc + costOfPart(p), 0);
   const totalMinutes = Number(total ?? 0);
   const costCents = partsTotalCents + consumablesTotalCents;
   const { profitCents, centsPerHour } = profitability({
@@ -292,13 +321,41 @@ export default async function ModelDetailPage({
       </CollapsibleCard>
 
       <PartsSection
-        parts={partRows}
+        parts={partRowsWithCost}
         add={addPart.bind(null, id)}
+        updateStockQuantity={updateStockPartQuantity.bind(null, id)}
         update={updatePart.bind(null, id)}
         updateStatus={updatePartStatus.bind(null, id)}
         remove={deletePart.bind(null, id)}
         setPaid={setPartPaid}
       />
+
+      <CollapsibleCard title={t("stockParts.title", { total: formatEuros(stockPartsTotalCents, locale) })}>
+        {stockOptions.length === 0 ? (
+          <p className="text-muted">
+            {t.rich("stockParts.addFirst", {
+              link: (chunks) => (
+                <Link href="/components" className="font-semibold text-brand hover:underline">
+                  {chunks}
+                </Link>
+              ),
+            })}
+          </p>
+        ) : (
+          <>
+            <p className="text-[13px] text-muted">{t("stockParts.help")}</p>
+            <StockPartForm
+              action={addStockPart.bind(null, id)}
+              options={stockOptions.map((c) => ({
+                id: c.id,
+                name: [c.brand, c.description].filter(Boolean).join(" "),
+                priceCents: c.priceCents,
+                quantity: c.quantity,
+              }))}
+            />
+          </>
+        )}
+      </CollapsibleCard>
 
       <CollapsibleCard title={t("consumables.title", { total: formatEuros(consumablesTotalCents, locale) })}>
 

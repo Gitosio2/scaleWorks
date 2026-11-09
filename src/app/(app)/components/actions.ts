@@ -4,7 +4,8 @@ import { and, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
-import { stockComponents } from "@/db/schema";
+import { parts, stockComponents } from "@/db/schema";
+import { isForeignKeyViolation } from "@/lib/db-errors";
 import { capText, isUuid, parseHttpUrl } from "@/lib/input";
 import { parseEuros, type ActionT } from "@/lib/labels";
 import { requireUser } from "@/lib/session";
@@ -73,8 +74,22 @@ export async function adjustComponentQuantity(id: string, delta: number) {
 export async function deleteComponent(id: string) {
   const user = await requireUser();
   await requireId(id);
-  await db
-    .delete(stockComponents)
-    .where(and(eq(stockComponents.id, id), eq(stockComponents.userId, user.id)));
+  const t = await getTranslations("actionErrors");
+  // A component used by a model's part cannot go: that part's cost is derived from it.
+  const [used] = await db
+    .select({ id: parts.id })
+    .from(parts)
+    .where(and(eq(parts.stockComponentId, id), eq(parts.userId, user.id)))
+    .limit(1);
+  if (used) throw new Error(t("componentInUse"));
+  try {
+    await db
+      .delete(stockComponents)
+      .where(and(eq(stockComponents.id, id), eq(stockComponents.userId, user.id)));
+  } catch (error) {
+    // Lost a race with a concurrent "add to model": the FK still protects it.
+    if (isForeignKeyViolation(error)) throw new Error(t("componentInUse"));
+    throw error;
+  }
   revalidatePath("/components");
 }

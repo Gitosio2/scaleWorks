@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { adjustQuantity, parseStockQuantity } from "./stock";
+import { adjustQuantity, parseStockQuantity, parseUsedQuantity } from "./stock";
 import type { ActionT } from "./labels";
 
 const t: ActionT = (key) => key;
@@ -40,5 +40,18 @@ describe("adjustQuantity", () => {
   it("never goes below zero", () => {
     expect(adjustQuantity(0, -1)).toBe(0);
     expect(adjustQuantity(2, -10)).toBe(0);
+  });
+});
+
+describe("parseUsedQuantity", () => {
+  it("accepts positive whole numbers", () => {
+    expect(parseUsedQuantity("1", t)).toBe(1);
+    expect(parseUsedQuantity(" 25 ", t)).toBe(25);
+  });
+
+  it("rejects zero, empty, negative, decimal and non-numeric input", () => {
+    for (const raw of ["", "0", "-2", "1.5", "abc"]) {
+      expect(() => parseUsedQuantity(raw, t)).toThrow("invalidUsedQuantity");
+    }
   });
 });

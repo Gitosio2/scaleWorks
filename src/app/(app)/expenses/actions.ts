@@ -60,6 +60,8 @@ export async function setPartPaid(partId: string, paid: boolean) {
         eq(parts.id, partId),
         eq(parts.userId, user.id),
         isNull(parts.quoteId),
+        // Stock parts are already-bought inventory: always paid.
+        isNull(parts.stockComponentId),
         paid ? ne(parts.status, "to_order") : undefined,
       ),
     )

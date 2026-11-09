@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq, ne } from "drizzle-orm";
+import { and, eq, ne, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -13,6 +13,7 @@ import {
   modelType,
   paymentStatus,
 } from "@/db/schema";
+import { isUuid } from "@/lib/input";
 import { parseEuros } from "@/lib/labels";
 import { derivePayment } from "@/lib/payments";
 import { nextHold } from "@/lib/payment-hold";
@@ -138,9 +139,25 @@ export async function deleteModel(id: string) {
     .select({ key: modelImages.key, thumbKey: modelImages.thumbKey })
     .from(modelImages)
     .where(and(eq(modelImages.modelId, id), eq(modelImages.userId, user.id)));
-  await db
-    .delete(models)
-    .where(and(eq(models.id, id), eq(models.userId, user.id)));
+  // Parts taken from stock go back to the warehouse with the model, in the same
+  // statement as the delete (no interactive transactions on neon-http).
+  if (isUuid(id)) {
+    await db.execute(sql`
+      WITH back AS (
+        SELECT stock_component_id, sum(quantity)::int AS units
+        FROM parts
+        WHERE model_id = ${id}::uuid AND user_id = ${user.id} AND stock_component_id IS NOT NULL
+        GROUP BY stock_component_id
+      ),
+      gone AS (
+        DELETE FROM models WHERE id = ${id}::uuid AND user_id = ${user.id} RETURNING id
+      )
+      UPDATE stock_components s
+      SET quantity = s.quantity + back.units, updated_at = now()
+      FROM back
+      WHERE s.id = back.stock_component_id AND EXISTS (SELECT 1 FROM gone)
+    `);
+  }
   // The model is already gone, so a storage failure must not fail the action or
   // skip the revalidation: log the keys so the files can be removed by hand.
   const keys = images.flatMap((i) => [i.key, i.thumbKey]);
