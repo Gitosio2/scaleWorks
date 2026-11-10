@@ -39,10 +39,12 @@ export async function addStockPart(modelId: string, formData: FormData) {
 
   // The component is only read to tell "not yours / gone" from "not enough".
   const [component] = await db
-    .select({ id: stockComponents.id })
+    .select({ id: stockComponents.id, status: stockComponents.status })
     .from(stockComponents)
     .where(and(eq(stockComponents.id, componentId), eq(stockComponents.userId, user.id)));
   if (!component) throw new Error(t("componentNotFound"));
+  // A component that has not arrived yet is not real stock.
+  if (component.status !== "in_hand") throw new Error(t("componentNotArrived"));
 
   // Decrement (guarded) and insert in one statement. The part is a snapshot of
   // the component's labels; its cost is never stored, it is derived live.
@@ -50,7 +52,7 @@ export async function addStockPart(modelId: string, formData: FormData) {
     WITH taken AS (
       UPDATE stock_components
       SET quantity = quantity - ${quantity}::int, updated_at = now()
-      WHERE id = ${componentId}::uuid AND user_id = ${user.id} AND quantity >= ${quantity}::int
+      WHERE id = ${componentId}::uuid AND user_id = ${user.id} AND status = 'in_hand' AND quantity >= ${quantity}::int
       RETURNING id, brand, reference, description, store, url
     )
     INSERT INTO parts (user_id, model_id, brand, reference, description, store, url, status, paid, stock_component_id, quantity)

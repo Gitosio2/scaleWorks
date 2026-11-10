@@ -20,10 +20,12 @@ import { EditModal } from "@/components/ui/edit-modal";
 import { FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filters";
 import { PageHeader } from "@/components/ui/page-header";
 import { Pagination } from "@/components/ui/pagination";
-import { StatusBadge } from "@/components/ui/status-badge";
-import { listItemClass } from "@/components/ui/styles";
+import { StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
+import { SubmitButton } from "@/components/ui/submit-button";
+import { listItemClass, secondaryButtonClass } from "@/components/ui/styles";
 import {
   adjustComponentQuantity,
+  receiveComponent,
   createComponent,
   deleteComponent,
   updateComponent,
@@ -55,6 +57,7 @@ export default async function ComponentsPage({
   const t = await getTranslations("components");
   const tc = await getTranslations("common");
   const tn = await getTranslations("nav");
+  const ts = await getTranslations("supplyStatus");
   const locale = await getLocale();
 
   const q = textParam(sp, "q");
@@ -75,8 +78,9 @@ export default async function ComponentsPage({
       : undefined,
     store ? eq(c.store, store) : undefined,
     brand ? eq(c.brand, brand) : undefined,
-    stock === "available" ? gt(c.quantity, 0) : undefined,
-    stock === "empty" ? eq(c.quantity, 0) : undefined,
+    // Components still on their way (ordered / to order) are not stock yet.
+    stock === "available" ? and(gt(c.quantity, 0), eq(c.status, "in_hand")) : undefined,
+    stock === "empty" ? and(eq(c.quantity, 0), eq(c.status, "in_hand")) : undefined,
   ];
   const activeCount = [q, store, brand, stock].filter(Boolean).length;
 
@@ -169,7 +173,17 @@ export default async function ComponentsPage({
                 )}
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                {row.quantity === 0 && <StatusBadge variant="mute">{t("outOfStock")}</StatusBadge>}
+                {row.status !== "in_hand" && (
+                  <>
+                    <StatusBadge variant={supplyStatusVariant(row.status)}>{ts(row.status)}</StatusBadge>
+                    <form action={receiveComponent.bind(null, row.id)}>
+                      <SubmitButton className={secondaryButtonClass}>{t("markInHand")}</SubmitButton>
+                    </form>
+                  </>
+                )}
+                {row.status === "in_hand" && row.quantity === 0 && (
+                  <StatusBadge variant="mute">{t("outOfStock")}</StatusBadge>
+                )}
                 <QuantityStepper
                   quantity={row.quantity}
                   action={adjustComponentQuantity.bind(null, row.id)}

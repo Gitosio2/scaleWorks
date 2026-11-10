@@ -142,7 +142,10 @@ export default async function ModelDetailPage({
         quantity: stockComponents.quantity,
       })
       .from(stockComponents)
-      .where(eq(stockComponents.userId, user.id))
+      // Only components in hand are real stock; ordered ones have not arrived.
+      .where(
+        and(eq(stockComponents.userId, user.id), eq(stockComponents.status, "in_hand")),
+      )
       .orderBy(stockComponents.description),
   ]);
   const partRowsWithCost = partRows.map(({ part, stockUnitPriceCents, stockAvailable }) => ({

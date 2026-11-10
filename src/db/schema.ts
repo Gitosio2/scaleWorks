@@ -68,6 +68,23 @@ export const clients = pgTable("clients", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// A delivery note ("albarán"): groups the parts, consumables and stock components
+// that arrive together. Its state is never stored: it is derived from the supply
+// status of its lines (see lib/delivery.ts). Deleting one keeps its lines.
+export const deliveries = pgTable(
+  "deliveries",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    name: text("name").notNull(),
+    // Company that brings the package. The store stays on each line.
+    carrier: text("carrier"),
+    trackingUrl: text("tracking_url"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [index("deliveries_user_idx").on(t.userId)],
+);
+
 export const models = pgTable(
   "models",
   {
@@ -165,6 +182,12 @@ export const stockComponents = pgTable(
     // Price of one unit, in cents.
     priceCents: integer("price_cents"),
     quantity: integer("quantity").notNull().default(0),
+    // Existing components are in the warehouse. One that arrives on a delivery
+    // note starts as ordered and only counts as stock once it is in hand.
+    status: supplyStatus("status").notNull().default("in_hand"),
+    deliveryId: uuid("delivery_id").references(() => deliveries.id, {
+      onDelete: "set null",
+    }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at")
       .notNull()
@@ -209,6 +232,10 @@ export const parts = pgTable(
     ),
     // Units taken from stock; set exactly when stockComponentId is.
     quantity: integer("quantity"),
+    // Delivery note this part arrives with; only loose parts are grouped.
+    deliveryId: uuid("delivery_id").references(() => deliveries.id, {
+      onDelete: "set null",
+    }),
   },
   (t) => [
     // At most one owner. A part with neither is a "loose" purchase added from
@@ -241,6 +268,9 @@ export const consumables = pgTable("consumables", {
   // Inactive = used up or broken. The row is kept so price and store stay
   // consultable, and it can still be linked from models it was used on.
   active: boolean("active").notNull().default(true),
+  deliveryId: uuid("delivery_id").references(() => deliveries.id, {
+    onDelete: "set null",
+  }),
 });
 
 // Many-to-many: which consumables were used on which model.

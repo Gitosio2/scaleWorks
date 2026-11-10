@@ -19,7 +19,7 @@ const icon = {
 };
 
 
-type NavLink = { href: string; label: "home" | "models" | "quotes" | "clients" | "consumables" | "components" | "expenses" | "gallery"; icon: React.ReactNode };
+type NavLink = { href: string; label: "home" | "models" | "quotes" | "clients" | "deliveries" | "consumables" | "components" | "expenses" | "gallery"; icon: React.ReactNode };
 type NavGroup = { label: "warehouse"; icon: React.ReactNode; children: NavLink[] };
 
 const items: Array<NavLink | NavGroup> = [
@@ -74,6 +74,17 @@ const items: Array<NavLink | NavGroup> = [
       </svg>
     ),
     children: [
+      {
+        href: "/deliveries",
+        label: "deliveries" as const,
+        icon: (
+          <svg {...icon}>
+            <path d="M3 7h11v9H3zM14 10h4l3 3v3h-7" />
+            <circle cx="7.5" cy="17.5" r="1.8" />
+            <circle cx="17" cy="17.5" r="1.8" />
+          </svg>
+        ),
+      },
       {
         href: "/consumables",
         label: "consumables" as const,
