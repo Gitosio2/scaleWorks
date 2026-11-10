@@ -159,7 +159,11 @@ export async function deleteModel(id: string) {
         GROUP BY stock_component_id
       ),
       gone AS (
-        DELETE FROM models WHERE id IN (SELECT id FROM owned) RETURNING id
+        -- Reading "removed" makes the model delete wait for the parts delete, so the
+        -- cascade can never remove the parts before their units are counted.
+        DELETE FROM models
+        WHERE id IN (SELECT id FROM owned) AND (SELECT count(*) FROM removed) >= 0
+        RETURNING id
       )
       UPDATE stock_components s
       SET quantity = s.quantity + back.units, updated_at = now()
