@@ -1,0 +1,4 @@
+ALTER TABLE "parts" ADD COLUMN "stock_component_id" uuid;--> statement-breakpoint
+ALTER TABLE "parts" ADD COLUMN "quantity" integer;--> statement-breakpoint
+ALTER TABLE "parts" ADD CONSTRAINT "parts_stock_component_id_stock_components_id_fk" FOREIGN KEY ("stock_component_id") REFERENCES "public"."stock_components"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "parts" ADD CONSTRAINT "parts_stock_link_consistent" CHECK (("parts"."stock_component_id" IS NULL AND "parts"."quantity" IS NULL) OR ("parts"."stock_component_id" IS NOT NULL AND "parts"."quantity" > 0 AND "parts"."model_id" IS NOT NULL));
