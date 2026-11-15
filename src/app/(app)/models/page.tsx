@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   and,
+  arrayContains,
   asc,
   count,
   desc,
@@ -39,6 +40,7 @@ import {
   type SearchParams,
 } from "@/lib/list-filters";
 import { pageWindow, parsePage } from "@/lib/pagination";
+import { filterTagOptions } from "@/lib/tags";
 import { canHold } from "@/lib/payment-hold";
 import { requireUser } from "@/lib/session";
 import { stalledCutoff } from "@/lib/stalled";
@@ -48,6 +50,7 @@ import { FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filt
 import { Pagination } from "@/components/ui/pagination";
 import { PageHeader } from "@/components/ui/page-header";
 import { PhaseProgress } from "@/components/ui/phase-progress";
+import { TagChips } from "@/components/ui/tag-chips";
 import { HoldBadge, PaymentBadge, PhaseBadge } from "@/components/ui/status-badge";
 import { DeleteIconButton, EditIconLink, HoldIconButton } from "@/components/ui/icon-actions";
 import {
@@ -96,6 +99,7 @@ export default async function ModelsPage({
   const tp = await getTranslations("phase");
   const tpay = await getTranslations("paymentStatus");
   const ttype = await getTranslations("modelType");
+  const ttag = await getTranslations("modelTag");
   const th = await getTranslations("paymentHold");
   const locale = await getLocale();
 
@@ -105,6 +109,9 @@ export default async function ModelsPage({
   const phase = enumParam(sp, "phase", phaseFilters);
   const payment = enumParam(sp, "payment", paymentFilters);
   const type = enumParam(sp, "type", modelType.enumValues);
+  // With a type filter only that type's tags make sense; a stale tag is ignored.
+  const tagOptions = filterTagOptions(type);
+  const tag = enumParam(sp, "tag", tagOptions);
   const scope = textParam(sp, "scope") === "all" ? "all" : "open";
   const sort = enumParam(sp, "sort", sortKeys) ?? "newest";
 
@@ -120,6 +127,7 @@ export default async function ModelsPage({
     client === "none" ? isNull(models.clientId) : client ? eq(models.clientId, client) : undefined,
     company ? eq(models.company, company) : undefined,
     type ? eq(models.type, type) : undefined,
+    tag ? arrayContains(models.tags, [tag]) : undefined,
     phase === "active"
       ? notInArray(models.phase, ["not_started", "finished"])
       : phase === "stalled"
@@ -142,8 +150,8 @@ export default async function ModelsPage({
       ? or(ne(models.phase, "finished"), ne(models.paymentStatus, "paid"))
       : undefined,
   ];
-  const activeCount = [q, client, company, type, phase, payment, scope === "open"].filter(Boolean).length;
-  const hasUserFilters = [q, client, company, type, phase, payment].some(Boolean);
+  const activeCount = [q, client, company, type, tag, phase, payment, scope === "open"].filter(Boolean).length;
+  const hasUserFilters = [q, client, company, type, tag, phase, payment].some(Boolean);
 
   // Total matches, so the requested page can be clamped to the last one.
   const [{ total }] = await db
@@ -237,6 +245,12 @@ export default async function ModelsPage({
           options={modelType.enumValues.map((v) => ({ value: v, label: ttype(v) }))}
         />
         <FilterSelect
+          name="tag"
+          label={t("tags")}
+          defaultValue={tag ?? ""}
+          options={tagOptions.map((v) => ({ value: v, label: ttag(v) }))}
+        />
+        <FilterSelect
           name="payment"
           label={t("payment")}
           defaultValue={payment ?? ""}
@@ -289,8 +303,10 @@ export default async function ModelsPage({
                   <p className="text-[13px] text-muted">
                     {m.type ? `${ttype(m.type)} · ` : ""}
                     {m.company ? `${m.company} · ` : ""}
+                    {m.year ? `${m.year} · ` : ""}
                     {formatEuros(m.priceCents, locale)}
                   </p>
+                  <TagChips tags={m.tags} />
                   {!done && (
                     <p className="text-[13px] text-muted">
                       {t("dates", {

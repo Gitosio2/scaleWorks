@@ -3,7 +3,6 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { cx, secondaryButtonClass } from "@/components/ui/styles";
-import { addModelImage } from "./image-actions";
 
 // Long edge of the stored full-size photo and of its thumbnail.
 const FULL_EDGE = 1600;
@@ -31,14 +30,21 @@ async function encode(bitmap: ImageBitmap, edge: number, quality: number) {
   return jpeg;
 }
 
+/**
+ * Photo picker shared by models and collection items. `upload` is the bound
+ * server action that stores one photo (a FormData with "full" and "thumb"), and
+ * `namespace` picks the translated texts.
+ */
 export function PhotoUploader({
-  modelId,
+  upload,
   disabled,
+  namespace,
 }: {
-  modelId: string;
+  upload: (data: FormData) => Promise<void>;
   disabled: boolean;
+  namespace: "models.photos" | "collection.photos";
 }) {
-  const t = useTranslations("models.photos");
+  const t = useTranslations(namespace);
   const [pending, startTransition] = useTransition();
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [failed, setFailed] = useState(false);
@@ -62,7 +68,7 @@ export function PhotoUploader({
           const data = new FormData();
           data.set("full", full, "full");
           data.set("thumb", thumb, "thumb");
-          await addModelImage(modelId, data);
+          await upload(data);
         }
       } catch {
         setFailed(true);

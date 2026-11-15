@@ -13,6 +13,8 @@ import {
   modelType,
   paymentStatus,
 } from "@/db/schema";
+import { parseYear } from "@/lib/input";
+import { parseTags } from "@/lib/tags";
 import { parseEuros } from "@/lib/labels";
 import { derivePayment } from "@/lib/payments";
 import { nextHold } from "@/lib/payment-hold";
@@ -34,6 +36,10 @@ async function parseModel(formData: FormData, userId: string) {
   if (type && !(modelType.enumValues as readonly string[]).includes(type)) {
     throw new Error(t("invalidType"));
   }
+
+  const year = parseYear(String(formData.get("year") ?? ""), t);
+
+  const typedType = (type || null) as (typeof modelType.enumValues)[number] | null;
 
   const priceCents = parseEuros(String(formData.get("price") ?? ""), t);
 
@@ -63,8 +69,10 @@ async function parseModel(formData: FormData, userId: string) {
   return {
     brand: String(formData.get("brand") ?? "").trim() || null,
     name,
-    type: (type || null) as (typeof modelType.enumValues)[number] | null,
+    type: typedType,
+    tags: parseTags(formData.getAll("tags").map(String), typedType, t),
     company: String(formData.get("company") ?? "").trim() || null,
+    year,
     clientId,
     priceCents,
     paymentStatus: status,
