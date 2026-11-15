@@ -241,10 +241,6 @@
     "no": "No",
     "estimatedAt": "as of {date}",
     "profitLabel": "Profit",
-    "details": "Details",
-    "acquisition": "Acquisition",
-    "value": "Value",
-    "sale": "Sale",
     "photos": {
       "title": "Photos: {count}",
       "empty": "No photos yet.",

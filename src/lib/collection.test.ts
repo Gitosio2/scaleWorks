@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { holdingValueCents, isSold, nextEstimatedValueAt, profitCents } from "./collection";
+import { isSold, nextEstimatedValueAt, profitCents } from "./collection";
 
 const base = {
   purchasePriceCents: null,
@@ -42,22 +42,6 @@ describe("profitCents", () => {
   it("is unknown when either price is missing", () => {
     expect(profitCents({ ...sold, purchasePriceCents: null, soldPriceCents: 6500 })).toBeNull();
     expect(profitCents({ ...sold, purchasePriceCents: 4000, soldPriceCents: null })).toBeNull();
-  });
-});
-
-describe("holdingValueCents", () => {
-  it("is the estimated value while the item is kept", () => {
-    expect(holdingValueCents({ ...base, estimatedValueCents: 9000 })).toBe(9000);
-  });
-
-  it("is unknown without an estimate", () => {
-    expect(holdingValueCents(base)).toBeNull();
-  });
-
-  it("is unknown once the item is sold", () => {
-    expect(
-      holdingValueCents({ ...base, estimatedValueCents: 9000, soldDate: "2026-03-01" }),
-    ).toBeNull();
   });
 });
 
