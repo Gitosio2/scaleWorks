@@ -17,6 +17,7 @@ import {
 } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
+import { modelPartsCostSql } from "@/db/part-cost-sql";
 import {
   clients,
   consumables,
@@ -24,7 +25,6 @@ import {
   modelPhase,
   models,
   modelType,
-  parts,
   paymentStatus,
 } from "@/db/schema";
 import { formatDate, formatEuros } from "@/lib/labels";
@@ -161,7 +161,7 @@ export default async function ModelsPage({
         // What the model costs: its parts plus the consumables used on it (unit
         // price x fraction used), the same figures its detail page totals.
         costCents: sql<number>`(
-          coalesce((select sum(${parts.priceCents}) from ${parts} where ${parts.modelId} = ${models.id}), 0)
+          ${modelPartsCostSql}
           + coalesce((
               select sum(round(${consumables.priceCents} * ${modelConsumables.quantity}))
               from ${modelConsumables}

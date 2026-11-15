@@ -219,7 +219,11 @@
     "paid": "Paid",
     "unpaid": "Unpaid",
     "markPaid": "Mark as paid",
-    "markUnpaid": "Mark as not paid"
+    "markUnpaid": "Mark as not paid",
+    "fromStock": "From stock",
+    "stockSummary": "{quantity} × {unit} = {total}",
+    "stockEditTitle": "Edit quantity",
+    "quantity": "Quantity"
   },
   "clients": {
     "subtitle": "People and companies you work for.",
@@ -431,6 +435,17 @@
       "durationHint": "Format hh:mm, e.g. 01:30",
       "empty": "No time logged yet."
     },
+    "stockParts": {
+      "title": "Components from stock: {total}",
+      "addFirst": "Add components to your stock first in <link>Components</link>.",
+      "select": "Component",
+      "quantity": "Quantity",
+      "option": "{name} · {unit} each · {available} in stock",
+      "optionEmpty": "{name} · {unit} each · out of stock",
+      "total": "Total: {total}",
+      "add": "Add from stock",
+      "help": "Adding takes these units out of your stock. Removing the part gives them back."
+    },
     "consumables": {
       "title": "Consumables: {total}",
       "addFirst": "Add consumables first in <link>Consumables</link>.",
@@ -482,6 +497,12 @@
     "invalidPrice": "Invalid price",
     "invalidQuantity": "Invalid quantity",
     "invalidStockQuantity": "Quantity must be a whole number of 0 or more",
+    "invalidUsedQuantity": "Quantity must be a whole number of 1 or more",
+    "componentNotFound": "Component not found",
+    "componentNotArrived": "This component has not arrived yet",
+    "insufficientStock": "Not enough stock of this component",
+    "componentInUse": "This component is used by a model's part. Remove it from the model first",
+    "partNotFound": "Part not found",
     "nameRequired": "Name is required",
     "clientHasRecords": "This client has models or quotes and cannot be deleted",
     "titleRequired": "Title is required",

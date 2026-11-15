@@ -2,6 +2,7 @@ import Link from "next/link";
 import { and, asc, eq, isNotNull, isNull, lt, lte, ne, notInArray, sql } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
+import { modelPartsCostSql } from "@/db/part-cost-sql";
 import {
   consumables,
   modelConsumables,
@@ -68,6 +69,10 @@ function Row({ children }: { children: React.ReactNode }) {
 }
 
 const rowLinkClass = "min-w-0 truncate font-semibold text-brand hover:underline";
+
+// Drizzle renders a column unqualified in a single-table query, so inside a
+// correlated subselect a bare "id" would bind to the subselect's own table.
+const outerModelId = sql.raw('"models"."id"');
 
 export default async function Home() {
   const user = await requireUser();
@@ -158,7 +163,13 @@ export default async function Home() {
       .select({ cents: sql<number>`coalesce(sum(${parts.priceCents}), 0)::int` })
       .from(parts)
       .where(
-        and(eq(parts.userId, user.id), isNull(parts.quoteId), ne(parts.status, "to_order")),
+        and(
+          eq(parts.userId, user.id),
+          isNull(parts.quoteId),
+          // Stock parts were bought earlier as components, not spent on this model.
+          isNull(parts.stockComponentId),
+          ne(parts.status, "to_order"),
+        ),
       ),
     db
       .select({ cents: sql<number>`coalesce(sum(${consumables.priceCents}), 0)::int` })
@@ -175,6 +186,7 @@ export default async function Home() {
         and(
           eq(parts.userId, user.id),
           isNull(parts.quoteId),
+          isNull(parts.stockComponentId),
           ne(parts.status, "to_order"),
           eq(parts.paid, false),
         ),
@@ -185,15 +197,15 @@ export default async function Home() {
       .select({
         priceCents: models.priceCents,
         costCents: sql<number>`(
-          coalesce((select sum(${parts.priceCents}) from ${parts} where ${parts.modelId} = ${models.id}), 0)
+          ${modelPartsCostSql}
           + coalesce((
               select sum(round(${consumables.priceCents} * ${modelConsumables.quantity}))
               from ${modelConsumables}
               inner join ${consumables} on ${consumables.id} = ${modelConsumables.consumableId}
-              where ${modelConsumables.modelId} = ${models.id}
+              where ${modelConsumables.modelId} = ${outerModelId}
             ), 0)
         )::int`,
-        minutes: sql<number>`coalesce((select sum(${timeEntries.minutes}) from ${timeEntries} where ${timeEntries.modelId} = ${models.id}), 0)::int`,
+        minutes: sql<number>`coalesce((select sum(${timeEntries.minutes}) from ${timeEntries} where ${timeEntries.modelId} = ${outerModelId}), 0)::int`,
       })
       .from(models)
       .where(and(eq(models.userId, user.id), eq(models.phase, "finished"))),

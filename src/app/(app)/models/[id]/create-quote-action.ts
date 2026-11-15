@@ -6,13 +6,16 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
-import { models, parts, quotes } from "@/db/schema";
+import { models, parts, quotes, stockComponents } from "@/db/schema";
 import { modelTitle } from "@/lib/model-title";
+import { partCostCents } from "@/lib/part-cost";
 import { requireUser } from "@/lib/session";
 
 // Starts a new quote from a finished model: copies its client, price and
 // parts so the quote can be adjusted instead of written from scratch.
-// Parts are copied (not moved) and restart as "to order".
+// Parts are copied (not moved) and restart as "to order". Parts taken from stock
+// become plain parts priced at their current derived cost, so a quote never
+// consumes or references stock and converting it back needs no special case.
 export async function createQuoteFromModel(modelId: string) {
   const user = await requireUser();
 
@@ -23,8 +26,9 @@ export async function createQuoteFromModel(modelId: string) {
   if (!model) throw new Error((await getTranslations("actionErrors"))("modelNotFound"));
 
   const modelParts = await db
-    .select()
+    .select({ part: parts, stockUnitPriceCents: stockComponents.priceCents })
     .from(parts)
+    .leftJoin(stockComponents, eq(stockComponents.id, parts.stockComponentId))
     .where(and(eq(parts.modelId, modelId), eq(parts.userId, user.id)));
 
   const quoteId = randomUUID();
@@ -45,13 +49,16 @@ export async function createQuoteFromModel(modelId: string) {
     await db.batch([
       insertQuote,
       db.insert(parts).values(
-        modelParts.map((p) => ({
+        modelParts.map(({ part: p, stockUnitPriceCents }) => ({
           userId: user.id,
           quoteId,
           brand: p.brand,
           reference: p.reference,
           description: p.description,
-          priceCents: p.priceCents,
+          priceCents:
+            p.quantity !== null
+              ? partCostCents({ priceCents: p.priceCents, stockUnitPriceCents, quantity: p.quantity })
+              : p.priceCents,
           store: p.store,
           url: p.url,
           status: "to_order" as const,

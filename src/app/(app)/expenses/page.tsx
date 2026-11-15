@@ -23,8 +23,13 @@ import { ExpenseFields } from "./expense-fields";
 
 // What can be owed: parts of models and loose purchases (no model, no quote) that
 // have been bought (ordered or in hand). A part still "to order" is a plan, and
-// quote parts are estimates.
-const bought = and(isNull(parts.quoteId), ne(parts.status, "to_order"));
+// quote parts are estimates. Parts taken from stock are not purchases (the stock
+// was already bought and paid for), so they never appear here.
+const bought = and(
+  isNull(parts.quoteId),
+  isNull(parts.stockComponentId),
+  ne(parts.status, "to_order"),
+);
 
 const sorts = {
   model: { order: [asc(sql`lower(concat_ws(' ', ${models.brand}, ${models.name}))`)] },
