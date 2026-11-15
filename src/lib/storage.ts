@@ -71,8 +71,12 @@ export async function deleteObjects(keys: string[]) {
       if (!res.ok && res.status !== 404) throw new Error(`Storage delete failed (${res.status})`);
     }),
   );
-  const failed = results.filter((r) => r.status === "rejected");
-  if (failed.length > 0) {
-    console.error(`Could not delete ${failed.length} of ${keys.length} stored objects`);
+  // Log which objects stayed behind, so they can be removed by hand.
+  const failedKeys = keys.filter((_, index) => results[index].status === "rejected");
+  if (failedKeys.length > 0) {
+    console.error(
+      `Could not delete ${failedKeys.length} of ${keys.length} stored objects:`,
+      failedKeys,
+    );
   }
 }

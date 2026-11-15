@@ -91,7 +91,14 @@ export async function deleteCollectionImage(itemId: string, imageId: string) {
   await db
     .delete(collectionItemImages)
     .where(and(eq(collectionItemImages.id, imageId), eq(collectionItemImages.userId, user.id)));
-  await deleteObjects([image.key, image.thumbKey]);
+  // The row is already gone, so a storage failure must not skip the refresh:
+  // deleteObjects logs the keys it could not remove; this catch covers setup errors.
+  const keys = [image.key, image.thumbKey];
+  try {
+    await deleteObjects(keys);
+  } catch (error) {
+    console.error("A deleted collection photo could not be removed from storage:", keys, error);
+  }
   refresh(itemId);
 }
 

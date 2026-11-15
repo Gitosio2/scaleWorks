@@ -71,7 +71,8 @@ export async function deleteCollectionItem(id: string) {
     .delete(collectionItems)
     .where(and(eq(collectionItems.id, id), eq(collectionItems.userId, user.id)));
   // The item is already gone, so a storage failure must not fail the action or
-  // skip the redirect: log the keys so the files can be removed by hand.
+  // skip the redirect. deleteObjects logs the keys of individual deletes that
+  // fail; this catch covers setup errors (e.g. storage not configured).
   const keys = images.flatMap((i) => [i.key, i.thumbKey]);
   try {
     await deleteObjects(keys);
