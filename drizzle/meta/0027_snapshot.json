@@ -1,6 +1,6 @@
 {
-  "id": "5672439e-5bc6-4460-95ab-9ba2625a1d0c",
-  "prevId": "8d34d503-61c5-4764-b7d5-970ecf620ef2",
+  "id": "d54c5f44-e32b-40df-b645-246e58d30df2",
+  "prevId": "b9f6feab-26cb-4d62-adf7-15e53f80bfd4",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -214,14 +214,6 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
-        },
-        "tags": {
-          "name": "tags",
-          "type": "model_tag[]",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::model_tag[]"
         },
         "customized": {
           "name": "customized",
@@ -708,14 +700,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "tags": {
-          "name": "tags",
-          "type": "model_tag[]",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::model_tag[]"
-        },
         "company": {
           "name": "company",
           "type": "text",
@@ -922,6 +906,18 @@
           "notNull": true,
           "default": false
         },
+        "stock_component_id": {
+          "name": "stock_component_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "delivery_id": {
           "name": "delivery_id",
           "type": "uuid",
@@ -969,6 +965,19 @@
           ],
           "onDelete": "set null",
           "onUpdate": "no action"
+        },
+        "parts_stock_component_id_stock_components_id_fk": {
+          "name": "parts_stock_component_id_stock_components_id_fk",
+          "tableFrom": "parts",
+          "tableTo": "stock_components",
+          "columnsFrom": [
+            "stock_component_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -978,6 +987,10 @@
         "parts_at_most_one_owner": {
           "name": "parts_at_most_one_owner",
           "value": "NOT (\"parts\".\"model_id\" IS NOT NULL AND \"parts\".\"quote_id\" IS NOT NULL)"
+        },
+        "parts_stock_link_consistent": {
+          "name": "parts_stock_link_consistent",
+          "value": "(\"parts\".\"stock_component_id\" IS NULL AND \"parts\".\"quantity\" IS NULL) OR (\"parts\".\"stock_component_id\" IS NOT NULL AND \"parts\".\"quantity\" > 0 AND \"parts\".\"model_id\" IS NOT NULL)"
         }
       },
       "isRLSEnabled": false
@@ -1657,57 +1670,13 @@
         "finished"
       ]
     },
-    "public.model_tag": {
-      "name": "model_tag",
-      "schema": "public",
-      "values": [
-        "rigid",
-        "articulated",
-        "tipper",
-        "tanker",
-        "tractor_unit",
-        "lowboy",
-        "tautliner",
-        "refrigerated",
-        "flatbed",
-        "special",
-        "crane_mounted",
-        "lattice",
-        "telescopic",
-        "tower",
-        "all_terrain",
-        "carry_deck",
-        "rough_terrain",
-        "heavy_lift",
-        "tracked",
-        "wheeled",
-        "front_shovel",
-        "backhoe",
-        "mining",
-        "civil_works",
-        "site",
-        "forestry"
-      ]
-    },
     "public.model_type": {
       "name": "model_type",
       "schema": "public",
       "values": [
         "truck",
         "crane",
-        "machine",
-        "excavator",
-        "backhoe_loader",
-        "dumper",
-        "loader",
-        "bulldozer",
-        "paver",
-        "compactor",
-        "motor_grader",
-        "semi_trailer",
-        "trailer",
-        "cargo",
-        "attachment"
+        "machine"
       ]
     },
     "public.payment_status": {

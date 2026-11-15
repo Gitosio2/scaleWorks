@@ -1,5 +1,5 @@
 {
-  "id": "a8cbf6d0-2a93-4261-9dec-30562462fa62",
+  "id": "90913ede-3f7e-47f4-9cfa-c479ea6dac92",
   "prevId": "56a403a0-3da3-4617-938e-f77a899bea3f",
   "version": "7",
   "dialect": "postgresql",
@@ -53,273 +53,6 @@
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.collection_item_images": {
-      "name": "collection_item_images",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "item_id": {
-          "name": "item_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "key": {
-          "name": "key",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "thumb_key": {
-          "name": "thumb_key",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "position": {
-          "name": "position",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "collection_item_images_item_idx": {
-          "name": "collection_item_images_item_idx",
-          "columns": [
-            {
-              "expression": "item_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "position",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "collection_item_images_item_id_collection_items_id_fk": {
-          "name": "collection_item_images_item_id_collection_items_id_fk",
-          "tableFrom": "collection_item_images",
-          "tableTo": "collection_items",
-          "columnsFrom": [
-            "item_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.collection_items": {
-      "name": "collection_items",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "brand": {
-          "name": "brand",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "company": {
-          "name": "company",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "country": {
-          "name": "country",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "manufacturer": {
-          "name": "manufacturer",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "reference": {
-          "name": "reference",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "type": {
-          "name": "type",
-          "type": "model_type",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "customized": {
-          "name": "customized",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "purchase_price_cents": {
-          "name": "purchase_price_cents",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "purchase_date": {
-          "name": "purchase_date",
-          "type": "date",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "estimated_value_cents": {
-          "name": "estimated_value_cents",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "estimated_value_at": {
-          "name": "estimated_value_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "sold_price_cents": {
-          "name": "sold_price_cents",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "sold_date": {
-          "name": "sold_date",
-          "type": "date",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "condition": {
-          "name": "condition",
-          "type": "collection_condition",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'new'"
-        },
-        "notes": {
-          "name": "notes",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "collection_items_user_idx": {
-          "name": "collection_items_user_idx",
-          "columns": [
-            {
-              "expression": "user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {
-        "collection_items_country_iso": {
-          "name": "collection_items_country_iso",
-          "value": "\"collection_items\".\"country\" IS NULL OR \"collection_items\".\"country\" ~ '^[A-Z]{2}$'"
-        },
-        "collection_items_prices_non_negative": {
-          "name": "collection_items_prices_non_negative",
-          "value": "(\"collection_items\".\"purchase_price_cents\" IS NULL OR \"collection_items\".\"purchase_price_cents\" >= 0) AND (\"collection_items\".\"estimated_value_cents\" IS NULL OR \"collection_items\".\"estimated_value_cents\" >= 0) AND (\"collection_items\".\"sold_price_cents\" IS NULL OR \"collection_items\".\"sold_price_cents\" >= 0)"
-        },
-        "collection_items_sold_after_purchase": {
-          "name": "collection_items_sold_after_purchase",
-          "value": "\"collection_items\".\"sold_date\" IS NULL OR \"collection_items\".\"purchase_date\" IS NULL OR \"collection_items\".\"sold_date\" >= \"collection_items\".\"purchase_date\""
-        },
-        "collection_items_sold_price_needs_date": {
-          "name": "collection_items_sold_price_needs_date",
-          "value": "\"collection_items\".\"sold_price_cents\" IS NULL OR \"collection_items\".\"sold_date\" IS NOT NULL"
-        }
-      },
       "isRLSEnabled": false
     },
     "public.consumables": {
@@ -886,6 +619,18 @@
           "notNull": true,
           "default": false
         },
+        "stock_component_id": {
+          "name": "stock_component_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "delivery_id": {
           "name": "delivery_id",
           "type": "uuid",
@@ -933,6 +678,19 @@
           ],
           "onDelete": "set null",
           "onUpdate": "no action"
+        },
+        "parts_stock_component_id_stock_components_id_fk": {
+          "name": "parts_stock_component_id_stock_components_id_fk",
+          "tableFrom": "parts",
+          "tableTo": "stock_components",
+          "columnsFrom": [
+            "stock_component_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -942,6 +700,10 @@
         "parts_at_most_one_owner": {
           "name": "parts_at_most_one_owner",
           "value": "NOT (\"parts\".\"model_id\" IS NOT NULL AND \"parts\".\"quote_id\" IS NOT NULL)"
+        },
+        "parts_stock_link_consistent": {
+          "name": "parts_stock_link_consistent",
+          "value": "(\"parts\".\"stock_component_id\" IS NULL AND \"parts\".\"quantity\" IS NULL) OR (\"parts\".\"stock_component_id\" IS NOT NULL AND \"parts\".\"quantity\" > 0 AND \"parts\".\"model_id\" IS NOT NULL)"
         }
       },
       "isRLSEnabled": false
@@ -1588,15 +1350,6 @@
     }
   },
   "enums": {
-    "public.collection_condition": {
-      "name": "collection_condition",
-      "schema": "public",
-      "values": [
-        "new",
-        "damaged",
-        "very_damaged"
-      ]
-    },
     "public.consumable_category": {
       "name": "consumable_category",
       "schema": "public",

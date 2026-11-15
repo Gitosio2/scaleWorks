@@ -1,6 +1,6 @@
 {
-  "id": "92fccfdb-0737-4872-a607-62ca017642cb",
-  "prevId": "d19926e6-faac-434c-9b2d-e2ff3047bf31",
+  "id": "3ada99d3-f349-4918-bac5-4380fd53c800",
+  "prevId": "b237c3d3-d124-4922-a566-8173c5d0b581",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -202,12 +202,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "year": {
-          "name": "year",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
         "type": {
           "name": "type",
           "type": "model_type",
@@ -309,10 +303,6 @@
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {
-        "collection_items_year_range": {
-          "name": "collection_items_year_range",
-          "value": "\"collection_items\".\"year\" IS NULL OR \"collection_items\".\"year\" BETWEEN 1800 AND 2100"
-        },
         "collection_items_country_iso": {
           "name": "collection_items_country_iso",
           "value": "\"collection_items\".\"country\" IS NULL OR \"collection_items\".\"country\" ~ '^[A-Z]{2}$'"
@@ -906,6 +896,18 @@
           "notNull": true,
           "default": false
         },
+        "stock_component_id": {
+          "name": "stock_component_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "delivery_id": {
           "name": "delivery_id",
           "type": "uuid",
@@ -953,6 +955,19 @@
           ],
           "onDelete": "set null",
           "onUpdate": "no action"
+        },
+        "parts_stock_component_id_stock_components_id_fk": {
+          "name": "parts_stock_component_id_stock_components_id_fk",
+          "tableFrom": "parts",
+          "tableTo": "stock_components",
+          "columnsFrom": [
+            "stock_component_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -962,6 +977,10 @@
         "parts_at_most_one_owner": {
           "name": "parts_at_most_one_owner",
           "value": "NOT (\"parts\".\"model_id\" IS NOT NULL AND \"parts\".\"quote_id\" IS NOT NULL)"
+        },
+        "parts_stock_link_consistent": {
+          "name": "parts_stock_link_consistent",
+          "value": "(\"parts\".\"stock_component_id\" IS NULL AND \"parts\".\"quantity\" IS NULL) OR (\"parts\".\"stock_component_id\" IS NOT NULL AND \"parts\".\"quantity\" > 0 AND \"parts\".\"model_id\" IS NOT NULL)"
         }
       },
       "isRLSEnabled": false

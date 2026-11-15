@@ -1,10 +1,11 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { models, parts, supplyStatus } from "@/db/schema";
+import { isUuid } from "@/lib/input";
 import { parseEuros, type ActionT } from "@/lib/labels";
 import { requireUser } from "@/lib/session";
 
@@ -85,6 +86,8 @@ export async function updatePart(
         eq(parts.id, partId),
         eq(parts.modelId, modelId),
         eq(parts.userId, user.id),
+        // Stock parts take their labels and price from the warehouse component.
+        isNull(parts.stockComponentId),
       ),
     );
   revalidatePath(`/models/${modelId}`);
@@ -112,21 +115,32 @@ export async function updatePartStatus(
         eq(parts.id, partId),
         eq(parts.modelId, modelId),
         eq(parts.userId, user.id),
+        // A stock part is always in hand: it was taken from the warehouse.
+        isNull(parts.stockComponentId),
       ),
     );
   revalidatePath(`/models/${modelId}`);
 }
 
+// Deleting a part that came from stock gives its units back, in the same
+// statement (the neon-http driver has no interactive transactions). For a plain
+// part the second step simply matches nothing.
 export async function deletePart(modelId: string, partId: string) {
   const user = await requireUser();
-  await db
-    .delete(parts)
-    .where(
-      and(
-        eq(parts.id, partId),
-        eq(parts.modelId, modelId),
-        eq(parts.userId, user.id),
-      ),
-    );
+  if (!isUuid(modelId) || !isUuid(partId)) return;
+  await db.execute(sql`
+    WITH removed AS (
+      DELETE FROM parts
+      WHERE id = ${partId}::uuid AND model_id = ${modelId}::uuid AND user_id = ${user.id}
+      RETURNING stock_component_id, quantity
+    )
+    UPDATE stock_components s
+    SET quantity = s.quantity + removed.quantity, updated_at = now()
+    FROM removed
+    WHERE s.id = removed.stock_component_id AND removed.quantity IS NOT NULL
+  `);
   revalidatePath(`/models/${modelId}`);
+  revalidatePath("/components");
+  revalidatePath("/models");
+  revalidatePath("/");
 }

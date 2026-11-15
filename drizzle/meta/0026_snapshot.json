@@ -1,6 +1,6 @@
 {
-  "id": "8d34d503-61c5-4764-b7d5-970ecf620ef2",
-  "prevId": "92fccfdb-0737-4872-a607-62ca017642cb",
+  "id": "b9f6feab-26cb-4d62-adf7-15e53f80bfd4",
+  "prevId": "3ada99d3-f349-4918-bac5-4380fd53c800",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -906,6 +906,18 @@
           "notNull": true,
           "default": false
         },
+        "stock_component_id": {
+          "name": "stock_component_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "delivery_id": {
           "name": "delivery_id",
           "type": "uuid",
@@ -953,6 +965,19 @@
           ],
           "onDelete": "set null",
           "onUpdate": "no action"
+        },
+        "parts_stock_component_id_stock_components_id_fk": {
+          "name": "parts_stock_component_id_stock_components_id_fk",
+          "tableFrom": "parts",
+          "tableTo": "stock_components",
+          "columnsFrom": [
+            "stock_component_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -962,6 +987,10 @@
         "parts_at_most_one_owner": {
           "name": "parts_at_most_one_owner",
           "value": "NOT (\"parts\".\"model_id\" IS NOT NULL AND \"parts\".\"quote_id\" IS NOT NULL)"
+        },
+        "parts_stock_link_consistent": {
+          "name": "parts_stock_link_consistent",
+          "value": "(\"parts\".\"stock_component_id\" IS NULL AND \"parts\".\"quantity\" IS NULL) OR (\"parts\".\"stock_component_id\" IS NOT NULL AND \"parts\".\"quantity\" > 0 AND \"parts\".\"model_id\" IS NOT NULL)"
         }
       },
       "isRLSEnabled": false
@@ -1613,7 +1642,6 @@
       "schema": "public",
       "values": [
         "new",
-        "normal",
         "damaged",
         "very_damaged"
       ]

@@ -17,3 +17,12 @@ export function parseStockQuantity(raw: string, t: ActionT) {
 export function adjustQuantity(current: number, delta: number) {
   return Math.max(0, current + delta);
 }
+
+// Units of a stock component used by a part: a positive whole number.
+export function parseUsedQuantity(raw: string, t: ActionT) {
+  const value = raw.trim();
+  if (!/^\d+$/.test(value)) throw new Error(t("invalidUsedQuantity"));
+  const n = Number(value);
+  if (n < 1 || n > MAX_STOCK) throw new Error(t("invalidUsedQuantity"));
+  return n;
+}

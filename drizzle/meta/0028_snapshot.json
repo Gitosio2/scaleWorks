@@ -1,6 +1,6 @@
 {
-  "id": "eed9bcbc-6888-41e3-81b7-14ed4f4e8bc4",
-  "prevId": "5672439e-5bc6-4460-95ab-9ba2625a1d0c",
+  "id": "4262fbb8-5d5e-487d-9d21-e223710cf3ef",
+  "prevId": "d54c5f44-e32b-40df-b645-246e58d30df2",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -922,6 +922,18 @@
           "notNull": true,
           "default": false
         },
+        "stock_component_id": {
+          "name": "stock_component_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "delivery_id": {
           "name": "delivery_id",
           "type": "uuid",
@@ -969,6 +981,19 @@
           ],
           "onDelete": "set null",
           "onUpdate": "no action"
+        },
+        "parts_stock_component_id_stock_components_id_fk": {
+          "name": "parts_stock_component_id_stock_components_id_fk",
+          "tableFrom": "parts",
+          "tableTo": "stock_components",
+          "columnsFrom": [
+            "stock_component_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -978,6 +1003,10 @@
         "parts_at_most_one_owner": {
           "name": "parts_at_most_one_owner",
           "value": "NOT (\"parts\".\"model_id\" IS NOT NULL AND \"parts\".\"quote_id\" IS NOT NULL)"
+        },
+        "parts_stock_link_consistent": {
+          "name": "parts_stock_link_consistent",
+          "value": "(\"parts\".\"stock_component_id\" IS NULL AND \"parts\".\"quantity\" IS NULL) OR (\"parts\".\"stock_component_id\" IS NOT NULL AND \"parts\".\"quantity\" > 0 AND \"parts\".\"model_id\" IS NOT NULL)"
         }
       },
       "isRLSEnabled": false
@@ -1695,6 +1724,7 @@
       "values": [
         "truck",
         "crane",
+        "machine",
         "excavator",
         "backhoe_loader",
         "dumper",
