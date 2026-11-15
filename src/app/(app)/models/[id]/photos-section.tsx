@@ -10,8 +10,8 @@ import { ConfirmDelete } from "@/components/ui/confirm-delete";
 import { Photo } from "@/components/ui/photo";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { linkActionClass, secondaryButtonClass } from "@/components/ui/styles";
-import { deleteModelImage, setCoverImage, setModelPublished } from "./image-actions";
-import { PhotoUploader } from "./photo-uploader";
+import { PhotoUploader } from "@/components/photo-uploader";
+import { addModelImage, deleteModelImage, setCoverImage, setModelPublished } from "./image-actions";
 
 export async function PhotosSection({
   modelId,
@@ -37,7 +37,11 @@ export async function PhotosSection({
   return (
     <CollapsibleCard title={t("title", { count: images.length })} defaultOpen={images.length > 0}>
       {!configured && <p className="text-sm text-warn">{t("notConfigured")}</p>}
-      <PhotoUploader modelId={modelId} disabled={!configured} />
+      <PhotoUploader
+        upload={addModelImage.bind(null, modelId)}
+        disabled={!configured}
+        namespace="models.photos"
+      />
 
       {images.length === 0 ? (
         <p className="text-muted">{t("empty")}</p>

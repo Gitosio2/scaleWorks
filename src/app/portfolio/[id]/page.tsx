@@ -23,6 +23,7 @@ async function findPublicModel(id: string) {
       name: models.name,
       type: models.type,
       company: models.company,
+      year: models.year,
     })
     .from(models)
     .where(
@@ -51,7 +52,9 @@ export async function generateMetadata({
     .where(eq(modelImages.modelId, model.id))
     .orderBy(asc(modelImages.position), asc(modelImages.createdAt))
     .limit(1);
-  const details = [model.type ? ttype(model.type) : null, model.company].filter(Boolean).join(" · ");
+  const details = [model.type ? ttype(model.type) : null, model.company, model.year]
+    .filter(Boolean)
+    .join(" · ");
   return shareMetadata({
     title: modelTitle(model.brand, model.name),
     description: details || t("subtitle"),
@@ -88,7 +91,9 @@ export default async function PublicModelPage({
       </Link>
       <PageHeader
         title={title}
-        subtitle={[model.type ? ttype(model.type) : null, model.company].filter(Boolean).join(" · ")}
+        subtitle={[model.type ? ttype(model.type) : null, model.company, model.year]
+          .filter(Boolean)
+          .join(" · ")}
       />
       {images.length === 0 ? (
         <p className="text-muted">{t("noPhotos")}</p>

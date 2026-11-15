@@ -33,7 +33,53 @@ export const consumableCategory = pgEnum("consumable_category", [
 
 // What kind of vehicle or machine a model depicts. Stable keys only; labels live
 // in messages/*.json under "modelType". Optional: existing models have none.
-export const modelType = pgEnum("model_type", ["truck", "crane", "machine"]);
+export const modelType = pgEnum("model_type", [
+  "truck",
+  "crane",
+  "excavator",
+  "backhoe_loader",
+  "dumper",
+  "loader",
+  "bulldozer",
+  "paver",
+  "compactor",
+  "motor_grader",
+  "semi_trailer",
+  "trailer",
+  "cargo",
+  "attachment",
+]);
+
+// Descriptive tags of a model or collection item, several per row. Which tags a
+// type allows lives in lib/tags.ts; labels live in messages/*.json under "modelTag".
+export const modelTag = pgEnum("model_tag", [
+  "rigid",
+  "articulated",
+  "tipper",
+  "tanker",
+  "tractor_unit",
+  "lowboy",
+  "tautliner",
+  "refrigerated",
+  "flatbed",
+  "special",
+  "crane_mounted",
+  "lattice",
+  "telescopic",
+  "tower",
+  "all_terrain",
+  "carry_deck",
+  "rough_terrain",
+  "heavy_lift",
+  "tracked",
+  "wheeled",
+  "front_shovel",
+  "backhoe",
+  "mining",
+  "civil_works",
+  "site",
+  "forestry",
+]);
 
 export const modelPhase = pgEnum("model_phase", [
   "not_started",
@@ -101,8 +147,13 @@ export const models = pgTable(
     brand: text("brand"),
     name: text("name").notNull(),
     type: modelType("type"),
+    // Labels live in messages under "modelTag"; allowed values depend on the type.
+    tags: modelTag("tags").array().notNull().default(sql`'{}'::model_tag[]`),
     // Company of the real-world subject (e.g. an airline or car brand).
     company: text("company"),
+    // Year of the real machine or vehicle the model depicts. Optional: existing
+    // models have none.
+    year: integer("year"),
     priceCents: integer("price_cents"),
     phase: modelPhase("phase").notNull().default("not_started"),
     requestedDate: date("requested_date"),
@@ -123,6 +174,7 @@ export const models = pgTable(
   },
   (t) => [
     index("models_user_idx").on(t.userId),
+    check("models_year_range", sql`${t.year} IS NULL OR ${t.year} BETWEEN 1800 AND 2100`),
     check(
       "models_deposit_consistent",
       sql`(${t.paymentStatus} = 'deposit_paid' AND ${t.depositCents} IS NOT NULL AND ${t.depositCents} > 0) OR (${t.paymentStatus} <> 'deposit_paid' AND ${t.depositCents} IS NULL)`,
@@ -272,6 +324,88 @@ export const consumables = pgTable("consumables", {
     onDelete: "set null",
   }),
 });
+
+export const collectionCondition = pgEnum("collection_condition", [
+  "new",
+  "normal",
+  "damaged",
+  "very_damaged",
+]);
+
+// Miniatures the user owns (or owned), separate from the models they build.
+// "Sold" is never stored: an item is sold when `soldDate` is set (see lib/collection.ts).
+export const collectionItems = pgTable(
+  "collection_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    // Brand of the real vehicle (e.g. "Iveco") and its model (e.g. "S-way").
+    brand: text("brand").notNull(),
+    name: text("name").notNull(),
+    // Real-world company of the livery.
+    company: text("company"),
+    // ISO 3166-1 alpha-2 code, e.g. "ES".
+    country: text("country"),
+    // Maker of the miniature (e.g. "Herpa") and its reference code.
+    manufacturer: text("manufacturer"),
+    reference: text("reference"),
+    // Year of the real vehicle the miniature depicts.
+    year: integer("year"),
+    type: modelType("type"),
+    // Labels live in messages under "modelTag"; allowed values depend on the type.
+    tags: modelTag("tags").array().notNull().default(sql`'{}'::model_tag[]`),
+    customized: boolean("customized").notNull().default(false),
+    purchasePriceCents: integer("purchase_price_cents"),
+    purchaseDate: date("purchase_date"),
+    estimatedValueCents: integer("estimated_value_cents"),
+    estimatedValueAt: timestamp("estimated_value_at"),
+    soldPriceCents: integer("sold_price_cents"),
+    soldDate: date("sold_date"),
+    condition: collectionCondition("condition").notNull().default("new"),
+    notes: text("notes"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [
+    index("collection_items_user_idx").on(t.userId),
+    check("collection_items_year_range", sql`${t.year} IS NULL OR ${t.year} BETWEEN 1800 AND 2100`),
+    check("collection_items_country_iso", sql`${t.country} IS NULL OR ${t.country} ~ '^[A-Z]{2}$'`),
+    check(
+      "collection_items_prices_non_negative",
+      sql`(${t.purchasePriceCents} IS NULL OR ${t.purchasePriceCents} >= 0) AND (${t.estimatedValueCents} IS NULL OR ${t.estimatedValueCents} >= 0) AND (${t.soldPriceCents} IS NULL OR ${t.soldPriceCents} >= 0)`,
+    ),
+    check(
+      "collection_items_sold_after_purchase",
+      sql`${t.soldDate} IS NULL OR ${t.purchaseDate} IS NULL OR ${t.soldDate} >= ${t.purchaseDate}`,
+    ),
+    check(
+      "collection_items_sold_price_needs_date",
+      sql`${t.soldPriceCents} IS NULL OR ${t.soldDate} IS NOT NULL`,
+    ),
+  ],
+);
+
+// Photos of a collection item. Only storage keys live here, like `modelImages`.
+export const collectionItemImages = pgTable(
+  "collection_item_images",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    itemId: uuid("item_id")
+      .notNull()
+      .references(() => collectionItems.id, { onDelete: "cascade" }),
+    userId: text("user_id").notNull(),
+    // Full-size and thumbnail objects.
+    key: text("key").notNull(),
+    thumbKey: text("thumb_key").notNull(),
+    // The lowest position is the cover (setting a cover may go below zero).
+    position: integer("position").notNull().default(0),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [index("collection_item_images_item_idx").on(t.itemId, t.position)],
+);
 
 // Many-to-many: which consumables were used on which model.
 export const modelConsumables = pgTable(

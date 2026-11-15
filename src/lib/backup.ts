@@ -2,6 +2,8 @@ import { eq, getTableColumns } from "drizzle-orm";
 import { db } from "@/db";
 import {
   clients,
+  collectionItemImages,
+  collectionItems,
   consumables,
   deliveries,
   modelConsumables,
@@ -27,6 +29,8 @@ export const BACKUP_TABLES = [
   "timeEntries",
   "stockComponents",
   "deliveries",
+  "collectionItems",
+  "collectionItemImages",
 ] as const;
 export type BackupTable = (typeof BACKUP_TABLES)[number];
 
@@ -49,6 +53,8 @@ const COLUMNS: Record<BackupTable, string[]> = {
   timeEntries: Object.keys(getTableColumns(timeEntries)),
   stockComponents: Object.keys(getTableColumns(stockComponents)),
   deliveries: Object.keys(getTableColumns(deliveries)),
+  collectionItems: Object.keys(getTableColumns(collectionItems)),
+  collectionItemImages: Object.keys(getTableColumns(collectionItemImages)),
 };
 
 export function columnsOf(table: BackupTable) {
@@ -88,6 +94,14 @@ export async function loadTable(table: BackupTable, userId: string): Promise<Row
       );
     case "deliveries":
       return withoutOwner(await db.select().from(deliveries).where(eq(deliveries.userId, userId)));
+    case "collectionItems":
+      return withoutOwner(
+        await db.select().from(collectionItems).where(eq(collectionItems.userId, userId)),
+      );
+    case "collectionItemImages":
+      return withoutOwner(
+        await db.select().from(collectionItemImages).where(eq(collectionItemImages.userId, userId)),
+      );
     case "modelConsumables":
       // The link table has no owner column: it belongs to the account through its model.
       return db
@@ -114,6 +128,8 @@ const DELIMITER = ";";
 
 function cell(value: unknown): string {
   if (value === null || value === undefined) return "";
+  // Array columns (tags) become their values joined with a comma and a space.
+  if (Array.isArray(value)) value = value.join(", ");
   let text =
     value instanceof Date ? value.toISOString() : typeof value === "string" ? value : String(value);
   // A text cell that starts with =, +, - or @ would be run as a formula by a

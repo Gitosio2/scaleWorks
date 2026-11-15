@@ -40,6 +40,7 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import { Card, CardTitle, CollapsibleCard } from "@/components/ui/card";
 import { BackLink, PageHeader } from "@/components/ui/page-header";
 import { PhaseProgress } from "@/components/ui/phase-progress";
+import { TagChips } from "@/components/ui/tag-chips";
 import { HoldBadge, PaymentBadge, PhaseBadge, StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
 import {
   ConfirmIconButton,
@@ -87,7 +88,6 @@ export default async function ModelDetailPage({
   const t = await getTranslations("models");
   const tc = await getTranslations("common");
   const ts = await getTranslations("supplyStatus");
-  const ttype = await getTranslations("modelType");
   const th = await getTranslations("paymentHold");
   const locale = await getLocale();
 
@@ -215,7 +215,7 @@ export default async function ModelDetailPage({
           <>
             <span className="font-semibold text-brand">{clientName ?? t("ownProject")}</span>
             {" · "}
-            {m.type ? `${ttype(m.type)} · ` : ""}
+            {m.year ? `${m.year} · ` : ""}
             {formatEuros(m.priceCents, locale)}
             {m.paymentStatus === "deposit_paid" && (
               <>
@@ -245,6 +245,8 @@ export default async function ModelDetailPage({
           </div>
         }
       />
+
+      <TagChips type={m.type} tags={m.tags} />
 
       <PhotosSection
         modelId={id}

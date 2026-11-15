@@ -1,0 +1,1 @@
+ALTER TYPE "public"."collection_condition" ADD VALUE 'normal' BEFORE 'damaged';

@@ -1,3 +1,4 @@
+import { MIN_YEAR, todayInMadrid } from "./dates";
 import type { ActionT } from "./labels";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -26,4 +27,19 @@ export function parseHttpUrl(value: string | null, t: ActionT) {
     throw new Error(t("invalidLink"));
   }
   return url.toString();
+}
+
+// The current year in the app's time zone, whatever zone the server runs in.
+const madridYear = (now: Date) => Number(todayInMadrid(now).slice(0, 4));
+
+// Year of the real vehicle a model depicts. Empty -> null; otherwise a whole year
+// between MIN_YEAR and next year (announced models); anything else throws.
+export function parseYear(raw: string, t: ActionT, now = new Date()) {
+  const value = raw.trim();
+  if (!value) return null;
+  const year = /^\d{1,4}$/.test(value) ? Number(value) : NaN;
+  if (!Number.isInteger(year) || year < MIN_YEAR || year > madridYear(now) + 1) {
+    throw new Error(t("invalidYear"));
+  }
+  return year;
 }

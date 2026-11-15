@@ -81,9 +81,39 @@ describe("parseEuros", () => {
     expect(parseEuros(" 7 ", t)).toBe(700);
   });
 
-  it("rounds sub-cent input to the nearest cent", () => {
-    expect(parseEuros("0.004", t)).toBe(0);
-    expect(parseEuros("0.006", t)).toBe(1);
+  it("accepts up to two decimals with either separator", () => {
+    expect(parseEuros("12.5", t)).toBe(1250);
+    expect(parseEuros("12,05", t)).toBe(1205);
+    expect(parseEuros("0.99", t)).toBe(99);
+  });
+
+  it("rejects more than two decimals instead of rounding", () => {
+    for (const value of ["0.004", "0.006", "12,345", "1.2345"]) {
+      expect(() => parseEuros(value, t), value).toThrow("invalidPrice");
+    }
+  });
+
+  it("reads a dot followed by exactly three digits as Spanish thousands", () => {
+    expect(parseEuros("1.234", t)).toBe(123400);
+    expect(parseEuros("1.250", t)).toBe(125000);
+    expect(parseEuros("1.234.567", t)).toBe(123456700);
+  });
+
+  it("accepts the Spanish thousands form with a decimal comma", () => {
+    expect(parseEuros("1.234,56", t)).toBe(123456);
+    expect(parseEuros("12.345,6", t)).toBe(1234560);
+  });
+
+  it("rejects ambiguous or malformed amounts", () => {
+    for (const value of ["1,234", "1,234.56", "1.23.4", "12.34.567", "1.2345,67", ".5", "5.", "1 000", "1e3", "0x10", "+5", "1,2,3"]) {
+      expect(() => parseEuros(value, t), value).toThrow("invalidPrice");
+    }
+  });
+
+  it("rejects amounts above the integer column limit", () => {
+    expect(parseEuros("21474836.47", t)).toBe(2_147_483_647);
+    expect(() => parseEuros("21474836.48", t)).toThrow("invalidPrice");
+    expect(() => parseEuros("99999999999", t)).toThrow("invalidPrice");
   });
 
   it("rejects negatives and garbage", () => {

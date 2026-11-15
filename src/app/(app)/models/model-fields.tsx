@@ -1,12 +1,16 @@
 import { useTranslations } from "next-intl";
 import { modelPhase, modelType, paymentStatus } from "@/db/schema";
+import { TypeAndTags } from "@/components/type-and-tags";
 import { inputClass, labelClass } from "@/components/ui/styles";
+import { TAGS_BY_TYPE } from "@/lib/tags";
 
 type Defaults = {
   brand?: string | null;
   name?: string;
   type?: (typeof modelType.enumValues)[number] | null;
+  tags?: readonly string[];
   company?: string | null;
+  year?: number | null;
   clientId?: string | null;
   priceCents?: number | null;
   phase?: (typeof modelPhase.enumValues)[number];
@@ -27,7 +31,6 @@ export function ModelFields({
   const tc = useTranslations("common");
   const tp = useTranslations("phase");
   const tpay = useTranslations("paymentStatus");
-  const ttype = useTranslations("modelType");
   return (
     <>
       <label className={labelClass}>
@@ -38,21 +41,31 @@ export function ModelFields({
         {t("modelName")}
         <input name="name" placeholder={t("modelName")} required defaultValue={defaults.name} className={inputClass} />
       </label>
-      <label className={labelClass}>
-        {t("type")}
-        <select name="type" defaultValue={defaults.type ?? ""} className={inputClass}>
-          <option value="">{t("noType")}</option>
-          {modelType.enumValues.map((v) => (
-            <option key={v} value={v}>{ttype(v)}</option>
-          ))}
-        </select>
-      </label>
+      <TypeAndTags
+        types={modelType.enumValues}
+        tagsByType={TAGS_BY_TYPE}
+        typeLabel={t("type")}
+        noTypeLabel={t("noType")}
+        tagsLabel={t("tags")}
+        defaultType={defaults.type ?? null}
+        defaultTags={defaults.tags ?? []}
+      />
       <label className={labelClass}>
         {tc("company")}
         <input
           name="company"
           placeholder={t("companyPlaceholder")}
           defaultValue={defaults.company ?? ""}
+          className={inputClass}
+        />
+      </label>
+      <label className={labelClass}>
+        {t("year")}
+        <input
+          name="year"
+          inputMode="numeric"
+          placeholder={t("yearPlaceholder")}
+          defaultValue={defaults.year ?? ""}
           className={inputClass}
         />
       </label>

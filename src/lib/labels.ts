@@ -18,12 +18,22 @@ export function remainingCents(
   return priceCents === null ? null : priceCents - (depositCents ?? 0);
 }
 
-// "12,50" or "12.5" -> 1250 (cents). Empty -> null. Invalid -> throws.
+const MAX_INT4 = 2_147_483_647;
+// Plain amount ("12", "12.5", "12,50") or Spanish thousands ("1.234", "1.234,56").
+const PLAIN_AMOUNT = /^(\d+)(?:[.,](\d{1,2}))?$/;
+const THOUSANDS_AMOUNT = /^([1-9]\d{0,2}(?:\.\d{3})*)(?:,(\d{1,2}))?$/;
+
+// "12,50" or "12.5" -> 1250 (cents). "1.234,56" and "1.250" read dots as thousands
+// separators. Empty -> null. More than two decimals, an ambiguous "1,234", a
+// negative or anything above the integer column limit -> throws.
 export function parseEuros(raw: string, t: ActionT) {
-  const value = raw.trim().replace(",", ".");
+  const value = raw.trim();
   if (!value) return null;
-  const cents = Math.round(Number(value) * 100);
-  if (!Number.isFinite(cents) || cents < 0) throw new Error(t("invalidPrice"));
+  const match = PLAIN_AMOUNT.exec(value) ?? THOUSANDS_AMOUNT.exec(value);
+  if (!match) throw new Error(t("invalidPrice"));
+  const euros = Number(match[1].replace(/\./g, ""));
+  const cents = euros * 100 + Number((match[2] ?? "").padEnd(2, "0") || "0");
+  if (!Number.isSafeInteger(cents) || cents > MAX_INT4) throw new Error(t("invalidPrice"));
   return cents;
 }
 

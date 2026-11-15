@@ -5,7 +5,12 @@ export function isPathActive(pathname: string, href: string) {
     : pathname === href || pathname.startsWith(href + "/");
 }
 
-// A group is active (and starts open) when any of its children is the current route.
-export function isGroupActive(pathname: string, children: ReadonlyArray<{ href: string }>) {
-  return children.some((c) => isPathActive(pathname, c.href));
+// A node is either a link or a group holding more nodes (any depth).
+export type NavTreeNode = { href: string } | { children: ReadonlyArray<NavTreeNode> };
+
+// A group is active (and starts open) when any descendant link is the current route.
+export function isGroupActive(pathname: string, children: ReadonlyArray<NavTreeNode>): boolean {
+  return children.some((c) =>
+    "children" in c ? isGroupActive(pathname, c.children) : isPathActive(pathname, c.href),
+  );
 }
