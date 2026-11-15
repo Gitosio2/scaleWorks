@@ -27,3 +27,17 @@ export function parseHttpUrl(value: string | null, t: ActionT) {
   }
   return url.toString();
 }
+
+export const MIN_YEAR = 1800;
+
+// Year of the real vehicle a model depicts. Empty -> null; otherwise a whole year
+// between MIN_YEAR and next year (announced models); anything else throws.
+export function parseYear(raw: string, t: ActionT, now = new Date()) {
+  const value = raw.trim();
+  if (!value) return null;
+  const year = /^\d{1,4}$/.test(value) ? Number(value) : NaN;
+  if (!Number.isInteger(year) || year < MIN_YEAR || year > now.getFullYear() + 1) {
+    throw new Error(t("invalidYear"));
+  }
+  return year;
+}

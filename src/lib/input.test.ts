@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { capText, isUuid, parseHttpUrl } from "./input";
+import { capText, isUuid, parseHttpUrl, parseYear } from "./input";
 import type { ActionT } from "./labels";
 
 const t: ActionT = (key) => key;
@@ -45,6 +45,37 @@ describe("parseHttpUrl", () => {
   it("rejects other protocols and malformed values", () => {
     for (const value of ["javascript:alert(1)", "ftp://example.com", "not a url", "example.com"]) {
       expect(() => parseHttpUrl(value, t)).toThrow("invalidLink");
+    }
+  });
+});
+
+describe("parseYear", () => {
+  const now = new Date("2026-06-15T12:00:00Z");
+
+  it("returns null for empty input", () => {
+    expect(parseYear("", t, now)).toBeNull();
+    expect(parseYear("   ", t, now)).toBeNull();
+  });
+
+  it("parses a plain integer year", () => {
+    expect(parseYear("2021", t, now)).toBe(2021);
+    expect(parseYear(" 1998 ", t, now)).toBe(1998);
+  });
+
+  it("accepts the range limits: 1800 up to next year", () => {
+    expect(parseYear("1800", t, now)).toBe(1800);
+    expect(parseYear("2027", t, now)).toBe(2027);
+  });
+
+  it("rejects years outside the range", () => {
+    for (const value of ["1799", "2028", "0", "-2000", "99999"]) {
+      expect(() => parseYear(value, t, now)).toThrow("invalidYear");
+    }
+  });
+
+  it("rejects non-integers and non-numeric text", () => {
+    for (const value of ["2021.5", "2021,5", "abc", "20x1", "1e3", "0x7E5"]) {
+      expect(() => parseYear(value, t, now)).toThrow("invalidYear");
     }
   });
 });
