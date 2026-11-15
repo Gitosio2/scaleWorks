@@ -75,7 +75,7 @@ export default async function CollectionItemPage({
         }
       />
 
-      <TagChips tags={item.tags} />
+      <TagChips type={item.type} tags={item.tags} />
 
       <Card>
         <dl className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">

@@ -301,12 +301,11 @@ export default async function ModelsPage({
                   </Link>
                   <p className="text-[13px] font-semibold text-brand">{clientName ?? t("ownProject")}</p>
                   <p className="text-[13px] text-muted">
-                    {m.type ? `${ttype(m.type)} · ` : ""}
                     {m.company ? `${m.company} · ` : ""}
                     {m.year ? `${m.year} · ` : ""}
                     {formatEuros(m.priceCents, locale)}
                   </p>
-                  <TagChips tags={m.tags} />
+                  <TagChips type={m.type} tags={m.tags} />
                   {!done && (
                     <p className="text-[13px] text-muted">
                       {t("dates", {

@@ -84,7 +84,6 @@ export default async function ModelDetailPage({
   const t = await getTranslations("models");
   const tc = await getTranslations("common");
   const ts = await getTranslations("supplyStatus");
-  const ttype = await getTranslations("modelType");
   const th = await getTranslations("paymentHold");
   const locale = await getLocale();
 
@@ -179,7 +178,6 @@ export default async function ModelDetailPage({
           <>
             <span className="font-semibold text-brand">{clientName ?? t("ownProject")}</span>
             {" · "}
-            {m.type ? `${ttype(m.type)} · ` : ""}
             {m.year ? `${m.year} · ` : ""}
             {formatEuros(m.priceCents, locale)}
             {m.paymentStatus === "deposit_paid" && (
@@ -211,7 +209,7 @@ export default async function ModelDetailPage({
         }
       />
 
-      <TagChips tags={m.tags} />
+      <TagChips type={m.type} tags={m.tags} />
 
       <PhotosSection
         modelId={id}
