@@ -1,10 +1,6 @@
-import { getTranslations } from "next-intl/server";
-import { PageHeader } from "@/components/ui/page-header";
+import { redirect } from "next/navigation";
 
-// Placeholder for the personal collection (private for now).
-export default async function CollectionPage() {
-  const t = await getTranslations("collection");
-  const tn = await getTranslations("nav");
-
-  return <PageHeader title={tn("collection")} subtitle={t("subtitle")} />;
+// There is no page at /collection itself; send visitors to the list view.
+export default function CollectionPage() {
+  redirect("/collection/list");
 }

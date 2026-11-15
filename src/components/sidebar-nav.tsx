@@ -21,10 +21,10 @@ const icon = {
 
 type NavLink = {
   href: string;
-  label: "home" | "models" | "quotes" | "clients" | "deliveries" | "consumables" | "components" | "expenses" | "gallery" | "collection";
+  label: "home" | "models" | "quotes" | "clients" | "deliveries" | "consumables" | "components" | "expenses" | "gallery" | "collectionList" | "collectionGallery";
   icon: React.ReactNode;
 };
-type NavGroup = { label: "work" | "warehouse"; icon: React.ReactNode; children: Array<NavLink | NavGroup> };
+type NavGroup = { label: "work" | "warehouse" | "collection"; icon: React.ReactNode; children: Array<NavLink | NavGroup> };
 
 const items: Array<NavLink | NavGroup> = [
   {
@@ -144,13 +144,37 @@ const items: Array<NavLink | NavGroup> = [
     ],
   },
   {
-    href: "/collection",
     label: "collection" as const,
     icon: (
       <svg {...icon}>
         <path d="M12 3.5 14.4 9l5.9.5-4.5 3.9 1.4 5.8L12 16l-5.2 3.2 1.4-5.8L3.7 9.5 9.6 9z" />
       </svg>
     ),
+    children: [
+      {
+        href: "/collection/list",
+        label: "collectionList" as const,
+        icon: (
+          <svg {...icon}>
+            <path d="M9 6h11M9 12h11M9 18h11" />
+            <circle cx="4.5" cy="6" r="1" />
+            <circle cx="4.5" cy="12" r="1" />
+            <circle cx="4.5" cy="18" r="1" />
+          </svg>
+        ),
+      },
+      {
+        href: "/collection/gallery",
+        label: "collectionGallery" as const,
+        icon: (
+          <svg {...icon}>
+            <rect x="3.5" y="4.5" width="17" height="15" rx="2" />
+            <circle cx="9" cy="10" r="1.6" />
+            <path d="m20.5 16-5-5-8 8" />
+          </svg>
+        ),
+      },
+    ],
   },
 ];
 

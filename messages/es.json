@@ -12,6 +12,8 @@
     "clients": "Clientes",
     "work": "Trabajos",
     "collection": "Mi colección",
+    "collectionList": "Listado",
+    "collectionGallery": "Galería",
     "warehouse": "Almacén",
     "deliveries": "Albaranes",
     "consumables": "Consumibles",
@@ -156,7 +158,8 @@
     "subtitle": "Gestiona tus maquetas, presupuestos, piezas y horas."
   },
   "collection": {
-    "subtitle": "Aquí irá tu colección personal. De momento es privada."
+    "listSubtitle": "Aquí se mostrará tu colección como un listado de texto.",
+    "gallerySubtitle": "Aquí se mostrará tu colección como una galería de fotos, igual que la galería pública."
   },
   "portfolio": {
     "title": "Trabajos realizados",

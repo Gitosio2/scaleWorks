@@ -12,6 +12,8 @@
     "clients": "Clients",
     "work": "Work",
     "collection": "My collection",
+    "collectionList": "List",
+    "collectionGallery": "Gallery",
     "warehouse": "Warehouse",
     "deliveries": "Delivery notes",
     "consumables": "Consumables",
@@ -156,7 +158,8 @@
     "subtitle": "Manage your scale models, quotes, parts and hours."
   },
   "collection": {
-    "subtitle": "Your personal collection will live here. It is private for now."
+    "listSubtitle": "Your collection will be shown here as a text-only list.",
+    "gallerySubtitle": "Your collection will be shown here as a photo gallery, like the public one."
   },
   "portfolio": {
     "title": "Completed work",
