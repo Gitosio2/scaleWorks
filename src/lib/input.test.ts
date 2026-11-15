@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { capText, isUuid, parseHttpUrl, parseYear } from "./input";
 import type { ActionT } from "./labels";
 
@@ -77,5 +77,27 @@ describe("parseYear", () => {
     for (const value of ["2021.5", "2021,5", "abc", "20x1", "1e3", "0x7E5"]) {
       expect(() => parseYear(value, t, now)).toThrow("invalidYear");
     }
+  });
+
+  // The server may run in any zone (Vercel runs in UTC): the year must not depend on it.
+  describe("year boundary", () => {
+    const originalTz = process.env.TZ;
+    beforeEach(() => {
+      process.env.TZ = "UTC";
+    });
+    afterEach(() => {
+      if (originalTz === undefined) delete process.env.TZ;
+      else process.env.TZ = originalTz;
+    });
+
+    it("takes the current year from Madrid time at the new-year boundary", () => {
+      // 23:30 UTC on 31 Dec is already 1 Jan in Madrid: next year is 2028.
+      const madridNewYear = new Date("2026-12-31T23:30:00Z");
+      expect(parseYear("2028", t, madridNewYear)).toBe(2028);
+      expect(() => parseYear("2029", t, madridNewYear)).toThrow("invalidYear");
+      const stillOldYear = new Date("2026-12-31T12:00:00Z");
+      expect(parseYear("2027", t, stillOldYear)).toBe(2027);
+      expect(() => parseYear("2028", t, stillOldYear)).toThrow("invalidYear");
+    });
   });
 });

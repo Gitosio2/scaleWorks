@@ -51,4 +51,10 @@ describe("parseDate", () => {
       expect(() => parseDate(value, t)).toThrow("invalidDate");
     }
   });
+
+  it("rejects years before 1800, which Postgres or the UI would not handle", () => {
+    expect(() => parseDate("0000-01-01", t)).toThrow("invalidDate");
+    expect(() => parseDate("1799-12-31", t)).toThrow("invalidDate");
+    expect(parseDate("1800-01-01", t)).toBe("1800-01-01");
+  });
 });
