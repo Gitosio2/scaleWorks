@@ -10,6 +10,8 @@
     "models": "Maquetas",
     "quotes": "Presupuestos",
     "clients": "Clientes",
+    "work": "Trabajos",
+    "collection": "Mi colección",
     "warehouse": "Almacén",
     "deliveries": "Albaranes",
     "consumables": "Consumibles",
@@ -152,6 +154,9 @@
   },
   "home": {
     "subtitle": "Gestiona tus maquetas, presupuestos, piezas y horas."
+  },
+  "collection": {
+    "subtitle": "Aquí irá tu colección personal. De momento es privada."
   },
   "portfolio": {
     "title": "Trabajos realizados",
