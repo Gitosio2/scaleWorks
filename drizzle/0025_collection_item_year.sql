@@ -1,0 +1,2 @@
+ALTER TABLE "collection_items" ADD COLUMN "year" integer;--> statement-breakpoint
+ALTER TABLE "collection_items" ADD CONSTRAINT "collection_items_year_range" CHECK ("collection_items"."year" IS NULL OR "collection_items"."year" BETWEEN 1800 AND 2100);

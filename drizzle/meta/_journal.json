@@ -162,6 +162,41 @@
       "when": 1793819812308,
       "tag": "0022_deliveries",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1794771745211,
+      "tag": "0023_collection_items",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1794772498079,
+      "tag": "0024_model_year",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1794772683702,
+      "tag": "0025_collection_item_year",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1794773633704,
+      "tag": "0026_collection_condition_normal",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1794774881750,
+      "tag": "0027_types_and_tags",
+      "breakpoints": true
     }
   ]
 }
