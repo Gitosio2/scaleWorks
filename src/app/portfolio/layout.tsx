@@ -21,11 +21,12 @@ const SOCIAL_NAMES = { tiktok: "TikTok", instagram: "Instagram", facebook: "Face
 // list of finished models with photos. What is shown is decided by the explicit
 // column lists in lib/portfolio.ts and the page queries.
 export default async function PortfolioLayout({ children }: { children: React.ReactNode }) {
-  const [session, publicModels, t, tp] = await Promise.all([
+  const [session, publicModels, t, tp, tl] = await Promise.all([
     auth.api.getSession({ headers: await headers() }),
     getPublicModels(),
     getTranslations("nav"),
     getTranslations("portfolio"),
+    getTranslations("login"),
   ]);
   const user = session?.user ?? null;
   const socials = socialLinks({
@@ -71,7 +72,10 @@ export default async function PortfolioLayout({ children }: { children: React.Re
             <LogoutButton />
           </div>
         ) : (
-          <div className="md:mt-auto">
+          // The installed home-screen app opens here when the session cookie has
+          // expired, so a visitor needs a way to reach the login page.
+          <div className="flex flex-col gap-1 md:mt-auto">
+            <Link href="/login" className={linkActionClass}>{tl("signIn")}</Link>
             <LanguageSwitcher />
           </div>
         )}
