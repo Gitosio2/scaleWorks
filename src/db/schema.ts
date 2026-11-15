@@ -36,7 +36,6 @@ export const consumableCategory = pgEnum("consumable_category", [
 export const modelType = pgEnum("model_type", [
   "truck",
   "crane",
-  "machine",
   "excavator",
   "backhoe_loader",
   "dumper",

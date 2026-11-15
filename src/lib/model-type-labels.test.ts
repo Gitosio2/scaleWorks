@@ -6,7 +6,6 @@ import es from "../../messages/es.json";
 const EXPECTED_TYPES = [
   "truck",
   "crane",
-  "machine",
   "excavator",
   "backhoe_loader",
   "dumper",
@@ -55,14 +54,14 @@ const EXPECTED_TAGS = [
 const EXPECTED_LABELS = {
   modelType: {
     es: {
-      truck: "Camión", crane: "Grúa", machine: "Máquina", excavator: "Excavadora",
+      truck: "Camión", crane: "Grúa", excavator: "Excavadora",
       backhoe_loader: "Retroexcavadora", dumper: "Dumper", loader: "Cargadora",
       bulldozer: "Bulldozer", paver: "Asfaltadora", compactor: "Compactador",
       motor_grader: "Motoniveladora", semi_trailer: "Semirremolque", trailer: "Remolque",
       cargo: "Carga", attachment: "Accesorio",
     },
     en: {
-      truck: "Truck", crane: "Crane", machine: "Machine", excavator: "Excavator",
+      truck: "Truck", crane: "Crane", excavator: "Excavator",
       backhoe_loader: "Backhoe loader", dumper: "Dumper", loader: "Loader",
       bulldozer: "Bulldozer", paver: "Asphalt paver", compactor: "Compactor",
       motor_grader: "Motor grader", semi_trailer: "Semi-trailer", trailer: "Trailer",

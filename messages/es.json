@@ -101,7 +101,6 @@
   "modelType": {
     "truck": "Camión",
     "crane": "Grúa",
-    "machine": "Máquina",
     "excavator": "Excavadora",
     "backhoe_loader": "Retroexcavadora",
     "dumper": "Dumper",
