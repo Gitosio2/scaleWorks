@@ -133,4 +133,30 @@ describe("parseCollectionItem", () => {
     expect(() => parse({}, ["rigid"])).toThrow("invalidTag");
     expect(() => parse({ type: "paver" }, ["rigid"])).toThrow("invalidTag");
   });
+
+  it("strips NUL characters from every text field, which Postgres text rejects", () => {
+    const nul = String.fromCharCode(0);
+    const item = parse({
+      brand: `Iv${nul}eco`,
+      name: `S${nul}-way`,
+      company: `Trans${nul}portes`,
+      manufacturer: `He${nul}rpa`,
+      reference: `31${nul}1`,
+      notes: `no${nul}tes`,
+    });
+    expect(item).toMatchObject({
+      brand: "Iveco",
+      name: "S-way",
+      company: "Transportes",
+      manufacturer: "Herpa",
+      reference: "311",
+      notes: "notes",
+    });
+  });
+
+  it("treats a field made only of NUL characters as empty", () => {
+    const nul = String.fromCharCode(0);
+    expect(() => parse({ brand: nul + nul })).toThrow("brandRequired");
+    expect(parse({ company: nul }).company).toBeNull();
+  });
 });

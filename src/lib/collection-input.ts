@@ -8,9 +8,10 @@ import { parseTags } from "./tags";
 const MAX_TEXT_LENGTH = 200;
 const MAX_NOTES_LENGTH = 5000;
 
-// Trimmed text from the form; empty -> null.
+// Trimmed text from the form (an empty string when absent). NUL characters are
+// dropped because Postgres text columns reject them.
 function text(formData: Pick<FormData, "get" | "getAll">, key: string) {
-  return String(formData.get(key) ?? "").trim();
+  return String(formData.get(key) ?? "").replace(/\u0000/g, "").trim();
 }
 
 function optionalText(formData: Pick<FormData, "get" | "getAll">, key: string, t: ActionT) {
@@ -18,14 +19,19 @@ function optionalText(formData: Pick<FormData, "get" | "getAll">, key: string, t
 }
 
 // One of an enum's values, or `fallback` when the field is empty. Anything else throws.
-function enumValue<T extends string>(raw: string, values: readonly T[], fallback: T | null, error: () => Error) {
+function enumValue<T extends string, F extends T | null>(
+  raw: string,
+  values: readonly T[],
+  fallback: F,
+  error: () => Error,
+): T | F {
   if (!raw) return fallback;
   if (!(values as readonly string[]).includes(raw)) throw error();
   return raw as T;
 }
 
-// Turns the create form into the insert payload for `collectionItems` (without the
-// owner). Throws translated errors like the model actions do. `now` stamps the
+// Turns the create or edit form into the values of a `collectionItems` row (without
+// the owner). Throws translated errors like the model actions do. `now` stamps the
 // estimated value, so the caller passes it (and tests can fix it).
 export function parseCollectionItem(formData: Pick<FormData, "get" | "getAll">, t: ActionT, now: Date) {
   const brand = text(formData, "brand");
@@ -67,7 +73,7 @@ export function parseCollectionItem(formData: Pick<FormData, "get" | "getAll">, 
       collectionCondition.enumValues,
       "new",
       () => new Error(t("invalidCondition")),
-    ) as (typeof collectionCondition.enumValues)[number],
+    ),
     purchasePriceCents: parseEuros(text(formData, "purchasePrice"), t),
     purchaseDate,
     estimatedValueCents,
