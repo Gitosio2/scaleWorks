@@ -4,10 +4,13 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { collectionItems } from "@/db/schema";
 import { isSold, profitCents } from "@/lib/collection";
+import { hasPurchasePrice, rowMeta } from "@/lib/collection-row";
+import { countryName } from "@/lib/countries";
 import { formatEuros } from "@/lib/labels";
 import { modelTitle } from "@/lib/model-title";
 import { requireUser } from "@/lib/session";
 import { Card } from "@/components/ui/card";
+import { CountryFlag } from "@/components/ui/country-flag";
 import { ConfirmDelete } from "@/components/ui/confirm-delete";
 import { CreateModal } from "@/components/ui/create-modal";
 import { EditModal } from "@/components/ui/edit-modal";
@@ -24,7 +27,6 @@ export default async function CollectionListPage() {
   const t = await getTranslations("collection");
   const tc = await getTranslations("common");
   const tn = await getTranslations("nav");
-  const tcond = await getTranslations("collectionCondition");
   const locale = await getLocale();
 
   // Whole rows: the edit modal of each item is prefilled from them.
@@ -48,16 +50,32 @@ export default async function CollectionListPage() {
           {items.map((item) => {
             const profit = profitCents(item);
             const title = modelTitle(item.brand, item.name);
+            const meta = rowMeta(item, (code) => countryName(code, locale));
+            const purchase = hasPurchasePrice(item)
+              ? t("purchaseShort", { amount: formatEuros(item.purchasePriceCents, locale) })
+              : null;
             return (
               <li key={item.id} className={`${listItemClass} flex items-start justify-between gap-3`}>
                 <div className="flex min-w-0 flex-col gap-0.5">
                   <Link href={`/collection/${item.id}`} className="font-bold hover:underline">
                     {title}
                   </Link>
-                  <p className="text-[13px] text-muted">
-                    {[item.company, item.year, tcond(item.condition)].filter(Boolean).join(" · ")}
-                  </p>
-                  <TagChips tags={item.tags} />
+                  {meta.length > 0 && (
+                    <p className="flex flex-wrap items-center gap-x-1.5 text-[13px] text-muted">
+                      {meta.map((part, index) => (
+                        <span key={index} className="inline-flex items-center gap-1.5">
+                          {index > 0 && <span aria-hidden>·</span>}
+                          {part.kind === "country" ? (
+                            <CountryFlag code={part.code} name={part.name} />
+                          ) : (
+                            part.text
+                          )}
+                        </span>
+                      ))}
+                    </p>
+                  )}
+                  {purchase && <p className="text-[13px] text-muted sm:hidden">{purchase}</p>}
+                  <TagChips type={item.type} tags={item.tags} />
                   {isSold(item) && (
                     <div className="flex flex-wrap items-center gap-2 pt-1">
                       <StatusBadge variant="mute">{t("sold")}</StatusBadge>
@@ -69,7 +87,10 @@ export default async function CollectionListPage() {
                     </div>
                   )}
                 </div>
-                <div className="-mt-1 flex shrink-0 items-center">
+                <div className="-mt-1 flex shrink-0 items-center gap-2">
+                  {purchase && (
+                    <span className="hidden whitespace-nowrap text-[13px] text-muted sm:inline">{purchase}</span>
+                  )}
                   <EditModal
                     label={tc("edit")}
                     title={t("editTitle")}

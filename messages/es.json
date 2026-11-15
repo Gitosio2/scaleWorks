@@ -232,6 +232,7 @@
     "notes": "Observaciones",
     "sold": "Vendido",
     "profit": "Beneficio: {amount}",
+    "purchaseShort": "Compra: {amount}",
     "back": "← Colección",
     "editTitle": "Editar pieza",
     "deleteTitle": "Eliminar pieza",

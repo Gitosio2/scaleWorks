@@ -232,6 +232,7 @@
     "notes": "Notes",
     "sold": "Sold",
     "profit": "Profit: {amount}",
+    "purchaseShort": "Purchase: {amount}",
     "back": "← Collection",
     "editTitle": "Edit item",
     "deleteTitle": "Delete item",
