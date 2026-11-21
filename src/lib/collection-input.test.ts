@@ -29,6 +29,7 @@ describe("parseCollectionItem", () => {
       tags: [],
       year: null,
       customized: false,
+      gift: false,
       condition: "new",
       purchasePriceCents: null,
       purchaseDate: null,
@@ -82,6 +83,11 @@ describe("parseCollectionItem", () => {
   it("reads customized from a checkbox", () => {
     expect(parse({ customized: "on" }).customized).toBe(true);
     expect(parse().customized).toBe(false);
+  });
+
+  it("reads gift from a checkbox", () => {
+    expect(parse({ gift: "on" }).gift).toBe(true);
+    expect(parse().gift).toBe(false);
   });
 
   it("defaults the condition to new and rejects unknown ones", () => {

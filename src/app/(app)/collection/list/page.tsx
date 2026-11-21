@@ -76,10 +76,11 @@ export default async function CollectionListPage() {
                   )}
                   {purchase && <p className="text-[13px] text-muted sm:hidden">{purchase}</p>}
                   <TagChips type={item.type} tags={item.tags} />
-                  {isSold(item) && (
+                  {(isSold(item) || item.gift) && (
                     <div className="flex flex-wrap items-center gap-2 pt-1">
-                      <StatusBadge variant="mute">{t("sold")}</StatusBadge>
-                      {profit !== null && (
+                      {item.gift && <StatusBadge variant="info">{t("gift")}</StatusBadge>}
+                      {isSold(item) && <StatusBadge variant="mute">{t("sold")}</StatusBadge>}
+                      {isSold(item) && profit !== null && (
                         <span className="text-[13px] font-semibold text-ink-2">
                           {t("profit", { amount: formatEuros(profit, locale) })}
                         </span>

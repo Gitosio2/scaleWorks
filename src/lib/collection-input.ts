@@ -68,6 +68,7 @@ export function parseCollectionItem(formData: Pick<FormData, "get" | "getAll">, 
     tags: parseTags(formData.getAll("tags").map(String), type, t),
     year: parseYear(text(formData, "year"), t, now),
     customized: formData.get("customized") === "on",
+    gift: formData.get("gift") === "on",
     condition: enumValue(
       text(formData, "condition"),
       collectionCondition.enumValues,

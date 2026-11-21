@@ -355,6 +355,8 @@ export const collectionItems = pgTable(
     // Labels live in messages under "modelTag"; allowed values depend on the type.
     tags: modelTag("tags").array().notNull().default(sql`'{}'::model_tag[]`),
     customized: boolean("customized").notNull().default(false),
+    // Received as a present rather than bought.
+    gift: boolean("gift").notNull().default(false),
     purchasePriceCents: integer("purchase_price_cents"),
     purchaseDate: date("purchase_date"),
     estimatedValueCents: integer("estimated_value_cents"),
