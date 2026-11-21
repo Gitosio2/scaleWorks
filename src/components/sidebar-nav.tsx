@@ -152,6 +152,15 @@ const items: Array<NavLink | NavGroup> = [
     ),
     children: [
       {
+        href: "/collection/dashboard",
+        label: "collectionDashboard" as const,
+        icon: (
+          <svg {...icon}>
+            <path d="M4 20V10M10 20V4M16 20v-7M21 20H3" />
+          </svg>
+        ),
+      },
+      {
         href: "/collection/list",
         label: "collectionList" as const,
         icon: (
@@ -171,15 +180,6 @@ const items: Array<NavLink | NavGroup> = [
             <rect x="3.5" y="4.5" width="17" height="15" rx="2" />
             <circle cx="9" cy="10" r="1.6" />
             <path d="m20.5 16-5-5-8 8" />
-          </svg>
-        ),
-      },
-      {
-        href: "/collection/dashboard",
-        label: "collectionDashboard" as const,
-        icon: (
-          <svg {...icon}>
-            <path d="M4 20V10M10 20V4M16 20v-7M21 20H3" />
           </svg>
         ),
       },
