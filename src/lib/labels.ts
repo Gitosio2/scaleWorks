@@ -86,6 +86,14 @@ export function formatEuros(cents: number | null, locale: Locale) {
   }).format(cents / 100);
 }
 
+// 0.256 -> "26%" / "26 %": a share between 0 and 1 as a whole percent.
+export function formatPercent(share: number, locale: Locale) {
+  return new Intl.NumberFormat(intlLocales[locale], {
+    style: "percent",
+    maximumFractionDigits: 0,
+  }).format(share);
+}
+
 // "2026-03-05" (a calendar date, no time zone) -> "Mar 5, 2026" / "5 mar 2026".
 export function formatDate(date: string | null, locale: Locale) {
   if (date === null) return "—";

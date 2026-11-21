@@ -20,6 +20,7 @@ import { stalledCutoff } from "@/lib/stalled";
 import { requireUser } from "@/lib/session";
 import { Card, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
+import { Stat } from "@/components/ui/stat";
 import { StatusBadge, type BadgeVariant } from "@/components/ui/status-badge";
 
 const DAY_MS = 86_400_000;
@@ -28,23 +29,6 @@ const MAX_ROWS = 5;
 // A model is "active" once started and until it is finished.
 const INACTIVE_PHASES = ["not_started", "finished"] as const;
 const ACTIVE = sql`${models.phase} not in ('not_started', 'finished')`;
-
-function Stat({
-  value,
-  label,
-  valueClass = "",
-}: {
-  value: React.ReactNode;
-  label: React.ReactNode;
-  valueClass?: string;
-}) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <span className={`text-3xl font-bold tracking-tight ${valueClass}`}>{value}</span>
-      <span className="text-[13px] text-muted">{label}</span>
-    </div>
-  );
-}
 
 // Card title that links to the matching section, pre-filtered where it helps.
 function CardLinkTitle({ title, href }: { title: string; href: string }) {

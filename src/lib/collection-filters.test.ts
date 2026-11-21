@@ -5,6 +5,7 @@ import {
   collectionOrder,
   collectionFilterConditions,
   collectionFilterOptions,
+  collectionListHref,
   parseCollectionFilters,
 } from "./collection-filters";
 
@@ -139,5 +140,38 @@ describe("collectionFilterOptions", () => {
     const o = collectionFilterOptions(rows, labels);
     expect(o.type.map((t) => t.value)).toEqual(["bulldozer", "excavator"]);
     expect(o.country).toEqual([{ value: "PE", label: "PE" }]);
+  });
+});
+
+describe("collectionListHref", () => {
+  const parse = (href: string) => {
+    const query = new URLSearchParams(href.split("?")[1] ?? "");
+    return parseCollectionFilters(
+      Object.fromEntries([...new Set(query.keys())].map((k) => [k, query.getAll(k)])),
+    );
+  };
+
+  it("points at the plain list without filters", () => {
+    expect(collectionListHref({})).toBe("/collection/list");
+  });
+
+  it("builds a link that parseCollectionFilters reads back", () => {
+    const href = collectionListHref({ brand: "man", manufacturer: "herpa", type: "truck", country: "ES" });
+    expect(href.startsWith("/collection/list?")).toBe(true);
+    expect(parse(href)).toMatchObject({ brand: "man", manufacturer: "herpa", type: "truck", country: "ES" });
+  });
+
+  it("escapes characters that mean something in a query", () => {
+    const href = collectionListHref({ brand: "a&b=c d#e" });
+    expect(href).not.toContain("#");
+    expect(parse(href).brand).toBe("a&b=c d#e");
+  });
+
+  it("repeats the tag param for several tags", () => {
+    expect(collectionListHref({ tags: ["mining", "tracked"] })).toBe("/collection/list?tag=mining&tag=tracked");
+  });
+
+  it("leaves out empty filters", () => {
+    expect(collectionListHref({ brand: "", type: null, country: null, tags: [] })).toBe("/collection/list");
   });
 });
