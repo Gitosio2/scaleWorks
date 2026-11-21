@@ -1,7 +1,7 @@
 import { and, arrayContains, asc, eq, ilike, or, sql, type SQL, type SQLWrapper } from "drizzle-orm";
 import { collectionItems, modelTag, modelType } from "@/db/schema";
 import { isCountryCode } from "./countries";
-import { containsPattern, enumParam, textParam, type SearchParams } from "./list-filters";
+import { containsPattern, enumParam, enumParams, textParam, type SearchParams } from "./list-filters";
 
 // Filters shared by the list and the gallery of the user's own collection.
 // Brand and manufacturer are compared without case or edge spaces ("Man" and
@@ -13,8 +13,9 @@ export type CollectionFilters = {
   manufacturer: string;
   type: (typeof modelType.enumValues)[number] | null;
   country: string | null;
-  // Any tag, whatever the type: "mining" matches the mining bulldozers, excavators and loaders alike.
-  tag: (typeof modelTag.enumValues)[number] | null;
+  // Any tags, whatever the type: "mining" matches the mining bulldozers, excavators and loaders alike.
+  // Several can be chosen (repeated `tag` params); none means no tag filtering.
+  tags: (typeof modelTag.enumValues)[number][];
 };
 
 const norm = (value: string | null | undefined) => value?.trim().toLowerCase() ?? "";
@@ -27,13 +28,20 @@ export function parseCollectionFilters(sp: SearchParams): CollectionFilters {
     manufacturer: norm(textParam(sp, "manufacturer")),
     type: enumParam(sp, "type", modelType.enumValues),
     country: isCountryCode(country) ? country : null,
-    tag: enumParam(sp, "tag", modelTag.enumValues),
+    tags: enumParams(sp, "tag", modelTag.enumValues),
   };
 }
 
-export function activeFilterCount(filters: CollectionFilters) {
-  return Object.values(filters).filter(Boolean).length;
+// One per filter in use; the tags are a single filter however many are chosen.
+export function activeFilterCount({ tags, ...single }: CollectionFilters) {
+  return Object.values(single).filter(Boolean).length + (tags.length > 0 ? 1 : 0);
 }
+
+// The one place that decides how several chosen tags combine. Now an item must
+// have ALL of them (array contains, `@>`); to match ANY of them instead, swap
+// `arrayContains` for `arrayOverlaps` (`&&`), imported from drizzle-orm.
+const tagsCondition = (tags: CollectionFilters["tags"]) =>
+  tags.length > 0 ? arrayContains(collectionItems.tags, tags) : undefined;
 
 const normalisedColumn = (column: SQLWrapper) => sql`lower(trim(${column}))`;
 
@@ -52,7 +60,7 @@ export function collectionFilterConditions(filters: CollectionFilters): SQL[] {
       : undefined,
     filters.type ? eq(collectionItems.type, filters.type) : undefined,
     filters.country ? eq(collectionItems.country, filters.country) : undefined,
-    filters.tag ? arrayContains(collectionItems.tags, [filters.tag]) : undefined,
+    tagsCondition(filters.tags),
   ];
   return conditions.filter((c): c is SQL => c !== undefined);
 }

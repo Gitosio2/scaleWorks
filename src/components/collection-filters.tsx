@@ -8,12 +8,13 @@ import {
   type CollectionFilters as Filters,
 } from "@/lib/collection-filters";
 import { countryName } from "@/lib/countries";
-import { FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filters";
+import { FilterChips, FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filters";
 
 /**
  * Filter panel of the user's own collection, shared by the list and the gallery:
- * brand, manufacturer, type, country and tag as selects (offering only values the
- * collection has) and a free text for the model or reference. `action` is the
+ * brand, manufacturer, type and country as selects and the tags as toggle chips
+ * (offering only values the collection has; several tags can be on at once) and a
+ * free text for the model or reference. `action` is the
  * page it filters; the page applies the same `filters` to its query.
  */
 export async function CollectionFilters({
@@ -48,6 +49,14 @@ export async function CollectionFilters({
     country: (code) => countryName(code, locale),
   });
 
+  // A tag from a bookmarked link stays visible (and can be switched off) even if the collection no longer has it.
+  const tagOptions = [
+    ...options.tag,
+    ...filters.tags
+      .filter((tag) => !options.tag.some((o) => o.value === tag))
+      .map((tag) => ({ value: tag as string, label: ttag(tag) })),
+  ];
+
   return (
     <ListFilters action={action} activeCount={activeFilterCount(filters)}>
       <FilterText
@@ -64,13 +73,13 @@ export async function CollectionFilters({
         options={options.manufacturer}
       />
       <FilterSelect name="type" label={t("type")} defaultValue={filters.type ?? ""} options={options.type} />
-      <FilterSelect name="tag" label={t("tags")} defaultValue={filters.tag ?? ""} options={options.tag} />
       <FilterSelect
         name="country"
         label={t("country")}
         defaultValue={filters.country ?? ""}
         options={options.country}
       />
+      <FilterChips name="tag" label={t("tags")} selected={filters.tags} options={tagOptions} />
     </ListFilters>
   );
 }
