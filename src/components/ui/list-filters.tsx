@@ -55,8 +55,8 @@ export function ListFilters({
   }
 
   return (
-    <details className="group overflow-hidden rounded-[14px] border border-l-4 border-brand/25 border-l-brand bg-brand/5">
-      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-2 px-5 bg-brand text-sm font-bold text-brand-fg hover:bg-brand-hover [&::-webkit-details-marker]:hidden">
+    <details className="group overflow-hidden has-[[data-listbox-open]]:overflow-visible rounded-[14px] border border-l-4 border-brand/25 border-l-brand bg-brand/5">
+      <summary className="flex min-h-12 cursor-pointer rounded-t-[13px] list-none items-center justify-between gap-2 px-5 bg-brand text-sm font-bold text-brand-fg hover:bg-brand-hover [&::-webkit-details-marker]:hidden">
         <span className="inline-flex items-center gap-2.5">
           <svg
             aria-hidden

@@ -6,7 +6,16 @@ import { flagCode } from "@/lib/country-flags";
 // forbids. Windows shows flag emoji as two letters, hence SVG. Without a flag the
 // ISO code is shown as text. The name stays for screen readers and, on very small
 // screens, is hidden visually (the title keeps it for hovering).
-export function CountryFlag({ code, name }: { code: string; name: string }) {
+export function CountryFlag({
+  code,
+  name,
+  iconOnly = false,
+}: {
+  code: string;
+  name: string;
+  // Only the flag, for places where the name is already written next to it (a select or listbox).
+  iconOnly?: boolean;
+}) {
   const known = flagCode(code);
   const Flag = known ? Flags[known as keyof typeof Flags] : null;
   return (
@@ -16,7 +25,7 @@ export function CountryFlag({ code, name }: { code: string; name: string }) {
       ) : (
         <span aria-hidden className="font-semibold">{code}</span>
       )}
-      <span className="sr-only sm:not-sr-only">{name}</span>
+      {!iconOnly && <span className="sr-only sm:not-sr-only">{name}</span>}
     </span>
   );
 }

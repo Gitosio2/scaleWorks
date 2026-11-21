@@ -8,11 +8,13 @@ import {
   type CollectionFilters as Filters,
 } from "@/lib/collection-filters";
 import { countryName } from "@/lib/countries";
+import { CountryFlag } from "@/components/ui/country-flag";
+import { FilterListbox } from "@/components/ui/filter-listbox";
 import { FilterChips, FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filters";
 
 /**
  * Filter panel of the user's own collection, shared by the list and the gallery:
- * brand, manufacturer, type and country as selects and the tags as toggle chips
+ * brand, manufacturer and type as selects, the country as a listbox showing flags and the tags as toggle chips
  * (offering only values the collection has; several tags can be on at once) and a
  * free text for the model or reference. `action` is the
  * page it filters; the page applies the same `filters` to its query.
@@ -57,6 +59,14 @@ export async function CollectionFilters({
       .map((tag) => ({ value: tag as string, label: ttag(tag) })),
   ];
 
+  // Every country option carries its flag, rendered here on the server so the client listbox only receives the markup of the countries offered. A country from a bookmarked link stays offered even if the collection no longer has it.
+  const countryOptions = [
+    ...options.country,
+    ...(filters.country && !options.country.some((o) => o.value === filters.country)
+      ? [{ value: filters.country, label: countryName(filters.country, locale) }]
+      : []),
+  ].map((o) => ({ ...o, icon: <CountryFlag code={o.value} name={o.label} iconOnly /> }));
+
   return (
     <ListFilters action={action} activeCount={activeFilterCount(filters)}>
       <FilterText
@@ -73,11 +83,11 @@ export async function CollectionFilters({
         options={options.manufacturer}
       />
       <FilterSelect name="type" label={t("type")} defaultValue={filters.type ?? ""} options={options.type} />
-      <FilterSelect
+      <FilterListbox
         name="country"
         label={t("country")}
         defaultValue={filters.country ?? ""}
-        options={options.country}
+        options={countryOptions}
       />
       <FilterChips name="tag" label={t("tags")} selected={filters.tags} options={tagOptions} />
     </ListFilters>
