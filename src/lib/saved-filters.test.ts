@@ -74,6 +74,21 @@ describe("restoreFilters", () => {
     expect(location(restoreFilters(req))?.search).toBe("?q=fiat");
   });
 
+  it("keeps the filters of a nested page in a cookie without a slash in its name", () => {
+    const req = request("/collection/list", { cookie: "filters_collection_list=tag%3Dmining" });
+    expect(location(restoreFilters(req))?.pathname).toBe("/collection/list");
+    expect(location(restoreFilters(req))?.search).toBe("?tag=mining");
+    const other = request("/collection/gallery", { cookie: "filters_collection_list=tag%3Dmining" });
+    expect(restoreFilters(other)).toBeNull();
+  });
+
+  it("restores a filter that has several values, in order", () => {
+    const req = request("/collection/list", {
+      cookie: "filters_collection_list=tag%3Dmining%26tag%3Dtracked%26q%3Dcat",
+    });
+    expect(location(restoreFilters(req))?.search).toBe("?tag=mining&tag=tracked&q=cat");
+  });
+
   it("clears the cookie and the query on reset", () => {
     const req = request(`/models?${RESET_PARAM}=1&q=fiat`, {
       cookie: "filters_models=q%3Dold",
@@ -97,6 +112,18 @@ describe("saveFilters", () => {
     expect(cookie?.httpOnly).toBe(true);
     expect(cookie?.sameSite).toBe("lax");
     expect(cookie?.path).toBe("/");
+  });
+
+  it("stores the filters of a nested page under a slash-free cookie name", () => {
+    const res = NextResponse.next();
+    saveFilters(request("/collection/gallery?tag=mining"), res);
+    expect(res.cookies.get("filters_collection_gallery")?.value).toBe("tag=mining");
+  });
+
+  it("stores every value of a repeated filter", () => {
+    const res = NextResponse.next();
+    saveFilters(request("/collection/list?tag=mining&tag=tracked"), res);
+    expect(res.cookies.get("filters_collection_list")?.value).toBe("tag=mining&tag=tracked");
   });
 
   it("does not store the RSC param", () => {

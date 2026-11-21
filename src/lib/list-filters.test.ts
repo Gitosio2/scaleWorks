@@ -6,6 +6,7 @@ import {
   containsPattern,
   descNullsLast,
   enumParam,
+  enumParams,
   textParam,
   uuidParam,
 } from "./list-filters";
@@ -49,6 +50,28 @@ describe("enumParam", () => {
   it("matches the trimmed value but is case sensitive", () => {
     expect(enumParam({ phase: " finished " }, "phase", phases)).toBe("finished");
     expect(enumParam({ phase: "FINISHED" }, "phase", phases)).toBeNull();
+  });
+});
+
+describe("enumParams", () => {
+  const tags = ["a", "b", "c"] as const;
+
+  it("reads every repeated value, in the order of the list", () => {
+    expect(enumParams({ tag: ["c", "a"] }, "tag", tags)).toEqual(["a", "c"]);
+  });
+
+  it("reads a single value (an old link) as one", () => {
+    expect(enumParams({ tag: "b" }, "tag", tags)).toEqual(["b"]);
+  });
+
+  it("drops unknown values and duplicates, and trims", () => {
+    expect(enumParams({ tag: [" a ", "a", "x", ""] }, "tag", tags)).toEqual(["a"]);
+  });
+
+  it("is empty when the param is absent or empty", () => {
+    expect(enumParams({}, "tag", tags)).toEqual([]);
+    expect(enumParams({ tag: [] }, "tag", tags)).toEqual([]);
+    expect(enumParams({ tag: undefined }, "tag", tags)).toEqual([]);
   });
 });
 

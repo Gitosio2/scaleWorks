@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { cx, inputClass, labelClass } from "@/components/ui/styles";
+import { inputClass, labelClass } from "@/components/ui/styles";
+import { TagToggle } from "@/components/ui/tag-toggle";
 
 /**
  * The type select plus, for the chosen type, its allowed tags as toggle chips.
@@ -69,39 +70,14 @@ export function TypeAndTags({
         ) : (
           <div className="flex flex-wrap gap-2">
             {allowed.map((tag) => (
-              <label
+              <TagToggle
                 key={tag}
-                className={cx(
-                  "inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-full border border-input-border bg-input px-3 text-[13px] font-semibold text-ink-2",
-                  "has-[:checked]:border-ok has-[:checked]:bg-ok has-[:checked]:text-brand-fg",
-                  "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ok",
-                )}
-              >
-                <input
-                  type="checkbox"
-                  name="tags"
-                  value={tag}
-                  checked={tags.includes(tag)}
-                  onChange={(event) => toggle(tag, event.target.checked)}
-                  className="sr-only"
-                />
-                {tags.includes(tag) && (
-                  <svg
-                    width={14}
-                    height={14}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={3}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden
-                  >
-                    <path d="m5 12 5 5 9-10" />
-                  </svg>
-                )}
-                {ttag(tag as Parameters<typeof ttag>[0])}
-              </label>
+                name="tags"
+                value={tag}
+                label={ttag(tag as Parameters<typeof ttag>[0])}
+                checked={tags.includes(tag)}
+                onChange={(event) => toggle(tag, event.target.checked)}
+              />
             ))}
           </div>
         )}

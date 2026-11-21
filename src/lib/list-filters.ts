@@ -22,6 +22,18 @@ export function enumParam<T extends string>(
   return values.find((v) => v === value) ?? null;
 }
 
+// Every repeated value of the param that is one of `values`: unique, in the
+// order of `values`. Unknown ones are dropped; a single value (an old link) counts as one.
+export function enumParams<T extends string>(
+  sp: SearchParams,
+  key: string,
+  values: readonly T[],
+) {
+  const raw = sp[key];
+  const given = new Set((Array.isArray(raw) ? raw : [raw ?? ""]).map((v) => v.replace(/\0/g, "").trim()));
+  return values.filter((v) => given.has(v));
+}
+
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // Postgres rejects malformed uuids, so anything else is treated as "no filter".

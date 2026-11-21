@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { RESET_PARAM } from "@/lib/filter-reset";
 import { inputClass, labelClass, secondaryButtonClass } from "./styles";
+import { TagToggle } from "./tag-toggle";
 
 const TYPING_DEBOUNCE_MS = 400;
 
@@ -54,8 +55,8 @@ export function ListFilters({
   }
 
   return (
-    <details className="group overflow-hidden rounded-[14px] border border-l-4 border-brand/25 border-l-brand bg-brand/5">
-      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-2 px-5 bg-brand text-sm font-bold text-brand-fg hover:bg-brand-hover [&::-webkit-details-marker]:hidden">
+    <details className="group overflow-hidden has-[[data-listbox-open]]:overflow-visible rounded-[14px] border border-l-4 border-brand/25 border-l-brand bg-brand/5">
+      <summary className="flex min-h-12 cursor-pointer rounded-t-[13px] list-none items-center justify-between gap-2 px-5 bg-brand text-sm font-bold text-brand-fg hover:bg-brand-hover [&::-webkit-details-marker]:hidden">
         <span className="inline-flex items-center gap-2.5">
           <svg
             aria-hidden
@@ -163,5 +164,54 @@ export function FilterSelect({
         ))}
       </select>
     </label>
+  );
+}
+
+/**
+ * Several values of one filter as toggle chips (the same ones the item form uses),
+ * each clicked on or off. Submits one `name` entry per selected chip, so the URL
+ * carries a repeated param. Renders nothing when there are no options.
+ */
+export function FilterChips({
+  name,
+  label,
+  selected,
+  options,
+}: {
+  name: string;
+  label: string;
+  selected: readonly string[];
+  options: ReadonlyArray<{ value: string; label: string }>;
+}) {
+  const ref = useRef<HTMLFieldSetElement>(null);
+  const selectedKey = selected.join(",");
+
+  // Like the other fields: when the URL changes without a click here (back,
+  // forward), copy the selection into the chips unless the user is on one.
+  useEffect(() => {
+    const fieldset = ref.current;
+    if (!fieldset || fieldset.contains(document.activeElement)) return;
+    const wanted = selectedKey ? selectedKey.split(",") : [];
+    for (const input of fieldset.querySelectorAll<HTMLInputElement>("input")) {
+      input.checked = wanted.includes(input.value);
+    }
+  }, [selectedKey]);
+
+  if (options.length === 0) return null;
+  return (
+    <fieldset ref={ref} className="flex flex-col gap-1.5 sm:col-span-2 lg:col-span-3">
+      <legend className="pb-1.5 text-[13px] font-semibold text-ink-2">{label}</legend>
+      <div className="flex flex-wrap gap-2">
+        {options.map((o) => (
+          <TagToggle
+            key={o.value}
+            name={name}
+            value={o.value}
+            label={o.label}
+            defaultChecked={selected.includes(o.value)}
+          />
+        ))}
+      </div>
+    </fieldset>
   );
 }
