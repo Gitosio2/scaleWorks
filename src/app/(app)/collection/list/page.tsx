@@ -1,14 +1,17 @@
 import Link from "next/link";
-import { desc, eq } from "drizzle-orm";
+import { desc } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { collectionItems } from "@/db/schema";
 import { isSold, profitCents } from "@/lib/collection";
+import { activeFilterCount, collectionWhere, parseCollectionFilters } from "@/lib/collection-filters";
 import { hasPurchasePrice, rowMeta } from "@/lib/collection-row";
 import { countryName } from "@/lib/countries";
 import { formatEuros } from "@/lib/labels";
+import type { SearchParams } from "@/lib/list-filters";
 import { modelTitle } from "@/lib/model-title";
 import { requireUser } from "@/lib/session";
+import { CollectionFilters } from "@/components/collection-filters";
 import { Card } from "@/components/ui/card";
 import { CountryFlag } from "@/components/ui/country-flag";
 import { ConfirmDelete } from "@/components/ui/confirm-delete";
@@ -22,18 +25,24 @@ import { createCollectionItem, deleteCollectionItem, updateCollectionItem } from
 import { CollectionFields } from "../collection-fields";
 
 // Text-only list of the collection (private for now).
-export default async function CollectionListPage() {
+export default async function CollectionListPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const sp = await searchParams;
   const user = await requireUser();
   const t = await getTranslations("collection");
   const tc = await getTranslations("common");
   const tn = await getTranslations("nav");
   const locale = await getLocale();
+  const filters = parseCollectionFilters(sp);
 
   // Whole rows: the edit modal of each item is prefilled from them.
   const items = await db
     .select()
     .from(collectionItems)
-    .where(eq(collectionItems.userId, user.id))
+    .where(collectionWhere(user.id, filters))
     .orderBy(desc(collectionItems.createdAt));
 
   return (
@@ -44,9 +53,13 @@ export default async function CollectionListPage() {
         <CollectionFields />
       </CreateModal>
 
+      <CollectionFilters action="/collection/list" userId={user.id} filters={filters} />
+
       <Card className="py-0!">
         <ul className="flex flex-col">
-          {items.length === 0 && <li className="py-4 text-muted">{t("empty")}</li>}
+          {items.length === 0 && (
+            <li className="py-4 text-muted">{activeFilterCount(filters) > 0 ? t("emptyFiltered") : t("empty")}</li>
+          )}
           {items.map((item) => {
             const profit = profitCents(item);
             const title = modelTitle(item.brand, item.name);

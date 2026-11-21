@@ -5,7 +5,15 @@ import { PAGE_PARAM } from "./pagination";
 // The list pages keep their filters in the URL. These helpers (run from the
 // proxy) also remember them in a cookie, so opening the list again without
 // filters - the sidebar link, or going back - brings the last ones back.
-const FILTER_PAGES = ["/models", "/clients", "/quotes", "/expenses", "/consumables"];
+const FILTER_PAGES = [
+  "/models",
+  "/clients",
+  "/quotes",
+  "/expenses",
+  "/consumables",
+  "/collection/list",
+  "/collection/gallery",
+];
 
 const MAX_LENGTH = 500;
 const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
@@ -16,7 +24,8 @@ const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
 const FRAMEWORK_PARAMS = ["_rsc"];
 const NON_FILTER_PARAMS = [...FRAMEWORK_PARAMS, PAGE_PARAM];
 
-const filtersCookieName = (pathname: string) => `filters_${pathname.slice(1)}`;
+// Cookie names cannot hold "/", so nested pages ("/collection/list") use "_".
+const filtersCookieName = (pathname: string) => `filters_${pathname.slice(1).replaceAll("/", "_")}`;
 
 // Parses a query string and drops the params that are not filters.
 function filtersOnly(query: string) {
