@@ -21,9 +21,13 @@ export type FilterListboxOption = {
 
 const NAVIGATION_KEYS: readonly string[] = ["ArrowDown", "ArrowUp", "Home", "End"];
 
-// Native setter of <input>.value: unlike `input.value = x` it does not tell React's
-// value tracker, so the `input` event dispatched afterwards is reported as a change.
-const setNativeValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+// Sets <input>.value through the native setter: unlike `input.value = x` it does not tell
+// React's value tracker, so the `input` event dispatched afterwards is reported as a change.
+// Looked up on each call, never at module level: this module is also evaluated on the
+// server, where `HTMLInputElement` does not exist.
+function setNativeValue(input: HTMLInputElement, value: string) {
+  Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set?.call(input, value);
+}
 
 /**
  * A single-choice filter shown as a button that opens a listbox, for the cases where
@@ -117,8 +121,8 @@ export function FilterListbox({
     if (next === value) return;
     setSel((s) => ({ ...s, value: next }));
     const input = hiddenRef.current;
-    if (input && setNativeValue) {
-      setNativeValue.call(input, next);
+    if (input) {
+      setNativeValue(input, next);
       input.dispatchEvent(new Event("input", { bubbles: true }));
     }
   }
