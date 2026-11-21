@@ -211,6 +211,13 @@
       "when": 1794775630670,
       "tag": "0029_remove_machine_type",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1795192882467,
+      "tag": "0030_collection_item_gift",
+      "breakpoints": true
     }
   ]
 }

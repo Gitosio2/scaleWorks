@@ -25,7 +25,7 @@ describe("backup tables", () => {
 
   it("exports the item columns including year and sale data", () => {
     expect(columnsOf("collectionItems")).toEqual(
-      expect.arrayContaining(["brand", "name", "year", "soldDate", "soldPriceCents", "condition"]),
+      expect.arrayContaining(["brand", "name", "year", "soldDate", "soldPriceCents", "condition", "gift"]),
     );
   });
 

@@ -61,6 +61,7 @@ export default async function CollectionItemPage({
         subtitle={[item.company, item.year, tcond(item.condition)].filter(Boolean).join(" · ")}
         action={
           <div className="flex flex-wrap items-center justify-end gap-2">
+            {item.gift && <StatusBadge variant="info">{t("gift")}</StatusBadge>}
             {isSold(item) && <StatusBadge variant="mute">{t("sold")}</StatusBadge>}
             <EditModal label={tc("edit")} title={t("editTitle")} submitLabel={tc("save")} action={updateCollectionItem.bind(null, id)}>
               <CollectionFields defaults={item} />
@@ -88,6 +89,7 @@ export default async function CollectionItemPage({
           <Detail label={t("type")}>{item.type ? ttype(item.type) : none}</Detail>
           <Detail label={t("year")}>{item.year ?? none}</Detail>
           <Detail label={t("customized")}>{item.customized ? t("yes") : t("no")}</Detail>
+          <Detail label={t("gift")}>{item.gift ? t("yes") : t("no")}</Detail>
           <Detail label={t("condition")}>{tcond(item.condition)}</Detail>
           <Detail label={t("purchasePrice")}>{formatEuros(item.purchasePriceCents, locale)}</Detail>
           <Detail label={t("purchaseDate")}>{formatDate(item.purchaseDate, locale)}</Detail>

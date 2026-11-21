@@ -16,6 +16,7 @@ export type CollectionDefaults = {
   tags?: readonly string[];
   year?: number | null;
   customized?: boolean;
+  gift?: boolean;
   condition?: (typeof collectionCondition.enumValues)[number];
   purchasePriceCents?: number | null;
   purchaseDate?: string | null;
@@ -81,6 +82,10 @@ export function CollectionFields({ defaults = {} }: { defaults?: CollectionDefau
       <label className="flex min-h-11 items-center gap-2.5 text-[13px] font-semibold text-ink-2">
         <input type="checkbox" name="customized" defaultChecked={defaults.customized ?? false} className="size-5" />
         {t("customized")}
+      </label>
+      <label className="flex min-h-11 items-center gap-2.5 text-[13px] font-semibold text-ink-2">
+        <input type="checkbox" name="gift" defaultChecked={defaults.gift ?? false} className="size-5" />
+        {t("gift")}
       </label>
       <label className={labelClass}>
         {t("condition")}
