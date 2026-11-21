@@ -1,6 +1,8 @@
+import { PgDialect } from "drizzle-orm/pg-core";
 import { describe, expect, it } from "vitest";
 import {
   activeFilterCount,
+  collectionOrder,
   collectionFilterConditions,
   collectionFilterOptions,
   parseCollectionFilters,
@@ -52,6 +54,19 @@ describe("collectionFilterConditions", () => {
       tag: "mining",
     });
     expect(collectionFilterConditions(all)).toHaveLength(6);
+  });
+});
+
+describe("collectionOrder", () => {
+  const dialect = new PgDialect();
+
+  it("sorts by brand, then model, then id, ignoring case and edge spaces", () => {
+    const clauses = collectionOrder().map((c) => dialect.sqlToQuery(c).sql);
+    expect(clauses).toEqual([
+      'lower(trim("collection_items"."brand")) asc',
+      'lower(trim("collection_items"."name")) asc',
+      '"collection_items"."id" asc',
+    ]);
   });
 });
 

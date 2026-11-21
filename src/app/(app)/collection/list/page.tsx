@@ -1,10 +1,9 @@
 import Link from "next/link";
-import { desc } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { collectionItems } from "@/db/schema";
 import { isSold, profitCents } from "@/lib/collection";
-import { activeFilterCount, collectionWhere, parseCollectionFilters } from "@/lib/collection-filters";
+import { activeFilterCount, collectionOrder, collectionWhere, parseCollectionFilters } from "@/lib/collection-filters";
 import { hasPurchasePrice, rowMeta } from "@/lib/collection-row";
 import { countryName } from "@/lib/countries";
 import { formatEuros } from "@/lib/labels";
@@ -43,7 +42,7 @@ export default async function CollectionListPage({
     .select()
     .from(collectionItems)
     .where(collectionWhere(user.id, filters))
-    .orderBy(desc(collectionItems.createdAt));
+    .orderBy(...collectionOrder());
 
   return (
     <>

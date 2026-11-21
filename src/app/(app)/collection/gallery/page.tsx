@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { desc, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { collectionItemImages, collectionItems } from "@/db/schema";
-import { activeFilterCount, collectionWhere, parseCollectionFilters } from "@/lib/collection-filters";
+import { activeFilterCount, collectionOrder, collectionWhere, parseCollectionFilters } from "@/lib/collection-filters";
 import type { SearchParams } from "@/lib/list-filters";
 import { modelTitle } from "@/lib/model-title";
 import { requireUser } from "@/lib/session";
@@ -43,7 +43,7 @@ export default async function CollectionGalleryPage({
     })
     .from(collectionItems)
     .where(collectionWhere(user.id, filters))
-    .orderBy(desc(collectionItems.createdAt));
+    .orderBy(...collectionOrder());
 
   return (
     <>

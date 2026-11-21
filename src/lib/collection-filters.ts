@@ -1,4 +1,4 @@
-import { and, arrayContains, eq, ilike, or, sql, type SQL, type SQLWrapper } from "drizzle-orm";
+import { and, arrayContains, asc, eq, ilike, or, sql, type SQL, type SQLWrapper } from "drizzle-orm";
 import { collectionItems, modelTag, modelType } from "@/db/schema";
 import { isCountryCode } from "./countries";
 import { containsPattern, enumParam, textParam, type SearchParams } from "./list-filters";
@@ -59,6 +59,15 @@ export function collectionFilterConditions(filters: CollectionFilters): SQL[] {
 
 export const collectionWhere = (userId: string, filters: CollectionFilters) =>
   and(eq(collectionItems.userId, userId), ...collectionFilterConditions(filters));
+
+// Default order of the list and the gallery: brand, then model, ignoring case
+// and edge spaces like the filters do. The id is the final tiebreaker so equal
+// brand and model always come out in the same order.
+export const collectionOrder = () => [
+  asc(normalisedColumn(collectionItems.brand)),
+  asc(normalisedColumn(collectionItems.name)),
+  asc(collectionItems.id),
+];
 
 type FacetRow = {
   brand: string;
