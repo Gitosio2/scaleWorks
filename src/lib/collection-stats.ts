@@ -132,7 +132,10 @@ export function collectionStats(rows: readonly StatsRow[], options: StatsOptions
       .map(([year, { count, spentCents }]) => ({ year, count, spentCents })),
     sold: {
       count: sold.length,
+      // Sum over the sold items that have both prices; null when none do.
       profitCents: profits.length > 0 ? profits.reduce((sum, p) => sum + p, 0) : null,
+      // Sold items whose profit is unknown (a price is missing), so left out of the sum.
+      unpricedCount: sold.length - profits.length,
     },
   };
 }

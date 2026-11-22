@@ -140,9 +140,14 @@ export default async function CollectionDashboardPage() {
           value={stats.sold.count}
           label={t("sold", { count: stats.sold.count })}
           hint={
-            stats.sold.profitCents !== null
-              ? t("soldProfit", { amount: formatEuros(stats.sold.profitCents, locale) })
-              : t("soldNote")
+            stats.sold.profitCents === null
+              ? t("soldNote")
+              : stats.sold.unpricedCount > 0
+                ? t("soldProfitPartial", {
+                    amount: formatEuros(stats.sold.profitCents, locale),
+                    missing: stats.sold.unpricedCount,
+                  })
+                : t("soldProfit", { amount: formatEuros(stats.sold.profitCents, locale) })
           }
         />
       </div>

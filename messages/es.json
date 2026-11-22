@@ -284,6 +284,7 @@
     "sold": "{count, plural, one {Maqueta vendida} other {Maquetas vendidas}}",
     "soldNote": "No se cuentan en el resto de cifras",
     "soldProfit": "Beneficio total {amount}. No se cuentan en el resto de cifras",
+    "soldProfitPartial": "Beneficio de los modelos vendidos con precio: {amount}. {missing, plural, one {# modelo vendido no tiene precio} other {# modelos vendidos no tienen precio}}. No se cuentan en el resto de cifras",
     "conditions": "Estado",
     "purchaseYears": "Compras por año"
   },

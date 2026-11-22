@@ -284,6 +284,7 @@
     "sold": "{count, plural, one {Model sold} other {Models sold}}",
     "soldNote": "Not counted in the other figures",
     "soldProfit": "Total profit {amount}. Not counted in the other figures",
+    "soldProfitPartial": "Profit of the sold models with prices: {amount}. {missing, plural, one {# sold model has no price} other {# sold models have no price}}. Not counted in the other figures",
     "conditions": "Condition",
     "purchaseYears": "Purchases per year"
   },

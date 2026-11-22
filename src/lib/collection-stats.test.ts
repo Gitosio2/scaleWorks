@@ -39,7 +39,7 @@ describe("collectionStats: empty collection", () => {
     expect(s.customizedCount).toBe(0);
     expect(s.mostExpensive).toBeNull();
     expect(s.purchaseYears).toEqual([]);
-    expect(s.sold).toEqual({ count: 0, profitCents: null });
+    expect(s.sold).toEqual({ count: 0, profitCents: null, unpricedCount: 0 });
   });
 });
 
@@ -81,12 +81,28 @@ describe("collectionStats: what is in the collection", () => {
       row({ purchasePriceCents: 3000, soldDate: "2026-03-02" }),
       row({ purchasePriceCents: null, soldDate: "2026-03-03", soldPriceCents: 9000 }),
     ]);
-    expect(s.sold).toEqual({ count: 4, profitCents: 1500 });
+    expect(s.sold).toEqual({ count: 4, profitCents: 1500, unpricedCount: 2 });
   });
 
   it("has no profit when no sold item has both prices", () => {
     const s = stats([row({ soldDate: "2026-02-01" })]);
-    expect(s.sold).toEqual({ count: 1, profitCents: null });
+    expect(s.sold).toEqual({ count: 1, profitCents: null, unpricedCount: 1 });
+  });
+
+  it("counts no unpriced sold items when every sold item has both prices", () => {
+    const s = stats([
+      row({ purchasePriceCents: 4000, soldDate: "2026-02-01", soldPriceCents: 6500 }),
+      row({ purchasePriceCents: 5000, soldDate: "2026-03-01", soldPriceCents: 4000 }),
+    ]);
+    expect(s.sold).toEqual({ count: 2, profitCents: 1500, unpricedCount: 0 });
+  });
+
+  it("counts every sold item as unpriced when none has both prices", () => {
+    const s = stats([
+      row({ purchasePriceCents: 4000, soldDate: "2026-02-01" }),
+      row({ soldDate: "2026-03-01", soldPriceCents: 4000 }),
+    ]);
+    expect(s.sold).toEqual({ count: 2, profitCents: null, unpricedCount: 2 });
   });
 
   it("shows an empty collection with only sold items as zero models", () => {
