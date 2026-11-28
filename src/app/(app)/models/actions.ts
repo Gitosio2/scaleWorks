@@ -1,5 +1,6 @@
 "use server";
 
+import { randomUUID } from "node:crypto";
 import { and, eq, ne, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -7,15 +8,23 @@ import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import {
   clients,
+  consumables,
+  modelConsumables,
   modelImages,
   models,
   modelPhase,
   modelType,
+  parts,
   paymentStatus,
 } from "@/db/schema";
 import { isUuid, parseYear } from "@/lib/input";
 import { parseTags } from "@/lib/tags";
 import { parseEuros } from "@/lib/labels";
+import {
+  duplicateConsumableLinks,
+  duplicateModelValues,
+  duplicatePartValues,
+} from "@/lib/duplicate-model";
 import { derivePayment } from "@/lib/payments";
 import { nextHold } from "@/lib/payment-hold";
 import { requireUser } from "@/lib/session";
@@ -106,6 +115,51 @@ export async function updateModel(id: string, formData: FormData) {
   revalidatePath(`/models/${id}`);
   revalidatePath("/");
   redirect("/models");
+}
+
+// Starts a new model from an existing one: same data, client, price, plain parts
+// and consumables, but the build, payment and dates start over. Opens the copy's
+// edit page so it can be renamed or adjusted right away.
+export async function duplicateModel(id: string) {
+  const user = await requireUser();
+  const t = await getTranslations("models");
+
+  const [model] = await db
+    .select()
+    .from(models)
+    .where(and(eq(models.id, id), eq(models.userId, user.id)));
+  if (!model) throw new Error((await getTranslations("actionErrors"))("modelNotFound"));
+
+  const [modelParts, links] = await Promise.all([
+    db
+      .select()
+      .from(parts)
+      .where(and(eq(parts.modelId, id), eq(parts.userId, user.id))),
+    db
+      .select({ link: modelConsumables })
+      .from(modelConsumables)
+      .innerJoin(consumables, eq(modelConsumables.consumableId, consumables.id))
+      .where(and(eq(modelConsumables.modelId, id), eq(consumables.userId, user.id))),
+  ]);
+
+  const copyId = randomUUID();
+  const newParts = duplicatePartValues(modelParts, copyId);
+  const newLinks = duplicateConsumableLinks(
+    links.map((l) => l.link),
+    copyId,
+  );
+
+  // One batch = one transaction: the copy never exists without its parts.
+  await db.batch([
+    db
+      .insert(models)
+      .values(duplicateModelValues(model, copyId, t("copyName", { name: model.name }))),
+    ...(newParts.length > 0 ? [db.insert(parts).values(newParts)] : []),
+    ...(newLinks.length > 0 ? [db.insert(modelConsumables).values(newLinks)] : []),
+  ]);
+
+  revalidatePath("/models");
+  redirect(`/models/${copyId}/edit`);
 }
 
 // Marks a model as paused because the client has not paid, or lifts the pause.
