@@ -34,7 +34,7 @@ import {
 } from "./consumable-actions";
 import { addPart, deletePart, updatePart, updatePartStatus } from "./part-actions";
 import { setPartPaid } from "../../expenses/actions";
-import { setPaymentHold } from "../actions";
+import { duplicateModel, setPaymentHold } from "../actions";
 import { profitability } from "@/lib/profitability";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Card, CardTitle, CollapsibleCard } from "@/components/ui/card";
@@ -45,6 +45,7 @@ import { HoldBadge, PaymentBadge, PhaseBadge, StatusBadge, supplyStatusVariant }
 import {
   ConfirmIconButton,
   DeleteIconButton,
+  DuplicateIconButton,
   EditIconLink,
   HoldIconButton,
   QuoteIconButton,
@@ -197,6 +198,9 @@ export default async function ModelDetailPage({
       )}
       <form action={createQuoteFromModel.bind(null, id)}>
         <QuoteIconButton label={t("createQuote")} />
+      </form>
+      <form action={duplicateModel.bind(null, id)}>
+        <DuplicateIconButton label={t("duplicate")} />
       </form>
       <EditIconLink href={`/models/${id}/edit`} label={tc("edit")} />
     </div>

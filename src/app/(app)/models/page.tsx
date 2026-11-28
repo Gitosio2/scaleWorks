@@ -52,11 +52,16 @@ import { PageHeader } from "@/components/ui/page-header";
 import { PhaseProgress } from "@/components/ui/phase-progress";
 import { TagChips } from "@/components/ui/tag-chips";
 import { HoldBadge, PaymentBadge, PhaseBadge } from "@/components/ui/status-badge";
-import { DeleteIconButton, EditIconLink, HoldIconButton } from "@/components/ui/icon-actions";
+import {
+  DeleteIconButton,
+  DuplicateIconButton,
+  EditIconLink,
+  HoldIconButton,
+} from "@/components/ui/icon-actions";
 import {
   listItemClass,
 } from "@/components/ui/styles";
-import { createModel, deleteModel, setPaymentHold } from "./actions";
+import { createModel, deleteModel, duplicateModel, setPaymentHold } from "./actions";
 import { ModelFields } from "./model-fields";
 
 // "brand name" as shown on screen, for searching and sorting by what the user sees.
@@ -325,6 +330,9 @@ export default async function ModelsPage({
                         />
                       </form>
                     )}
+                    <form action={duplicateModel.bind(null, m.id)}>
+                      <DuplicateIconButton label={t("duplicate")} />
+                    </form>
                     <EditIconLink href={`/models/${m.id}/edit`} label={tc("edit")} />
                     <form action={deleteModel.bind(null, m.id)}>
                       <DeleteIconButton label={tc("delete")} />

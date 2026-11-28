@@ -554,6 +554,8 @@
     "dates": "Requested: {requested} · Estimated: {estimated}",
     "depositSummary": "Deposit: {deposit} · Remaining: {remaining}",
     "createQuote": "Create quote from this model",
+    "duplicate": "Duplicate model",
+    "copyName": "{name} (copy)",
     "sort": {
       "newest": "Newest first",
       "oldest": "Oldest first",

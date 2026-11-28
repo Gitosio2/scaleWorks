@@ -49,6 +49,15 @@ function BanknoteIcon() {
   );
 }
 
+function CopyIcon() {
+  return (
+    <svg {...iconProps}>
+      <rect x="9" y="9" width="12" height="12" rx="2" />
+      <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" />
+    </svg>
+  );
+}
+
 function CheckIcon() {
   return (
     <svg {...iconProps}>
@@ -158,6 +167,15 @@ export function QuoteIconButton({ label }: { label: string }) {
   return (
     <IconSubmit label={label} className="text-brand">
       <BanknoteIcon />
+    </IconSubmit>
+  );
+}
+
+// Two stacked sheets: make a copy of the current item.
+export function DuplicateIconButton({ label }: { label: string }) {
+  return (
+    <IconSubmit label={label} className="text-brand">
+      <CopyIcon />
     </IconSubmit>
   );
 }
