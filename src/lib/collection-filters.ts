@@ -53,6 +53,27 @@ export function collectionListHref(
   return qs ? `/collection/list?${qs}` : "/collection/list";
 }
 
+// The filters as a query string (no leading "?"), in a fixed order and without
+// anything else the URL had (page, unknown params). "Show more" sends it to the
+// server, which reads it back with `parseCollectionFilters`.
+export function collectionFilterQuery(filters: CollectionFilters) {
+  const params = new URLSearchParams();
+  for (const key of ["q", "brand", "manufacturer", "type", "country"] as const) {
+    const value = filters[key];
+    if (value) params.set(key, value);
+  }
+  for (const tag of filters.tags) params.append("tag", tag);
+  return params.toString();
+}
+
+// Longest query string `collectionFilterQuery` can produce, with room to spare:
+// the three text filters keep at most 100 characters each (`textParam`), at most
+// 9 encoded characters apiece (3 UTF-8 bytes as %XX), so about 2,700; type,
+// country and every tag at once add about 400. Real queries are far shorter;
+// the cap only stops a tampered "show more" call from making the server parse
+// an arbitrarily long string. A test checks the worst case fits.
+export const MAX_FILTER_QUERY_LENGTH = 4096;
+
 // One per filter in use; the tags are a single filter however many are chosen.
 export function activeFilterCount({ tags, ...single }: CollectionFilters) {
   return Object.values(single).filter(Boolean).length + (tags.length > 0 ? 1 : 0);

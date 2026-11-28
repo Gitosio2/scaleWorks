@@ -1,5 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { PAGE_SIZE, pageHref, pageWindow, parsePage } from "./pagination";
+import {
+  MAX_BATCH_LIMIT,
+  MAX_OFFSET,
+  PAGE_SIZE,
+  listQuery,
+  pageHref,
+  pageWindow,
+  parseLimit,
+  parseOffset,
+  parsePage,
+  searchParamsFromQuery,
+} from "./pagination";
 
 describe("parsePage", () => {
   it("defaults to the first page", () => {
@@ -85,6 +96,93 @@ describe("pageWindow", () => {
 
   it("defaults the page size", () => {
     expect(pageWindow(1, 100).limit).toBe(PAGE_SIZE);
+  });
+});
+
+describe("parseOffset", () => {
+  it("keeps a non-negative integer", () => {
+    expect(parseOffset(0)).toBe(0);
+    expect(parseOffset(24)).toBe(24);
+  });
+
+  it("treats anything else as the start", () => {
+    for (const value of [-1, 2.5, Number.NaN, Number.POSITIVE_INFINITY, "24", null, undefined, {}, [3]]) {
+      expect(parseOffset(value)).toBe(0);
+    }
+  });
+
+  it("caps a huge offset", () => {
+    expect(parseOffset(MAX_OFFSET + 1)).toBe(MAX_OFFSET);
+    expect(parseOffset(Number.MAX_SAFE_INTEGER)).toBe(MAX_OFFSET);
+    expect(parseOffset(MAX_OFFSET)).toBe(MAX_OFFSET);
+  });
+});
+
+describe("parseLimit", () => {
+  it("keeps a positive integer", () => {
+    expect(parseLimit(1, 20)).toBe(1);
+    expect(parseLimit(60, 20)).toBe(60);
+  });
+
+  it("uses the fallback for anything else", () => {
+    for (const value of [0, -4, 2.5, Number.NaN, Number.POSITIVE_INFINITY, "60", null, undefined, {}]) {
+      expect(parseLimit(value, 24)).toBe(24);
+    }
+  });
+
+  it("caps a huge limit", () => {
+    expect(parseLimit(MAX_BATCH_LIMIT, 20)).toBe(MAX_BATCH_LIMIT);
+    expect(parseLimit(MAX_BATCH_LIMIT + 1, 20)).toBe(MAX_BATCH_LIMIT);
+    expect(parseLimit(Number.MAX_SAFE_INTEGER, 20)).toBe(MAX_BATCH_LIMIT);
+  });
+});
+
+describe("listQuery", () => {
+  it("is empty without params", () => {
+    expect(listQuery({})).toBe("");
+  });
+
+  it("keeps the filters and drops the page", () => {
+    expect(listQuery({ q: "a b", page: "3", brand: "man" })).toBe("q=a+b&brand=man");
+    expect(listQuery({ page: ["2", "3"] })).toBe("");
+  });
+
+  it("keeps repeated params and skips undefined ones", () => {
+    expect(listQuery({ tag: ["mining", "crane"], b: undefined })).toBe("tag=mining&tag=crane");
+  });
+});
+
+describe("searchParamsFromQuery", () => {
+  it("is empty for an empty query", () => {
+    expect(searchParamsFromQuery("")).toEqual({});
+  });
+
+  it("decodes single values as strings", () => {
+    expect(searchParamsFromQuery("q=a+b&brand=man")).toEqual({ q: "a b", brand: "man" });
+  });
+
+  it("collects repeated keys into an array", () => {
+    expect(searchParamsFromQuery("tag=mining&q=x&tag=crane&tag=tipper")).toEqual({
+      tag: ["mining", "crane", "tipper"],
+      q: "x",
+    });
+  });
+
+  it("accepts a leading question mark", () => {
+    expect(searchParamsFromQuery("?q=x")).toEqual({ q: "x" });
+  });
+
+  it("round-trips listQuery", () => {
+    const sp = { q: "a&b=c", tag: ["mining", "crane"], country: "ES" };
+    expect(searchParamsFromQuery(listQuery(sp))).toEqual(sp);
+  });
+
+  it("keeps keys named like Object.prototype members as plain values", () => {
+    const sp = searchParamsFromQuery("__proto__=x&__proto__=z&constructor=y");
+    expect(Object.getPrototypeOf(sp)).toBe(Object.prototype);
+    expect(Object.hasOwn(sp, "__proto__")).toBe(true);
+    expect(sp["__proto__"]).toEqual(["x", "z"]);
+    expect(sp.constructor).toBe("y");
   });
 });
 

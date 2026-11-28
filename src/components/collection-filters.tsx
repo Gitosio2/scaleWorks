@@ -8,6 +8,7 @@ import {
   type CollectionFilters as Filters,
 } from "@/lib/collection-filters";
 import { countryName } from "@/lib/countries";
+import { MAX_TEXT_LENGTH } from "@/lib/list-filters";
 import { CountryFlag } from "@/components/ui/country-flag";
 import { FilterListbox } from "@/components/ui/filter-listbox";
 import { FilterChips, FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filters";
@@ -74,6 +75,7 @@ export async function CollectionFilters({
         label={t("searchLabel")}
         defaultValue={filters.q}
         placeholder={t("searchPlaceholder")}
+        maxLength={MAX_TEXT_LENGTH}
       />
       <FilterSelect name="brand" label={t("brand")} defaultValue={filters.brand} options={options.brand} />
       <FilterSelect
