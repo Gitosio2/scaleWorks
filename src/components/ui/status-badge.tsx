@@ -34,9 +34,9 @@ export function StatusBadge({
 }) {
   return (
     <span
-      className={`inline-flex h-[26px] items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-[12.5px] font-semibold ${variants[variant]}`}
+      className={`inline-flex h-[26px] items-center gap-1.5 whitespace-nowrap rounded-[4px] px-2.5 font-mono text-[11px] font-bold uppercase tracking-[0.06em] ${variants[variant]}`}
     >
-      <span aria-hidden className="size-[7px] rounded-full bg-current" />
+      <span aria-hidden className="size-[7px] rounded-[1px] bg-current" />
       {children}
     </span>
   );

@@ -86,7 +86,7 @@ export function SidebarShell({
             aria-expanded={open}
             aria-controls="site-menu"
             aria-label={open ? t("closeMenu") : t("openMenu")}
-            className="-my-1 -ml-2 flex size-11 cursor-pointer items-center justify-center rounded-[10px] text-ink hover:bg-line md:hidden"
+            className="-my-1 -ml-2 flex size-11 cursor-pointer items-center justify-center rounded-[8px] text-ink hover:bg-line-soft md:hidden"
           >
             <svg
               aria-hidden

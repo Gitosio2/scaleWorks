@@ -11,7 +11,7 @@ import { CreateModal } from "@/components/ui/create-modal";
 import { FilterSelect, ListFilters } from "@/components/ui/list-filters";
 import { PageHeader } from "@/components/ui/page-header";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { listItemClass, primaryButtonClass } from "@/components/ui/styles";
+import { inlineLinkClass, listItemClass, primaryButtonClass } from "@/components/ui/styles";
 import { createDelivery, markDelivered } from "./actions";
 import { DeliveryFields } from "./delivery-fields";
 import { DeliveryStateBadge } from "./state-badge";
@@ -90,7 +90,7 @@ export default async function DeliveriesPage({
                   {[d.carrier, total > 0 ? t("progress", { done, total }) : null].filter(Boolean).join(" · ") || "—"}
                 </p>
                 {d.trackingUrl && (
-                  <a href={d.trackingUrl} target="_blank" rel="noopener noreferrer" className="text-[13px] font-semibold text-brand hover:underline">
+                  <a href={d.trackingUrl} target="_blank" rel="noopener noreferrer" className={`text-[13px] ${inlineLinkClass}`}>
                     {t("track")}
                   </a>
                 )}

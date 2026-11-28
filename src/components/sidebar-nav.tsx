@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { isGroupActive, isPathActive } from "@/lib/nav-groups";
+import { captionClass, cx } from "@/components/ui/styles";
 
 const icon = {
   width: 20,
@@ -188,8 +189,8 @@ const items: Array<NavLink | NavGroup> = [
 ];
 
 const linkClass = (active: boolean) =>
-  `flex min-h-11 items-center gap-3 rounded-[10px] px-3 ${
-    active ? "bg-brand font-semibold text-brand-fg" : "text-ink-2 hover:bg-line"
+  `flex min-h-11 items-center gap-3 rounded-[8px] px-3 ${
+    active ? "bg-accent font-bold text-accent-fg" : "text-ink-2 hover:bg-line-soft"
   }`;
 
 function NavItemLink({ item, pathname }: { item: NavLink; pathname: string }) {
@@ -234,7 +235,7 @@ function NavGroupItem({ group, pathname }: { group: NavGroup; pathname: string }
         className={`${linkClass(false)} w-full cursor-pointer text-left ${childActive ? "font-semibold text-ink" : ""}`}
       >
         {group.icon}
-        <span className="flex-1">{t(group.label)}</span>
+        <span className={cx("flex-1", captionClass)}>{t(group.label)}</span>
         <svg
           {...icon}
           width={16}

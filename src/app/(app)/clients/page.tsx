@@ -35,6 +35,7 @@ import { ConfirmDelete } from "@/components/ui/confirm-delete";
 import { EditIconLink } from "@/components/ui/icon-actions";
 import { PhaseBadge, StatusBadge } from "@/components/ui/status-badge";
 import {
+  inlineLinkClass,
   listItemClass,
 } from "@/components/ui/styles";
 import { createClient, deleteClient } from "./actions";
@@ -209,7 +210,7 @@ export default async function ClientsPage({
                 <ul className="hidden w-full basis-full flex-col border-t border-line-soft pt-2 group-has-[input:checked]:flex">
                   {(modelsByClient.get(c.id) ?? []).map((m) => (
                     <li key={m.id} className="flex items-center justify-between gap-3 py-1.5">
-                      <Link href={`/models/${m.id}`} className="min-w-0 font-semibold text-brand hover:underline">
+                      <Link href={`/models/${m.id}`} className={`min-w-0 ${inlineLinkClass}`}>
                         {modelTitle(m.brand, m.name)}
                       </Link>
                       <PhaseBadge phase={m.phase} />

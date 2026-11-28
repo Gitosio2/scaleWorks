@@ -50,7 +50,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
           title={t(l)}
           className={`h-6 w-9 overflow-hidden rounded border transition ${
             l === locale
-              ? "border-brand ring-2 ring-brand/30"
+              ? "border-ink ring-2 ring-accent"
               : "border-transparent opacity-60 hover:opacity-100"
           }`}
         >

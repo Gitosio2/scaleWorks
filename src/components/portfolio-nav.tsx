@@ -18,16 +18,16 @@ export function PortfolioNav({ models, label }: { models: NavModel[]; label: str
             key={m.id}
             href={href}
             aria-current={active ? "page" : undefined}
-            className={`flex min-h-11 min-w-0 flex-col justify-center rounded-[10px] px-3 py-1.5 ${
+            className={`flex min-h-11 min-w-0 flex-col justify-center rounded-[8px] px-3 py-1.5 ${
               active
-                ? "bg-brand font-semibold text-brand-fg"
-                : "text-ink-2 hover:bg-line"
+                ? "bg-accent font-bold text-accent-fg"
+                : "text-ink-2 hover:bg-line-soft"
             }`}
           >
             <span className="truncate">{m.name}</span>
             {m.company && (
               <span
-                className={`truncate text-xs font-normal ${active ? "text-brand-fg/80" : "text-muted"}`}
+                className={`truncate font-mono text-[11px] font-normal uppercase tracking-[0.06em] ${active ? "text-accent-fg" : "text-muted"}`}
               >
                 {m.company}
               </span>

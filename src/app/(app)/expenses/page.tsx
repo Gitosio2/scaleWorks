@@ -17,7 +17,7 @@ import { FilterSelect, FilterText, ListFilters } from "@/components/ui/list-filt
 import { PageHeader } from "@/components/ui/page-header";
 import { Pagination } from "@/components/ui/pagination";
 import { StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
-import { listItemClass } from "@/components/ui/styles";
+import { inlineLinkClass, listItemClass } from "@/components/ui/styles";
 import { createLoosePart, deleteLoosePart, setPartPaid, updateLoosePart } from "./actions";
 import { ExpenseFields } from "./expense-fields";
 
@@ -147,7 +147,7 @@ export default async function ExpensesPage({
                 </p>
                 <p className="text-[13px]">
                   {modelId && modelName ? (
-                    <Link href={`/models/${modelId}`} className="font-semibold text-brand hover:underline">
+                    <Link href={`/models/${modelId}`} className={inlineLinkClass}>
                       {modelTitle(modelBrand, modelName)}
                     </Link>
                   ) : (

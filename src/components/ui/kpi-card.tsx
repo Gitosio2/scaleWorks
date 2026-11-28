@@ -29,7 +29,7 @@ export function KpiCard({
   );
   if (!href) return <Card className="gap-2!">{content}</Card>;
   return (
-    <Link href={href} className={cx(cardClass, "gap-2! hover:border-brand")}>
+    <Link href={href} className={cx(cardClass, "gap-2! hover:border-ink")}>
       {content}
     </Link>
   );

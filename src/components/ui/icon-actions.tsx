@@ -6,7 +6,7 @@ import { Spinner } from "./spinner";
 import { cx } from "./styles";
 
 const baseClass =
-  "inline-flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-[10px] hover:bg-canvas";
+  "inline-flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-[8px] hover:bg-canvas";
 
 const iconProps = {
   "aria-hidden": true,

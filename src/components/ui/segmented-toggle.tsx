@@ -90,7 +90,7 @@ export function SegmentedToggle({
                 aria-checked={i === index}
                 aria-label={o.label}
                 onClick={() => choose(o.value)}
-                className="flex cursor-pointer items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+                className="flex cursor-pointer items-center justify-center rounded-full focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ink"
               >
                 {i !== index && <span aria-hidden className="size-1.5 rounded-full bg-muted/40" />}
               </button>

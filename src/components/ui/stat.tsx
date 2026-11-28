@@ -1,4 +1,6 @@
-// A big figure with a caption under it. Shared by the dashboards.
+import { captionClass } from "./styles";
+
+// A big figure with a small caption above it. Shared by the dashboards.
 export function Stat({
   value,
   label,
@@ -9,9 +11,9 @@ export function Stat({
   valueClass?: string;
 }) {
   return (
-    <div className="flex flex-col gap-0.5">
-      <span className={`text-3xl font-bold tracking-tight ${valueClass}`}>{value}</span>
-      <span className="text-[13px] text-muted">{label}</span>
+    <div className="flex flex-col gap-1.5">
+      <span className={captionClass}>{label}</span>
+      <span className={`font-display text-[44px] font-bold leading-none ${valueClass}`}>{value}</span>
     </div>
   );
 }

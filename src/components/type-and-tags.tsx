@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { inputClass, labelClass } from "@/components/ui/styles";
+import { inputClass, labelClass, labelTextClass } from "@/components/ui/styles";
 import { TagToggle } from "@/components/ui/tag-toggle";
 
 /**
@@ -64,7 +64,7 @@ export function TypeAndTags({
         </select>
       </label>
       <fieldset className="flex flex-col gap-1.5">
-        <legend className="pb-1.5 text-[13px] font-semibold text-ink-2">{tagsLabel}</legend>
+        <legend className={`pb-1.5 ${labelTextClass}`}>{tagsLabel}</legend>
         {allowed.length === 0 ? (
           <p className="text-[13px] text-muted">{thint(type ? "noTags" : "pickType")}</p>
         ) : (

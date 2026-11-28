@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ralHex } from "@/lib/ral";
-import { cx, labelClass } from "@/components/ui/styles";
+import { cx, labelClass, labelTextClass } from "@/components/ui/styles";
 
 const NEUTRAL = "#9a968e";
 
@@ -55,7 +55,7 @@ export function ColorField({
 
   return (
     <div ref={wrapRef} className={cx(labelClass, !isPaint && "hidden")}>
-      <label htmlFor={id}>{tc("color")}</label>
+      <label htmlFor={id} className={labelTextClass}>{tc("color")}</label>
       {/* Submitted only for paints, so changing category drops a stale color. */}
       <input type="hidden" name="color" value={isPaint ? (manual ?? "") : ""} />
       <div className="flex flex-wrap items-center gap-3 font-normal">
@@ -64,13 +64,13 @@ export function ColorField({
           type="color"
           value={shown}
           onChange={(e) => setManual(e.target.value)}
-          className="size-11 cursor-pointer rounded-[10px] border border-input-border bg-input p-1"
+          className="size-11 cursor-pointer rounded-[8px] border border-input-border bg-input p-1"
         />
         {manual && (
           <button
             type="button"
             onClick={() => setManual(null)}
-            className="min-h-11 cursor-pointer px-1 text-sm font-semibold text-brand hover:text-brand-hover"
+            className="min-h-11 cursor-pointer px-1 text-sm font-semibold text-brand underline-offset-4 hover:underline"
           >
             {t("colorClear")}
           </button>

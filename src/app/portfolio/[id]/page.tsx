@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { and, asc, eq } from "drizzle-orm";
 import { getTranslations } from "next-intl/server";
@@ -9,7 +8,7 @@ import { modelTitle } from "@/lib/model-title";
 import { portfolioOwnerId, UUID_PATTERN } from "@/lib/portfolio";
 import { shareMetadata } from "@/lib/share-metadata";
 import { SITE_NAME } from "@/lib/site";
-import { PageHeader } from "@/components/ui/page-header";
+import { BackLink, PageHeader } from "@/components/ui/page-header";
 import { PhotoViewer } from "@/components/photo-viewer";
 
 // Public page: only these columns are ever read for a model.
@@ -83,12 +82,7 @@ export default async function PublicModelPage({
 
   return (
     <>
-      <Link
-        href="/portfolio"
-        className="inline-flex min-h-11 items-center self-start font-semibold text-brand hover:text-brand-hover"
-      >
-        {t("back")}
-      </Link>
+      <BackLink href="/portfolio">{t("back")}</BackLink>
       <PageHeader
         title={title}
         subtitle={[model.type ? ttype(model.type) : null, model.company, model.year]

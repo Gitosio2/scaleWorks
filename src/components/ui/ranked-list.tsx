@@ -55,13 +55,13 @@ export function RankedList({
               <div className="flex items-center justify-between gap-3">
                 <span className="flex min-w-0 items-center gap-2.5">
                   {numbered && (
-                    <span aria-hidden className="w-4 shrink-0 text-[13px] font-semibold text-muted tabular-nums">
+                    <span aria-hidden className="w-5 shrink-0 font-mono text-[12px] font-bold text-muted tabular-nums">
                       {index + 1}
                     </span>
                   )}
                   {item.icon}
                   {item.href ? (
-                    <Link href={item.href} className="min-w-0 truncate font-semibold hover:text-brand hover:underline">
+                    <Link href={item.href} className="min-w-0 truncate font-semibold underline-offset-4 hover:underline">
                       {item.label}
                     </Link>
                   ) : (
@@ -69,7 +69,7 @@ export function RankedList({
                   )}
                 </span>
                 <span className="flex shrink-0 items-baseline gap-2 text-[13px]">
-                  <span className="font-semibold">{item.value}</span>
+                  <span className="font-mono font-bold">{item.value}</span>
                   {item.detail && <span className="text-muted">{item.detail}</span>}
                 </span>
               </div>

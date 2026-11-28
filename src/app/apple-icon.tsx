@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { SITE_INITIAL } from "@/lib/site";
+import { SITE_INITIAL, THEME_ACCENT, THEME_INK } from "@/lib/site";
 
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
@@ -15,10 +15,10 @@ export default function AppleIcon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#3e5e58",
-          color: "#f7f5f0",
+          background: THEME_ACCENT,
+          color: THEME_INK,
           fontSize: 124,
-          fontWeight: 700,
+          fontWeight: 800,
         }}
       >
         {SITE_INITIAL}

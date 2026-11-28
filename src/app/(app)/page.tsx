@@ -22,6 +22,7 @@ import { Card, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { Stat } from "@/components/ui/stat";
 import { StatusBadge, type BadgeVariant } from "@/components/ui/status-badge";
+import { captionClass, inlineLinkClass } from "@/components/ui/styles";
 
 const DAY_MS = 86_400_000;
 // Rows shown per list; the rest is summarized as "and N more".
@@ -34,7 +35,7 @@ const ACTIVE = sql`${models.phase} not in ('not_started', 'finished')`;
 function CardLinkTitle({ title, href }: { title: string; href: string }) {
   return (
     <CardTitle>
-      <Link href={href} className="group inline-flex items-center gap-1.5 hover:text-brand">
+      <Link href={href} className="group inline-flex items-center gap-1.5 underline-offset-4 hover:underline">
         {title}
         <span aria-hidden className="text-brand transition-transform group-hover:translate-x-0.5">
           →
@@ -240,7 +241,7 @@ export default async function Home() {
             )}
           </div>
           <div>
-            <h3 className="text-[13px] font-semibold text-ink-2">{t("deadlinesTitle")}</h3>
+            <h3 className={captionClass}>{t("deadlinesTitle")}</h3>
             {deadlines.length === 0 ? (
               <p className="pt-2 text-muted">{t("deadlinesEmpty")}</p>
             ) : (
@@ -381,7 +382,7 @@ export default async function Home() {
               value={formatEuros(unpaidExpenses.cents, locale)}
               valueClass={unpaidExpenses.count > 0 ? "text-warn" : ""}
               label={
-                <Link href="/expenses" className="font-semibold text-brand hover:underline">
+                <Link href="/expenses" className={inlineLinkClass}>
                   {t("unpaidExpensesLabel", { count: unpaidExpenses.count })}
                 </Link>
               }

@@ -10,7 +10,7 @@ import {
   typeaheadQuery,
   type ListboxKey,
 } from "@/lib/listbox";
-import { cx, inputClass, labelClass } from "./styles";
+import { cx, inputClass, labelClass, labelTextClass } from "./styles";
 
 export type FilterListboxOption = {
   value: string;
@@ -170,7 +170,7 @@ export function FilterListbox({
 
   return (
     <div className={labelClass}>
-      <label id={labelId} htmlFor={buttonId}>
+      <label id={labelId} htmlFor={buttonId} className={labelTextClass}>
         {label}
       </label>
       <div
@@ -230,7 +230,7 @@ export function FilterListbox({
             aria-activedescendant={optionId(active)}
             onKeyDown={onListKeyDown}
             onMouseDown={(e) => e.preventDefault()}
-            className="absolute inset-x-0 top-full z-20 mt-1 max-h-60 overflow-y-auto overscroll-contain rounded-[10px] border border-input-border bg-surface py-1 text-ink shadow-lg outline-none"
+            className="absolute inset-x-0 top-full z-20 mt-1 max-h-60 overflow-y-auto overscroll-contain rounded-[8px] border border-input-border bg-surface py-1 text-ink shadow-lg outline-none"
           >
             {shown.map((o, i) => (
               <li
@@ -243,7 +243,7 @@ export function FilterListbox({
                 className={cx(
                   "flex min-h-11 cursor-pointer items-center gap-2 px-3 text-sm",
                   i === active && "bg-canvas",
-                  o.value === value && "font-semibold text-brand",
+                  o.value === value && "font-semibold text-brand shadow-[inset_3px_0_0_var(--ink)]",
                 )}
               >
                 {o.icon ? (

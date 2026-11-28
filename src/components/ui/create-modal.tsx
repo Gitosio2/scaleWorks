@@ -26,7 +26,7 @@ export function CreateModal({
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
         aria-label={label}
-        className="fixed right-4 bottom-4 z-30 inline-flex size-14 cursor-pointer items-center justify-center gap-2 rounded-full bg-brand font-semibold text-brand-fg shadow-lg hover:bg-brand-hover md:right-8 md:bottom-8 md:size-auto md:min-h-14 md:px-5"
+        className="fixed right-4 bottom-4 z-30 inline-flex size-14 cursor-pointer items-center justify-center gap-2 rounded-[12px] border-2 border-ink bg-accent font-display text-[17px] font-bold uppercase tracking-wide text-accent-fg shadow-lg hover:bg-accent-hover md:right-8 md:bottom-8 md:size-auto md:min-h-14 md:px-5"
       >
         <span aria-hidden className="text-2xl leading-none">+</span>
         <span className="hidden md:inline">{label}</span>

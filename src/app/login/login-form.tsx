@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth-client";
-import { SITE_INITIAL, SITE_NAME } from "@/lib/site";
+import { Brand } from "@/components/brand";
 import { Card } from "@/components/ui/card";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Spinner } from "@/components/ui/spinner";
@@ -55,17 +55,14 @@ export function LoginForm({ signupEnabled }: { signupEnabled: boolean }) {
         <form onSubmit={onSubmit} className="flex flex-col gap-4">
           <div className="flex items-center gap-2.5">
             <LanguageSwitcher className="order-last ml-auto" />
-            <span
-              aria-hidden
-              className="flex size-8 items-center justify-center rounded-[9px] bg-brand font-bold text-brand-fg"
-            >
-              {SITE_INITIAL}
-            </span>
-            <span className="text-lg font-bold tracking-tight">{SITE_NAME}</span>
+            <Brand />
           </div>
-          <h1 className="text-[28px] font-bold leading-tight tracking-tight">
-            {mode === "signin" ? t("signIn") : t("createAccount")}
-          </h1>
+          <div className="flex flex-col gap-3">
+            <h1 className="font-display text-[40px] font-extrabold uppercase leading-[0.9] tracking-tight">
+              {mode === "signin" ? t("signIn") : t("createAccount")}
+            </h1>
+            <div aria-hidden className="hazard-stripe h-2 w-24 rounded-[2px]" />
+          </div>
           {mode === "signup" && (
             <label className={labelClass}>
               {t("name")}

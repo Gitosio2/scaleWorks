@@ -14,7 +14,7 @@ import { BackLink, PageHeader } from "@/components/ui/page-header";
 import { SegmentedToggle } from "@/components/ui/segmented-toggle";
 import { supplyStatusVariant } from "@/components/ui/status-badge";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { listItemClass, primaryButtonClass } from "@/components/ui/styles";
+import { inlineLinkClass, listItemClass, primaryButtonClass } from "@/components/ui/styles";
 import { ComponentFields } from "../../components/component-fields";
 import { ConsumableFields } from "../../consumables/consumable-fields";
 import { ExpenseFields } from "../../expenses/expense-fields";
@@ -118,7 +118,7 @@ export default async function DeliveryPage({ params }: { params: Promise<{ id: s
             {delivery.trackingUrl && (
               <>
                 {delivery.carrier || lines.length > 0 ? " · " : ""}
-                <a href={delivery.trackingUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-brand hover:underline">
+                <a href={delivery.trackingUrl} target="_blank" rel="noopener noreferrer" className={inlineLinkClass}>
                   {t("track")}
                 </a>
               </>

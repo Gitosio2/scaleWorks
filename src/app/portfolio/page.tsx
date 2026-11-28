@@ -117,7 +117,7 @@ export default async function PortfolioPage({
           {rows.map((m) => (
             <li key={m.id}>
               <Link href={`/portfolio/${m.id}`} className="group flex flex-col gap-2">
-                <div className="relative aspect-[4/3] overflow-hidden rounded-[14px] border border-line bg-canvas">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-[12px] border border-line bg-canvas group-hover:border-ink">
                   {m.coverId && (
                     <Photo
                       src={`/img/${m.coverId}/thumb`}
@@ -126,7 +126,7 @@ export default async function PortfolioPage({
                     />
                   )}
                 </div>
-                <span title={label(m)} className="truncate px-3 text-sm font-bold group-hover:text-brand">
+                <span title={label(m)} className="truncate px-3 text-sm font-bold underline-offset-4 group-hover:underline">
                   {label(m)}
                 </span>
               </Link>
