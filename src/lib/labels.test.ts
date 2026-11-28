@@ -3,6 +3,7 @@ import {
   formatDate,
   formatDuration,
   formatEuros,
+  formatPercent,
   formatQuantity,
   parseDuration,
   parseEuros,
@@ -62,6 +63,19 @@ describe("formatEuros", () => {
 
   it("formats negative amounts", () => {
     expect(plain(formatEuros(-250, "en"))).toBe("-€2.50");
+  });
+});
+
+describe("formatPercent", () => {
+  it("rounds a share between 0 and 1 to a whole percent", () => {
+    expect(plain(formatPercent(1 / 3, "en"))).toBe("33%");
+    expect(plain(formatPercent(0.5, "en"))).toBe("50%");
+    expect(plain(formatPercent(1, "en"))).toBe("100%");
+    expect(plain(formatPercent(0, "en"))).toBe("0%");
+  });
+
+  it("puts a space before the sign in Spanish", () => {
+    expect(plain(formatPercent(0.25, "es"))).toBe("25 %");
   });
 });
 

@@ -32,6 +32,27 @@ export function parseCollectionFilters(sp: SearchParams): CollectionFilters {
   };
 }
 
+// Link to the collection list with the given filters applied, the inverse of
+// parseCollectionFilters. Values go in the URL-encoded query; empty ones are left out.
+export function collectionListHref(
+  filters: Partial<{
+    brand: string;
+    manufacturer: string;
+    type: string | null;
+    country: string | null;
+    tags: readonly string[];
+  }>,
+) {
+  const query = new URLSearchParams();
+  if (filters.brand) query.set("brand", filters.brand);
+  if (filters.manufacturer) query.set("manufacturer", filters.manufacturer);
+  if (filters.type) query.set("type", filters.type);
+  if (filters.country) query.set("country", filters.country);
+  for (const tag of filters.tags ?? []) query.append("tag", tag);
+  const qs = query.toString();
+  return qs ? `/collection/list?${qs}` : "/collection/list";
+}
+
 // One per filter in use; the tags are a single filter however many are chosen.
 export function activeFilterCount({ tags, ...single }: CollectionFilters) {
   return Object.values(single).filter(Boolean).length + (tags.length > 0 ? 1 : 0);

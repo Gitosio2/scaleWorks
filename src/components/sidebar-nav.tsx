@@ -21,7 +21,7 @@ const icon = {
 
 type NavLink = {
   href: string;
-  label: "home" | "models" | "quotes" | "clients" | "deliveries" | "consumables" | "components" | "expenses" | "gallery" | "collectionList" | "collectionGallery";
+  label: "home" | "models" | "quotes" | "clients" | "deliveries" | "consumables" | "components" | "expenses" | "gallery" | "collectionList" | "collectionGallery" | "collectionDashboard";
   icon: React.ReactNode;
 };
 type NavGroup = { label: "work" | "warehouse" | "collection"; icon: React.ReactNode; children: Array<NavLink | NavGroup> };
@@ -151,6 +151,15 @@ const items: Array<NavLink | NavGroup> = [
       </svg>
     ),
     children: [
+      {
+        href: "/collection/dashboard",
+        label: "collectionDashboard" as const,
+        icon: (
+          <svg {...icon}>
+            <path d="M4 20V10M10 20V4M16 20v-7M21 20H3" />
+          </svg>
+        ),
+      },
       {
         href: "/collection/list",
         label: "collectionList" as const,
