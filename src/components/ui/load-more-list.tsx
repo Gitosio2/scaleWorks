@@ -2,6 +2,7 @@
 
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { MAX_BATCH_LIMIT } from "@/lib/pagination";
 import { Spinner } from "./spinner";
 import { cx, secondaryButtonClass } from "./styles";
 
@@ -88,12 +89,27 @@ export function LoadMoreList({
 
     busy.current = true;
     const request = ++latest.current;
-    loadMore(initialCount, appendedCount)
+    // The server caps each request at MAX_BATCH_LIMIT rows, so a long appended
+    // range comes back in several calls, one after the other.
+    const reload = async () => {
+      const chunks: React.ReactNode[] = [];
+      let fetched = 0;
+      while (fetched < appendedCount) {
+        const limit = Math.min(appendedCount - fetched, MAX_BATCH_LIMIT);
+        const { items, count } = await loadMore(initialCount + fetched, limit);
+        if (request !== latest.current) break;
+        chunks.push(items);
+        fetched += count;
+        if (count < limit) break;
+      }
+      return { chunks, fetched };
+    };
+    reload()
       .then(
-        ({ items, count }) => {
+        ({ chunks, fetched }) => {
           if (request !== latest.current) return;
-          setBatches([items]);
-          setAppendedCount(count);
+          setBatches(chunks);
+          setAppendedCount(fetched);
           setExhausted(false);
           setFailed(false);
         },

@@ -191,6 +191,25 @@ describe("LoadMoreList", () => {
       expect(loadMore).toHaveBeenLastCalledWith(6);
     });
 
+    it("re-fetches more appended rows than one request allows in several calls", async () => {
+      const loadMore = vi.fn(async (offset: number, limit = 700) => batch(offset + 1, offset + limit));
+      const { rerenderWith } = renderList({ initialCount: 2, total: 1000, refreshKey: "a", loadMore });
+      await userEvent.click(showMore()!);
+      expect(itemTexts()).toHaveLength(702);
+
+      rerenderWith({ initialCount: 2, total: 1000, refreshKey: "b", loadMore });
+
+      await waitFor(() => expect(loadMore).toHaveBeenCalledTimes(3));
+      // The server caps each request at MAX_BATCH_LIMIT (500) rows.
+      expect(loadMore.mock.calls.slice(1)).toEqual([
+        [2, 500],
+        [502, 200],
+      ]);
+      await waitFor(() => expect(itemTexts()).toHaveLength(702));
+      expect(itemTexts().at(-1)).toBe("Item 702");
+      expect(screen.getByText("Showing 702 of 1000")).toBeTruthy();
+    });
+
     it("does not fetch when nothing was appended", () => {
       const loadMore = vi.fn();
       const { rerenderWith } = renderList({ initialCount: 2, total: 8, refreshKey: "a", loadMore });
