@@ -2,7 +2,8 @@ import { sql, type SQLWrapper } from "drizzle-orm";
 
 export type SearchParams = Record<string, string | string[] | undefined>;
 
-const MAX_TEXT_LENGTH = 100;
+// Longest text filter value kept; search inputs use it as their maxLength.
+export const MAX_TEXT_LENGTH = 100;
 
 // First value of a query param, trimmed. "" when absent. NUL bytes are dropped
 // (Postgres rejects them) and the length is capped.

@@ -1,29 +1,22 @@
-import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
-import { db } from "@/db";
-import { collectionItems } from "@/db/schema";
-import { isSold, profitCents } from "@/lib/collection";
-import { activeFilterCount, collectionOrder, collectionWhere, parseCollectionFilters } from "@/lib/collection-filters";
-import { hasPurchasePrice, rowMeta } from "@/lib/collection-row";
-import { countryName } from "@/lib/countries";
-import { formatEuros } from "@/lib/labels";
+import { activeFilterCount, collectionFilterQuery, parseCollectionFilters } from "@/lib/collection-filters";
 import type { SearchParams } from "@/lib/list-filters";
-import { modelTitle } from "@/lib/model-title";
+import { PAGE_SIZE } from "@/lib/pagination";
 import { requireUser } from "@/lib/session";
 import { CollectionFilters } from "@/components/collection-filters";
 import { Card } from "@/components/ui/card";
-import { CountryFlag } from "@/components/ui/country-flag";
-import { ConfirmDelete } from "@/components/ui/confirm-delete";
 import { CreateModal } from "@/components/ui/create-modal";
-import { EditModal } from "@/components/ui/edit-modal";
+import { LoadMoreList } from "@/components/ui/load-more-list";
 import { PageHeader } from "@/components/ui/page-header";
-import { StatusBadge } from "@/components/ui/status-badge";
-import { TagChips } from "@/components/ui/tag-chips";
-import { listItemClass } from "@/components/ui/styles";
-import { createCollectionItem, deleteCollectionItem, updateCollectionItem } from "../actions";
+import { cardClass, cx } from "@/components/ui/styles";
+import { createCollectionItem } from "../actions";
 import { CollectionFields } from "../collection-fields";
+import { ListRow } from "../list-row";
+import { loadMoreCollection } from "../load-more-actions";
+import { collectionTotals, listItems } from "../queries";
 
 // Text-only list of the collection (private for now).
+// The first batch is rendered here; "Show more" appends the next ones.
 export default async function CollectionListPage({
   searchParams,
 }: {
@@ -32,17 +25,15 @@ export default async function CollectionListPage({
   const sp = await searchParams;
   const user = await requireUser();
   const t = await getTranslations("collection");
-  const tc = await getTranslations("common");
   const tn = await getTranslations("nav");
-  const locale = await getLocale();
   const filters = parseCollectionFilters(sp);
+  const locale = await getLocale();
+  const query = collectionFilterQuery(filters);
 
-  // Whole rows: the edit modal of each item is prefilled from them.
-  const items = await db
-    .select()
-    .from(collectionItems)
-    .where(collectionWhere(user.id, filters))
-    .orderBy(...collectionOrder());
+  const [{ total, version }, items] = await Promise.all([
+    collectionTotals(user.id, filters),
+    listItems(user.id, filters, { offset: 0, limit: PAGE_SIZE }),
+  ]);
 
   return (
     <>
@@ -54,76 +45,30 @@ export default async function CollectionListPage({
 
       <CollectionFilters action="/collection/list" userId={user.id} filters={filters} />
 
-      <Card className="py-0!">
-        <ul className="flex flex-col">
-          {items.length === 0 && (
+      {items.length === 0 ? (
+        <Card className="py-0!">
+          <ul className="flex flex-col">
             <li className="py-4 text-muted">{activeFilterCount(filters) > 0 ? t("emptyFiltered") : t("empty")}</li>
-          )}
-          {items.map((item) => {
-            const profit = profitCents(item);
-            const title = modelTitle(item.brand, item.name);
-            const meta = rowMeta(item, (code) => countryName(code, locale));
-            const purchase = hasPurchasePrice(item)
-              ? t("purchaseShort", { amount: formatEuros(item.purchasePriceCents, locale) })
-              : null;
-            return (
-              <li key={item.id} className={`${listItemClass} flex items-start justify-between gap-3`}>
-                <div className="flex min-w-0 flex-col gap-0.5">
-                  <Link href={`/collection/${item.id}`} className="font-bold hover:underline">
-                    {title}
-                  </Link>
-                  {meta.length > 0 && (
-                    <p className="flex flex-wrap items-center gap-x-1.5 text-[13px] text-muted">
-                      {meta.map((part, index) => (
-                        <span key={index} className="inline-flex items-center gap-1.5">
-                          {index > 0 && <span aria-hidden>·</span>}
-                          {part.kind === "country" ? (
-                            <CountryFlag code={part.code} name={part.name} />
-                          ) : (
-                            part.text
-                          )}
-                        </span>
-                      ))}
-                    </p>
-                  )}
-                  {purchase && <p className="text-[13px] text-muted sm:hidden">{purchase}</p>}
-                  <TagChips type={item.type} tags={item.tags} />
-                  {(isSold(item) || item.gift) && (
-                    <div className="flex flex-wrap items-center gap-2 pt-1">
-                      {item.gift && <StatusBadge variant="info">{t("gift")}</StatusBadge>}
-                      {isSold(item) && <StatusBadge variant="mute">{t("sold")}</StatusBadge>}
-                      {isSold(item) && profit !== null && (
-                        <span className="text-[13px] font-semibold text-ink-2">
-                          {t("profit", { amount: formatEuros(profit, locale) })}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </div>
-                <div className="-mt-1 flex shrink-0 items-center gap-2">
-                  {purchase && (
-                    <span className="hidden whitespace-nowrap text-[13px] text-muted sm:inline">{purchase}</span>
-                  )}
-                  <EditModal
-                    label={tc("edit")}
-                    title={t("editTitle")}
-                    submitLabel={tc("save")}
-                    action={updateCollectionItem.bind(null, item.id)}
-                  >
-                    <CollectionFields defaults={item} />
-                  </EditModal>
-                  <ConfirmDelete
-                    label={tc("delete")}
-                    title={t("deleteTitle")}
-                    message={t("deleteMessage", { name: title })}
-                    action={deleteCollectionItem.bind(null, item.id)}
-                  />
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      </Card>
+          </ul>
+        </Card>
+      ) : (
+        // Same card as <Card className="py-0!">, with the button below it. Other filters or
+        // another language start over (new key); items added, edited or deleted re-fetch
+        // the appended batches in place (new refreshKey).
+        <LoadMoreList
+          key={`${locale}|${query}`}
+          refreshKey={`${total}|${version}`}
+          listWrapperClassName={cx(cardClass, "py-0!")}
+          listClassName="flex flex-col"
+          initialCount={items.length}
+          total={total}
+          loadMore={loadMoreCollection.bind(null, "list", query)}
+        >
+          {items.map((item) => (
+            <ListRow key={item.id} item={item} />
+          ))}
+        </LoadMoreList>
+      )}
     </>
   );
 }

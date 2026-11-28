@@ -100,11 +100,14 @@ export function FilterText({
   label,
   defaultValue,
   placeholder,
+  maxLength,
 }: {
   name: string;
   label: string;
   defaultValue: string;
   placeholder?: string;
+  // The server keeps no more than this; stop typing there instead of silently cutting.
+  maxLength?: number;
 }) {
   const ref = useSyncedField<HTMLInputElement>(defaultValue);
   return (
@@ -116,6 +119,7 @@ export function FilterText({
         name={name}
         defaultValue={defaultValue}
         placeholder={placeholder}
+        maxLength={maxLength}
         className={inputClass}
       />
     </label>

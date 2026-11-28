@@ -64,7 +64,10 @@
     "next": "Siguiente",
     "pageOf": "Página {page} de {totalPages}",
     "showing": "Mostrando {from}–{to} de {total}",
-    "pagination": "Paginación"
+    "pagination": "Paginación",
+    "showMore": "Ver más",
+    "showingCount": "Mostrando {shown} de {total}",
+    "loadMoreError": "No se pudieron cargar más elementos. Inténtalo de nuevo."
   },
   "login": {
     "signIn": "Iniciar sesión",

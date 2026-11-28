@@ -1,7 +1,11 @@
 import { PgDialect } from "drizzle-orm/pg-core";
 import { describe, expect, it } from "vitest";
+import { modelTag, modelType } from "@/db/schema";
+import { searchParamsFromQuery } from "./pagination";
 import {
+  MAX_FILTER_QUERY_LENGTH,
   activeFilterCount,
+  collectionFilterQuery,
   collectionOrder,
   collectionFilterConditions,
   collectionFilterOptions,
@@ -10,6 +14,10 @@ import {
 } from "./collection-filters";
 
 describe("parseCollectionFilters", () => {
+  it("caps the search text, so a huge q does not travel any further", () => {
+    expect(parseCollectionFilters({ q: "x".repeat(5000) }).q).toHaveLength(100);
+  });
+
   it("reads nothing from an empty query", () => {
     const f = parseCollectionFilters({});
     expect(f).toEqual({ q: "", brand: "", manufacturer: "", type: null, country: null, tags: [] });
@@ -173,5 +181,52 @@ describe("collectionListHref", () => {
 
   it("leaves out empty filters", () => {
     expect(collectionListHref({ brand: "", type: null, country: null, tags: [] })).toBe("/collection/list");
+  });
+});
+
+describe("collectionFilterQuery", () => {
+  it("is empty without filters", () => {
+    expect(collectionFilterQuery(parseCollectionFilters({}))).toBe("");
+  });
+
+  it("writes only the parsed filters, without unknown params or the page", () => {
+    const filters = parseCollectionFilters({
+      tag: ["mining", "tipper"],
+      page: "3",
+      utm: "x",
+      country: "es",
+      type: "truck",
+      brand: " MAN ",
+      q: "s way",
+    });
+    expect(collectionFilterQuery(filters)).toBe("q=s+way&brand=man&type=truck&country=ES&tag=tipper&tag=mining");
+  });
+
+  it("reads back as the same filters", () => {
+    const filters = parseCollectionFilters({
+      q: "a&b=c %",
+      brand: "Iveco",
+      manufacturer: "Herpa",
+      type: "crane",
+      country: "DE",
+      tag: ["lattice"],
+    });
+    expect(parseCollectionFilters(searchParamsFromQuery(collectionFilterQuery(filters)))).toEqual(filters);
+  });
+
+  it("fits the longest filters a page can parse within the action's cap", () => {
+    // Each text value keeps 100 characters; "€" is the worst case, 3 bytes = 9 encoded characters.
+    const long = "€".repeat(500);
+    const longestType = [...modelType.enumValues].sort((a, b) => b.length - a.length)[0];
+    const filters = parseCollectionFilters({
+      q: long,
+      brand: long,
+      manufacturer: long,
+      type: longestType,
+      country: "ES",
+      tag: [...modelTag.enumValues],
+    });
+    expect(filters.tags).toHaveLength(modelTag.enumValues.length);
+    expect(collectionFilterQuery(filters).length).toBeLessThanOrEqual(MAX_FILTER_QUERY_LENGTH);
   });
 });
