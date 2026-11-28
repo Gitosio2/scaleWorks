@@ -5,7 +5,7 @@ import { SidebarNav } from "@/components/sidebar-nav";
 import { SidebarShell } from "@/components/sidebar-shell";
 import { LogoutButton } from "@/components/logout-button";
 import { LanguageSwitcher } from "@/components/language-switcher";
-import { cardClass, cx, linkActionClass } from "@/components/ui/styles";
+import { captionClass, cardClass, cx, linkActionClass } from "@/components/ui/styles";
 import { requireUser } from "@/lib/session";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -17,8 +17,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <SidebarShell brand={<Brand />}>
         <SidebarNav />
         <div className={cx(cardClass, "gap-0.5! p-3! md:mt-auto")}>
-          <p className="text-xs text-muted">{t("signedInAs")}</p>
-          <p className="truncate font-semibold">{user.name}</p>
+          <p className={captionClass}>{t("signedInAs")}</p>
+          <p className="truncate font-display text-[18px] font-bold uppercase tracking-wide">{user.name}</p>
           <LanguageSwitcher />
           <Link href="/backup" className={linkActionClass}>{t("backup")}</Link>
           <LogoutButton />

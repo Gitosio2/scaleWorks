@@ -50,6 +50,7 @@ import {
   QuoteIconButton,
 } from "@/components/ui/icon-actions";
 import {
+  inlineLinkClass,
   inputClass,
   labelClass,
   listItemClass,
@@ -345,7 +346,7 @@ export default async function ModelDetailPage({
           <p className="text-muted">
             {t.rich("stockParts.addFirst", {
               link: (chunks) => (
-                <Link href="/components" className="font-semibold text-brand hover:underline">
+                <Link href="/components" className={inlineLinkClass}>
                   {chunks}
                 </Link>
               ),
@@ -373,7 +374,7 @@ export default async function ModelDetailPage({
           <p className="text-muted">
             {t.rich("consumables.addFirst", {
               link: (chunks) => (
-                <Link href="/consumables" className="font-semibold text-brand hover:underline">
+                <Link href="/consumables" className={inlineLinkClass}>
                   {chunks}
                 </Link>
               ),

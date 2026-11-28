@@ -13,7 +13,7 @@ export function Card({
 }
 
 export function CardTitle({ children }: { children: React.ReactNode }) {
-  return <h2 className="text-lg font-bold tracking-tight">{children}</h2>;
+  return <h2 className="font-display text-[22px] font-bold uppercase leading-tight tracking-wide">{children}</h2>;
 }
 
 /**
@@ -33,9 +33,9 @@ export function CollapsibleCard({
   return (
     <details
       open={defaultOpen}
-      className="group rounded-[14px] border border-line bg-surface p-5"
+      className="group rounded-[12px] border border-line bg-surface p-5"
     >
-      <summary className="-m-1 flex cursor-pointer list-none items-center justify-between gap-3 rounded-[10px] p-1 marker:hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand [&::-webkit-details-marker]:hidden">
+      <summary className="-m-1 flex cursor-pointer list-none items-center justify-between gap-3 rounded-[8px] p-1 marker:hidden focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ink [&::-webkit-details-marker]:hidden">
         <CardTitle>{title}</CardTitle>
         <svg
           aria-hidden

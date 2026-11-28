@@ -1,10 +1,10 @@
 import { ImageResponse } from "next/og";
-import { SITE_INITIAL } from "@/lib/site";
+import { SITE_INITIAL, THEME_ACCENT, THEME_INK } from "@/lib/site";
 
 export const size = { width: 64, height: 64 };
 export const contentType = "image/png";
 
-// Same mark as components/brand.tsx: brand-colored rounded square with the initial.
+// Same mark as components/brand.tsx: safety-yellow square with the initial in ink.
 export default function Icon() {
   return new ImageResponse(
     (
@@ -15,11 +15,11 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#3e5e58",
-          color: "#f7f5f0",
+          background: THEME_ACCENT,
+          color: THEME_INK,
           fontSize: 44,
-          fontWeight: 700,
-          borderRadius: 14,
+          fontWeight: 800,
+          borderRadius: 12,
         }}
       >
         {SITE_INITIAL}

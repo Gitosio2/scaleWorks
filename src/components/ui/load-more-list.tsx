@@ -4,7 +4,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { MAX_BATCH_LIMIT } from "@/lib/pagination";
 import { Spinner } from "./spinner";
-import { cx, secondaryButtonClass } from "./styles";
+import { cx, primaryButtonClass } from "./styles";
 
 export type LoadMoreBatch = { items: React.ReactNode; count: number };
 
@@ -157,13 +157,13 @@ export function LoadMoreList({
               onClick={handleLoadMore}
               aria-disabled={pending}
               aria-busy={pending}
-              className={cx(secondaryButtonClass, "gap-2", pending && "cursor-wait")}
+              className={cx(primaryButtonClass, "gap-2", pending && "cursor-wait")}
             >
               {pending && <Spinner />}
               {t("showMore")}
             </button>
           )}
-          <div aria-live="polite" className="flex flex-col items-center gap-1 text-center text-[13px]">
+          <div aria-live="polite" className="flex flex-col items-center gap-1 text-center font-mono text-[12px]">
             <p ref={statusRef} tabIndex={-1} className="text-muted">
               {t("showingCount", { shown: Math.min(shown, total), total })}
             </p>

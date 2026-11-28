@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { SITE_INITIAL } from "@/lib/site";
+import { SITE_INITIAL, THEME_ACCENT, THEME_INK } from "@/lib/site";
 
 // Same mark as icon.tsx, in the sizes the web manifest needs. "any" icons are
 // rounded; the maskable one is full-bleed with the letter inside the safe zone,
@@ -28,10 +28,10 @@ export async function GET(_request: Request, ctx: RouteContext<"/pwa-icon/[varia
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#3e5e58",
-          color: "#f7f5f0",
+          background: THEME_ACCENT,
+          color: THEME_INK,
           fontSize: Math.round(px * (rounded ? 0.69 : 0.5)),
-          fontWeight: 700,
+          fontWeight: 800,
           borderRadius: rounded ? Math.round(px * 0.22) : 0,
         }}
       >

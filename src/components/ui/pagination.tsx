@@ -55,7 +55,7 @@ export async function Pagination({
           label={t("next")}
         />
       </div>
-      <p className="text-[13px] text-muted">{t("showing", { from, to, total })}</p>
+      <p className="font-mono text-[12px] text-muted">{t("showing", { from, to, total })}</p>
     </nav>
   );
 }

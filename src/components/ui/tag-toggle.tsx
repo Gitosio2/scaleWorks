@@ -14,8 +14,8 @@ export function TagToggle({
   return (
     <label
       className={cx(
-        "group inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-full border border-input-border bg-input px-3 text-[13px] font-semibold text-ink-2",
-        "has-[:checked]:border-ok has-[:checked]:bg-ok has-[:checked]:text-brand-fg",
+        "group inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-[6px] border border-input-border bg-input px-3 text-[13px] font-semibold text-ink-2",
+        "has-[:checked]:border-ok has-[:checked]:bg-ok has-[:checked]:text-white",
         "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ok",
       )}
     >

@@ -22,7 +22,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Pagination } from "@/components/ui/pagination";
 import { StatusBadge, supplyStatusVariant } from "@/components/ui/status-badge";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { listItemClass, secondaryButtonClass } from "@/components/ui/styles";
+import { inlineLinkClass, listItemClass, secondaryButtonClass } from "@/components/ui/styles";
 import {
   adjustComponentQuantity,
   receiveComponent,
@@ -166,7 +166,7 @@ export default async function ComponentsPage({
                     href={row.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[13px] font-semibold text-brand hover:text-brand-hover"
+                    className={`text-[13px] ${inlineLinkClass}`}
                   >
                     {t("openLink")}
                   </a>

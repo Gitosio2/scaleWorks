@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { modelTitle } from "@/lib/model-title";
 import { getPublicPhotos } from "@/lib/portfolio";
 import { shareMetadata } from "@/lib/share-metadata";
-import { PageHeader } from "@/components/ui/page-header";
+import { BackLink, PageHeader } from "@/components/ui/page-header";
 import { PhotoViewer } from "@/components/photo-viewer";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -33,12 +32,7 @@ export default async function AllPhotosPage() {
 
   return (
     <>
-      <Link
-        href="/portfolio"
-        className="inline-flex min-h-11 items-center self-start font-semibold text-brand hover:text-brand-hover"
-      >
-        {t("back")}
-      </Link>
+      <BackLink href="/portfolio">{t("back")}</BackLink>
       <PageHeader title={t("allPhotos")} subtitle={t("allPhotosSubtitle", { count: photos.length })} />
       {photos.length === 0 ? (
         <p className="text-muted">{t("noPhotos")}</p>

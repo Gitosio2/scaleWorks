@@ -11,14 +11,14 @@ export function TagChips({ type, tags }: { type?: string | null; tags: readonly 
   return (
     <ul className="flex flex-wrap gap-1.5">
       {type && (
-        <li className="inline-flex h-[22px] items-center rounded-full bg-brand px-2.5 text-[12px] font-semibold text-brand-fg">
+        <li className="inline-flex h-[22px] items-center rounded-[4px] bg-brand px-2.5 font-mono text-[11px] font-bold uppercase tracking-[0.06em] text-brand-fg">
           {ttype(type as Parameters<typeof ttype>[0])}
         </li>
       )}
       {tags.map((tag) => (
         <li
           key={tag}
-          className="inline-flex h-[22px] items-center rounded-full border border-line px-2 text-[12px] font-semibold text-ink-2"
+          className="inline-flex h-[22px] items-center rounded-[4px] border border-line px-2 font-mono text-[11px] font-medium uppercase tracking-[0.06em] text-ink-2"
         >
           {ttag(tag as Parameters<typeof ttag>[0])}
         </li>
